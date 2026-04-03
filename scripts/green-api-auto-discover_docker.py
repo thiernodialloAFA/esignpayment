@@ -629,7 +629,7 @@ Examples:
     parser.add_argument("--bearer", default="", help="Bearer token for authenticated APIs")
     parser.add_argument("--param", action="append", default=[], help="Path/query param key=value (repeatable)")
     parser.add_argument("--repeat", type=int, default=3, help="Number of repetitions per endpoint (default: 3)")
-    parser.add_argument("--methods", default="get", help="Comma-separated HTTP methods to measure (default: get)")
+    parser.add_argument("--methods", default="get,post,put", help="Comma-separated HTTP methods to measure (default: get)")
     parser.add_argument("--dry-run", action="store_true", help="List endpoints without calling them")
     parser.add_argument("--spectral-config", default="", help="Path to .spectral.yml (auto-detected)")
     parser.add_argument("--network-kwh-per-gb", type=float, default=DEFAULT_NETWORK_KWH_PER_GB)
