@@ -4,6 +4,8 @@ import com.esign.payment.dto.response.ApiResponse;
 import com.esign.payment.dto.response.UserResponse;
 import com.esign.payment.model.User;
 import com.esign.payment.service.KeycloakUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Current user identity (synced from Keycloak)")
 public class AuthController {
 
     private final KeycloakUserService keycloakUserService;
 
     @GetMapping("/me")
+    @Operation(summary = "Get current authenticated user")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         User user = keycloakUserService.getCurrentUser();
         UserResponse response = UserResponse.builder()

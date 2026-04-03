@@ -45,6 +45,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/sign/*/verify-otp").permitAll()
                         .requestMatchers("/api/sign/*").permitAll()
                         .requestMatchers("/api/webhooks/stripe").permitAll()
+                        // Swagger / OpenAPI
+                        .requestMatchers("/api/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())

@@ -5,6 +5,8 @@ import com.esign.payment.dto.request.CreatePaymentRequest;
 import com.esign.payment.dto.response.ApiResponse;
 import com.esign.payment.dto.response.PaymentResponse;
 import com.esign.payment.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,7 @@ public class PaymentController {
      * Confirms a payment after 3D Secure authentication on the frontend.
      */
     @PostMapping("/confirm")
+    @Operation(summary = "Confirm payment after 3D Secure")
     public ResponseEntity<ApiResponse<PaymentResponse>> confirmPayment(
             @Valid @RequestBody ConfirmPaymentRequest request) {
         PaymentResponse payment = paymentService.confirmPayment(request.getPaymentIntentId());
@@ -47,6 +50,7 @@ public class PaymentController {
      * Returns the Stripe publishable key for frontend initialization.
      */
     @GetMapping("/config")
+    @Operation(summary = "Get Stripe publishable key")
     public ResponseEntity<ApiResponse<Map<String, String>>> getPaymentConfig() {
         Map<String, String> config = Map.of(
                 "publishableKey", paymentService.getStripePublishableKey()
@@ -55,18 +59,21 @@ public class PaymentController {
     }
 
     @GetMapping
+    @Operation(summary = "List my payments")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getMyPayments() {
         List<PaymentResponse> payments = paymentService.getMyPayments();
         return ResponseEntity.ok(ApiResponse.success(payments));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get payment detail")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(@PathVariable UUID id) {
         PaymentResponse payment = paymentService.getPayment(id);
         return ResponseEntity.ok(ApiResponse.success(payment));
     }
 
     @PostMapping("/{id}/cancel")
+    @Operation(summary = "Cancel a payment")
     public ResponseEntity<ApiResponse<PaymentResponse>> cancelPayment(@PathVariable UUID id) {
         PaymentResponse payment = paymentService.cancelPayment(id);
         return ResponseEntity.ok(ApiResponse.success("Payment cancelled", payment));

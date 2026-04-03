@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Green API Score Dashboard — Devoxx France 2026</title>
+    <style>
+        :root {
+            --green-50: #f0fdf4; --green-100: #dcfce7; --green-200: #bbf7d0;
+            --green-400: #4ade80; --green-500: #22c55e; --green-600: #16a34a;
+            --green-700: #15803d; --green-800: #166534; --green-900: #14532d;
+            --red-400: #f87171; --red-500: #ef4444;
+            --yellow-400: #facc15; --yellow-500: #eab308;
+            --blue-400: #60a5fa; --blue-500: #3b82f6;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--green-900) 100%);
+            color: var(--gray-100);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 2.15rem;
+            background: linear-gradient(135deg, var(--green-400), var(--green-200));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .header .subtitle {
+            color: var(--gray-400);
+            font-size: 1.0rem;
+        }
+        .header .badge {
+            display: inline-block;
+            background: var(--green-800);
+            color: var(--green-200);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 17px; max-width: 1400px; margin: 0 auto; }
+        .card {
+            background: rgba(31,41,55,0.85);
+            border: 1px solid var(--gray-700);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+        .card h2 {
+            font-size: 1.05rem;
+            color: var(--green-400);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .score-hero {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px;
+        }
+        .score-circle {
+            width: 175px; height: 175px;
+            border-radius: 50%;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+        .score-circle .number { font-size: 3.0rem; font-weight: 800; }
+        .score-circle .max { font-size: 0.92rem; color: var(--gray-400); }
+        .score-circle .grade {
+            position: absolute;
+            top: -9px; right: -9px;
+            background: var(--green-500);
+            color: white;
+            width: 43px; height: 43px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem; font-weight: 800;
+            box-shadow: var(--shadow-lg);
+        }
+        .rule-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-700);
+        }
+        .rule-row:last-child { border-bottom: none; }
+        .rule-name { font-weight: 600; font-size: 0.9rem; }
+        .rule-score {
+            display: inline-block;
+            padding: 3px 11px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .rule-score.good { background: var(--green-800); color: var(--green-200); }
+        .rule-score.medium { background: rgba(234,179,8,0.2); color: var(--yellow-400); }
+        .rule-score.bad { background: rgba(239,68,68,0.2); color: var(--red-400); }
+        .bar-container { width: 100%; background: var(--gray-700); border-radius: 6px; height: 21px; overflow: hidden; margin: 5px 0; }
+        .bar { height: 100%; border-radius: 6px; transition: width 0.8s ease; display: flex; align-items: center; padding-left: 7px; font-size: 0.7rem; font-weight: 600; color: white; }
+        .bar.baseline { background: var(--red-500); }
+        .bar.optimized { background: var(--green-500); }
+        .bar.time-baseline { background: linear-gradient(90deg, var(--red-500), var(--red-400)); }
+        .bar.time-optimized { background: linear-gradient(90deg, var(--green-500), var(--green-400)); }
+        .time-row { margin-bottom: 10px; }
+        .time-row .endpoint-label { font-size: 0.82rem; color: var(--gray-300); margin-bottom: 4px; font-weight: 600; }
+        .time-pair { display: grid; grid-template-columns: 65px 1fr 75px; align-items: center; gap: 7px; margin: 3px 0; }
+        .time-pair .label { font-size: 0.72rem; color: var(--gray-400); text-align: right; }
+        .time-pair .bar-container { margin: 0; height: 16px; }
+        .time-pair .value { font-size: 0.72rem; color: var(--gray-300); font-weight: 600; }
+        .time-speedup { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 0.66rem; font-weight: 700; margin-left: 7px; }
+        .time-speedup.faster { background: var(--green-800); color: var(--green-200); }
+        .time-speedup.slower { background: rgba(239,68,68,0.2); color: var(--red-400); }
+        .comparison-row { margin-bottom: 12px; }
+        .comparison-label { font-size: 0.82rem; color: var(--gray-400); margin-bottom: 4px; }
+        .comparison-values { display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--gray-300); }
+        .gain-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+        .gain-badge.positive { background: var(--green-800); color: var(--green-200); }
+        .gain-badge.negative { background: rgba(239,68,68,0.2); color: var(--red-400); }
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .metric-item { text-align: center; padding: 10px; background: var(--gray-800); border-radius: 8px; }
+        .metric-value { font-size: 1.4rem; font-weight: 800; color: var(--green-400); }
+        .metric-label { font-size: 0.75rem; color: var(--gray-400); margin-top: 3px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+        th { text-align: left; color: var(--green-400); padding: 6px 5px; border-bottom: 2px solid var(--gray-600); }
+        td { padding: 6px 5px; border-bottom: 1px solid var(--gray-700); }
+        .history-chart { width: 100%; height: 180px; position: relative; }
+        .empty-state { text-align: center; padding: 32px; color: var(--gray-500); }
+        .empty-state .icon { font-size: 2.6rem; margin-bottom: 10px; }
+        #timeline-canvas { width: 100%; height: 180px; }
+        .footer { text-align: center; margin-top: 32px; color: var(--gray-500); font-size: 0.8rem; }
+        .footer a { color: var(--green-400); text-decoration: none; }
+
+        /* ─── Accordéon ─────────────────────────────────────── */
+        .accordion-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--green-400);
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 0;
+            text-align: left;
+            font-family: inherit;
+        }
+        .accordion-toggle:hover { color: var(--green-200); }
+        .accordion-toggle .chevron {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+            font-size: 0.85rem;
+        }
+        .accordion-toggle[aria-expanded="false"] .chevron {
+            transform: rotate(-90deg);
+        }
+        .accordion-toggle[aria-expanded="true"] .chevron {
+            transform: rotate(0deg);
+        }
+        .accordion-body {
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.3s ease;
+            max-height: 5000px;
+            opacity: 1;
+        }
+        .accordion-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+        .accordion-body:not(.collapsed) {
+            margin-top: 13px;
+        }
+
+        /* ─── Layout principal : sidebar + contenu ────────── */
+        .dashboard-layout {
+            display: flex;
+            gap: 17px;
+            max-width: 1680px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .sidebar-panel {
+            width: 250px;
+            min-width: 250px;
+            background: rgba(31,41,55,0.92);
+            border: 1px solid var(--gray-700);
+            border-radius: var(--radius);
+            padding: 17px 14px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar-panel h3 {
+            font-size: 0.94rem;
+            color: var(--green-400);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sidebar-panel .param-group {
+            margin-bottom: 15px;
+        }
+        .sidebar-panel .param-label {
+            display: block;
+            font-size: 0.76rem;
+            color: var(--gray-300);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .sidebar-panel .param-sublabel {
+            display: block;
+            font-size: 0.66rem;
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+        .sidebar-panel input[type="range"] {
+            width: 100%;
+            accent-color: var(--green-500);
+            cursor: pointer;
+        }
+        .sidebar-panel input[type="number"] {
+            width: 100%;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-100);
+            border-radius: 6px;
+            padding: 5px 9px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .sidebar-panel input[type="number"]:focus {
+            outline: none;
+            border-color: var(--green-500);
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.25);
+        }
+        .sidebar-panel .param-value {
+            display: inline-block;
+            background: var(--green-800);
+            color: var(--green-200);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            float: right;
+        }
+        .sidebar-panel .reset-btn {
+            width: 100%;
+            margin-top: 7px;
+            background: var(--gray-700);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-300);
+            padding: 7px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.76rem;
+            transition: all 0.2s;
+        }
+        .sidebar-panel .reset-btn:hover {
+            background: var(--green-700);
+            border-color: var(--green-500);
+            color: white;
+        }
+        .dashboard-main {
+            flex: 1;
+            min-width: 0;
+        }
+        .dashboard-main .grid {
+            max-width: 100%;
+        }
+
+        /* ─── Sidebar droite : actions ────────────────────── */
+        .sidebar-right {
+            width: 208px;
+            min-width: 208px;
+            background: rgba(31,41,55,0.92);
+            border: 1px solid var(--gray-700);
+            border-radius: var(--radius);
+            padding: 17px 14px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .sidebar-right h3 {
+            font-size: 0.94rem;
+            color: var(--green-400);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sidebar-right .action-btn,
+        .sidebar-right .action-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            width: 100%;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-200);
+            padding: 9px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: left;
+            font-family: inherit;
+        }
+        .sidebar-right .action-btn:hover,
+        .sidebar-right .action-label:hover {
+            background: var(--green-700);
+            border-color: var(--green-500);
+            color: white;
+        }
+        .sidebar-right input[type="file"] { display: none; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.4rem; }
+            .grid { grid-template-columns: 1fr; }
+            .score-circle { width: 135px; height: 135px; }
+            .score-circle .number { font-size: 2.25rem; }
+            .dashboard-layout { flex-direction: column; }
+            .sidebar-panel, .sidebar-right { width: 100%; min-width: 0; position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌿 Green API Score Dashboard</h1>
+        <div class="subtitle">Green Architecture : moins de gras, plus d'impact, plus d'efficacité !</div>
+        <div class="badge">Devoxx France 2026 — Tools in Action</div>
+    </div>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar : Paramétrage Énergie -->
+        <div class="sidebar-panel" id="energy-params-panel">
+            <h3>⚙️ Paramètres énergie</h3>
+
+            <div class="param-group">
+                <label class="param-label">
+                    🌐 Réseau (kWh/GB)
+                    <span class="param-value" id="val-network">0.06</span>
+                </label>
+                <input type="range" id="param-network" min="0.01" max="0.30" step="0.01" value="0.06">
+                <span class="param-sublabel">The Shift Project : 0.06 — Haut : 0.20</span>
+            </div>
+
+            <div class="param-group">
+                <label class="param-label">
+                    🖥️ Puissance serveur (W)
+                    <span class="param-value" id="val-server">25</span>
+                </label>
+                <input type="range" id="param-server" min="5" max="200" step="1" value="25">
+                <span class="param-sublabel">VM légère : 10W — Bare metal : 150W</span>
+            </div>
+
+            <div class="param-group">
+                <label class="param-label">
+                    📊 Requêtes / jour
+                    <span class="param-value" id="val-reqday">10000</span>
+                </label>
+                <input type="number" id="param-reqday" min="1" max="100000000" value="10000">
+                <span class="param-sublabel">Projection journalière</span>
+            </div>
+
+            <div class="param-group">
+                <label class="param-label">
+                    📅 Jours / an
+                    <span class="param-value" id="val-days">365</span>
+                </label>
+                <input type="number" id="param-days" min="1" max="365" value="365">
+                <span class="param-sublabel">Projection annuelle</span>
+            </div>
+
+            <div class="param-group" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-600);">
+                <label class="param-label" style="font-size:0.85rem;">📋 Projection énergie</label>
+                <div style="font-size:0.8rem;color:var(--gray-300);line-height:1.7;" id="projection-summary">
+                    —
+                </div>
+            </div>
+
+            <div class="param-group" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-600);">
+                <label class="param-label">
+                    🌍 Pays d'hébergement
+                    <span class="param-value" id="val-country-co2">53</span> gCO2/kWh
+                </label>
+                <select id="param-country" style="width:100%;background:var(--gray-800);border:1px solid var(--gray-600);color:var(--gray-100);border-radius:6px;padding:6px 10px;font-size:0.85rem;font-weight:600;">
+                    <option value="53" selected>🇫🇷 France — 53 gCO2/kWh</option>
+                    <option value="385">🇩🇪 Allemagne — 385 gCO2/kWh</option>
+                    <option value="233">🇬🇧 Royaume-Uni — 233 gCO2/kWh</option>
+                    <option value="200">🇪🇸 Espagne — 200 gCO2/kWh</option>
+                    <option value="371">🇮🇹 Italie — 371 gCO2/kWh</option>
+                    <option value="397">🇺🇸 États-Unis — 397 gCO2/kWh</option>
+                    <option value="21">🇨🇦 Canada — 21 gCO2/kWh</option>
+                    <option value="45">🇸🇪 Suède — 45 gCO2/kWh</option>
+                    <option value="29">🇳🇴 Norvège — 29 gCO2/kWh</option>
+                    <option value="340">🇳🇱 Pays-Bas — 340 gCO2/kWh</option>
+                    <option value="155">🇧🇪 Belgique — 155 gCO2/kWh</option>
+                    <option value="440">🇵🇱 Pologne — 440 gCO2/kWh</option>
+                    <option value="709">🇨🇳 Chine — 709 gCO2/kWh</option>
+                    <option value="708">🇮🇳 Inde — 708 gCO2/kWh</option>
+                    <option value="478">🇯🇵 Japon — 478 gCO2/kWh</option>
+                    <option value="424">🇰🇷 Corée du Sud — 424 gCO2/kWh</option>
+                    <option value="656">🇦🇺 Australie — 656 gCO2/kWh</option>
+                    <option value="24">🇧🇷 Brésil — 24 gCO2/kWh</option>
+                    <option value="410">🇿🇦 Afrique du Sud — 410 gCO2/kWh</option>
+                    <option value="100">🇨🇭 Suisse — 100 gCO2/kWh</option>
+                </select>
+                <span class="param-sublabel">Source : Electricity Maps / AIE 2024</span>
+            </div>
+
+            <button class="reset-btn" onclick="resetEnergyParams()">🔄 Réinitialiser par défaut</button>
+        </div>
+
+        <!-- Main dashboard -->
+        <div class="dashboard-main">
+            <div class="grid" id="main-grid">
+        <!-- Score Hero -->
+        <div class="card score-hero" id="score-hero">
+            <div class="empty-state" id="empty-state">
+                <div class="icon">📊</div>
+                <p>Chargez un rapport JSON généré par <code>green-score-analyzer.sh</code></p>
+                <p style="margin-top:8px;font-size:0.85rem;">ou cliquez sur "Données démo" pour voir un aperçu</p>
+            </div>
+            <div id="score-display" style="display:none;">
+                <div class="score-circle" id="score-circle">
+                    <span class="number" id="score-number">0</span>
+                    <span class="max" id="score-max">/ 9</span>
+                    <span class="grade" id="score-grade">—</span>
+                </div>
+                <div style="color:var(--gray-400);margin-top:8px;" id="score-timestamp"></div>
+            </div>
+        </div>
+
+        <!-- Rules Breakdown -->
+        <div class="card" id="rules-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📋 Détail par règle API Green Score <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="rules-accordion">
+                <div id="rules-list"></div>
+            </div>
+        </div>
+
+        <!-- Before/After Comparison -->
+        <div class="card" id="comparison-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Avant / Après — Payload (bytes) <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="comparison-accordion">
+                <div id="comparison-bars"></div>
+            </div>
+        </div>
+
+        <!-- Response Times -->
+        <div class="card" id="response-times-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⏱️ Temps de réponse (secondes) <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="response-times-accordion">
+                <div id="response-times-bars"></div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="card" id="metrics-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">🔑 Métriques clés <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="metrics-accordion">
+                <div class="metric-grid" id="metrics-grid"></div>
+            </div>
+        </div>
+
+        <!-- Energy Summary -->
+        <div class="card" id="energy-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⚡ Résumé énergie <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="energy-accordion">
+                <div class="metric-grid" id="energy-grid"></div>
+                <p style="margin-top:10px;font-size:0.75rem;color:var(--gray-400);">Modèle : réseau 0.06 kWh/GB (The Shift Project) + serveur 25W estimé.</p>
+            </div>
+        </div>
+
+        <!-- CO2 Emissions Equivalent -->
+        <div class="card" id="co2-card" style="display:none;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">🌍 Équivalent Émissions CO₂ <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="co2-accordion">
+                <div class="metric-grid" id="co2-grid"></div>
+                <p style="margin-top:10px;font-size:0.75rem;color:var(--gray-400);" id="co2-source-label">Source : Electricity Maps / AIE 2024 — Pays : France (53 gCO₂/kWh)</p>
+            </div>
+        </div>
+
+
+        <!-- Measurements Table -->
+        <div class="card" id="table-card" style="display:none;grid-column:1/-1;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📐 Détail des mesures <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="table-accordion">
+                <div style="overflow-x:auto;">
+                    <table id="measurements-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>HTTP</th>
+                                <th>Taille (bytes)</th>
+                                <th>Temps (s)</th>
+                                <th>⚡ Énergie réseau (Wh)</th>
+                                <th>⚡ Énergie serveur (Wh)</th>
+                                <th>⚡ Énergie totale (Wh)</th>
+                                <th>🌍 CO₂ (g)</th>
+                                <th>Règle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="measurements-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Timeline -->
+        <div class="card" id="history-card" style="display:none;grid-column:1/-1;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📈 Historique des scores <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="history-accordion">
+                <canvas id="timeline-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Energy History Timeline -->
+        <div class="card" id="energy-history-card" style="display:none;grid-column:1/-1;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⚡ Historique Consommation Énergie <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="energy-history-accordion">
+                <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
+                    <span style="color:#ef4444;">● Énergie naive / full (Wh)</span>
+                    <span style="color:#22c55e;">● Énergie optimisée (Wh)</span>
+                </div>
+                <canvas id="energy-timeline-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- CO2 History Timeline -->
+        <div class="card" id="co2-history-card" style="display:none;grid-column:1/-1;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">🌍 Historique Émissions CO₂ <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="co2-history-accordion">
+                <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
+                    <span style="color:#ef4444;">● CO₂ naive (g)</span>
+                    <span style="color:#3b82f6;">● CO₂ optimisée (g)</span>
+                </div>
+                <canvas id="co2-timeline-canvas"></canvas>
+            </div>
+        </div>
+        </div>
+    </div><!-- /dashboard-main -->
+
+        <!-- Sidebar droite : Actions -->
+        <div class="sidebar-right" id="actions-panel">
+            <h3>🎛️ Actions</h3>
+            <label class="action-label" for="file-input">📂 Charger rapport JSON
+                <input type="file" id="file-input" accept=".json" multiple>
+            </label>
+            <button class="action-btn" onclick="loadFromUrl()">🔗 Charger depuis URL</button>
+            <button class="action-btn" onclick="loadSampleData()">🧪 Données démo</button>
+            <button class="action-btn" onclick="exportPng()">📸 Exporter PNG</button>
+            <button class="action-btn" onclick="clearHistory()" style="border-color:var(--red-500);color:var(--red-400);">🗑️ Réinitialiser</button>
+        </div>
+
+    </div><!-- /dashboard-layout -->
+
+    <div class="footer">
+        <p>🌿 API Green Score — <a href="https://github.com/API-Green-Score/APIGreenScore" target="_blank">Framework</a> |
+        <a href="https://github.com/API-Green-Score/training-student" target="_blank">Training</a> |
+        Devoxx France 2026</p>
+    </div>
+
+<script>
+const STORAGE_KEY = 'green-api-score-history';
+const EMBEDDED_REPORT = {"timestamp": "2026-04-03T12:53:00Z", "green_score": {"total": 90.4, "max": 100, "grade": "A+", "breakdown": {"DE11_pagination": 15, "DE08_fields": 15, "DE01_compression": 8, "DE02_DE03_cache": 15, "DE06_delta": 10, "range_206": 10, "LO01_observability": 5, "US07_rate_limit": 5, "AR02_format_cbor": 7.4}, "details": {"DE11_pagination": {"baseline_bytes": 138327793, "optimized_bytes": 3805, "reduction_pct": 100.0}, "DE08_fields": {"paginated_bytes": 3805, "filtered_bytes": 974, "reduction_pct": 74.4}, "DE01_compression": {"note": "gzip active"}, "DE02_DE03_cache": {"http_code": 304, "body_bytes": 0, "note": "perfect 304"}, "DE06_delta": {"delta_bytes": 178, "full_bytes": 203213429, "reduction_pct": 100.0, "note": "delta endpoint active"}, "range_206": {"http_code": 206, "bytes": 17, "note": "partial content supported"}, "LO01_observability": {"note": "PayloadLoggingFilter detected"}, "US07_rate_limit": {"note": "RateLimitFilter detected"}, "AR02_format_cbor": {"cbor_bytes": 153786191, "json_bytes": 203213429, "reduction_pct": 24.3, "note": "CBOR active"}}}, "measurements": {"baseline": {"full_payload": {"http_code": 200, "size_download": 138327793, "time_total": 1.373071, "speed_download": 100743365}, "single_resource": {"http_code": 200, "size_download": 127, "time_total": 0.229903, "speed_download": 552}, "single_repeat": {"http_code": 200, "size_download": 127, "time_total": 0.215403, "speed_download": 589}}, "optimized": {"pagination": {"http_code": 200, "size_download": 3805, "time_total": 0.387613, "speed_download": 9816}, "fields_filter": {"http_code": 200, "size_download": 974, "time_total": 0.292987, "speed_download": 3324}, "gzip_compression": {"http_code": 200, "size_download": 2457, "time_total": 0.259909, "speed_download": 9453}, "etag_first_call": {"http_code": 200, "size_download": 187, "time_total": 0.247877, "speed_download": 754}, "etag_304": {"http_code": 304, "size_download": 0, "time_total": 0.235458, "speed_download": 0}, "delta_changes": {"http_code": 200, "size_download": 178, "time_total": 0.268048, "speed_download": 664}, "range_206": {"http_code": 206, "size_download": 17, "time_total": 0.217917, "speed_download": 78}, "cbor_format": {"http_code": 200, "size_download": 153786191, "time_total": 1.776668, "speed_download": 86558766}, "full_payload": {"http_code": 200, "size_download": 203213429, "time_total": 1.895557, "speed_download": 107205127}}}, "auto_discovery": {"base_url": "http://localhost:8081", "swagger_url": "http://localhost:8081/v3/api-docs", "endpoints_discovered": 20, "endpoints_measured": 0, "all_measurements": {}, "discovered_endpoints": []}, "spectral": {"issues_count": 0, "errors": 0, "warnings": 0, "infos": 0, "issues": []}};
+
+// ─── State ─────────────────────────────────────────────────────
+let currentReport = null;
+let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+// ─── File Input ────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change', async (e) => {
+    for (const file of e.target.files) {
+        const text = await file.text();
+        try {
+            const report = JSON.parse(text);
+            addToHistory(report);
+            renderReport(report);
+        } catch (err) {
+            alert('Erreur de parsing JSON: ' + err.message);
+        }
+    }
+});
+
+function loadFromUrl() {
+    const url = prompt('URL du rapport JSON:', 'reports/latest-report.json');
+    if (!url) return;
+    fetch(url)
+        .then(r => r.json())
+        .then(report => { addToHistory(report); renderReport(report); })
+        .catch(err => alert('Erreur: ' + err.message));
+}
+
+function addToHistory(report) {
+    // Avoid duplicates by timestamp
+    if (!history.find(h => h.timestamp === report.timestamp)) {
+        // Compute energy & CO2 for this report
+        const m = report.measurements || {};
+        const optKeys = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
+        let eWh = 0;
+        for (const k of optKeys) {
+            const ep = m.optimized?.[k];
+            if (ep) {
+                eWh += energyNetworkWh(ep.size_download || 0) + energyServerWh(ep.time_total || 0);
+            }
+        }
+        const co2 = energyWhToCO2g(eWh);
+
+        // Naive full payload energy (non optimisé)
+        const naiveSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
+        const naiveTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
+        const naiveWh = energyNetworkWh(naiveSize) + energyServerWh(naiveTime);
+        const naiveCO2 = energyWhToCO2g(naiveWh);
+
+        history.push({
+            timestamp: report.timestamp,
+            total: report.green_score.total,
+            max: report.green_score.max || 9,
+            grade: report.green_score.grade,
+            breakdown: report.green_score.breakdown,
+            energyWh: eWh,
+            co2g: co2,
+            naiveEnergyWh: naiveWh,
+            naiveCO2g: naiveCO2
+        });
+        history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+        // Keep last 50
+        if (history.length > 50) history = history.slice(-50);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+}
+
+function clearHistory() {
+    if (confirm('Supprimer tout l\'historique ?')) {
+        history = [];
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
+}
+
+// ─── Render ────────────────────────────────────────────────────
+function renderReport(report) {
+    currentReport = report;
+    const gs = report.green_score;
+    const m = report.measurements;
+
+    // Hero score
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('score-display').style.display = 'block';
+    document.getElementById('score-number').textContent = gs.total;
+    const maxScore = gs.max || 100;
+    const pctScore = maxScore > 0 ? Math.round((gs.total / maxScore) * 100) : 0;
+    document.getElementById('score-max').textContent = '/ ' + maxScore + '  (' + pctScore + '%)';
+    document.getElementById('score-grade').textContent = gs.grade;
+    document.getElementById('score-timestamp').textContent = '📅 ' + report.timestamp;
+
+    // Color the circle
+    const circle = document.getElementById('score-circle');
+    const color = pctScore >= 80 ? 'var(--green-600)' : pctScore >= 50 ? 'var(--yellow-500)' : 'var(--red-500)';
+    circle.style.border = `6px solid ${color}`;
+    circle.style.boxShadow = `0 0 30px ${color}40`;
+    document.getElementById('score-grade').style.background = color;
+
+    // Rules breakdown
+    const rulesCard = document.getElementById('rules-card');
+    rulesCard.style.display = 'block';
+    const rulesList = document.getElementById('rules-list');
+    rulesList.innerHTML = '';
+
+    const ruleLabels = {
+        'DE11_pagination': { name: 'DE11 — Pagination', max: 1, icon: '📄' },
+        'DE08_fields': { name: 'DE08 — Filtrage champs', max: 1, icon: '🔍' },
+        'DE01_compression': { name: 'DE01 — Compression Gzip', max: 1, icon: '🗜️' },
+        'DE02_DE03_cache': { name: 'DE02/03 — Cache ETag/304', max: 1, icon: '💾' },
+        'DE06_delta': { name: 'DE06 — Delta changes', max: 1, icon: '🔄' },
+        'range_206': { name: '206 — Partial Content', max: 1, icon: '✂️' },
+        'LO01_observability': { name: 'LO01 — Observabilité', max: 1, icon: '👁️' },
+        'US07_rate_limit': { name: 'US07 — Rate Limiting', max: 1, icon: '🚦' },
+        'AR02_format_cbor': { name: 'AR02 — Format CBOR', max: 1, icon: '📦' },
+    };
+
+    for (const [key, meta] of Object.entries(ruleLabels)) {
+        const score = gs.breakdown[key] || 0;
+        const passed = score >= meta.max;
+        const cls = passed ? 'good' : 'bad';
+        const detail = gs.details && gs.details[key] ? gs.details[key] : {};
+        const note = detail.reduction_pct ? `(-${detail.reduction_pct}%)` : (detail.note || '');
+        const icon = passed ? '✅' : '❌';
+
+        rulesList.innerHTML += `
+            <div class="rule-row">
+                <div>
+                    <span class="rule-name">${meta.icon} ${meta.name}</span>
+                    <span style="font-size:0.75rem;color:var(--gray-400);margin-left:8px;">${note}</span>
+                </div>
+                <span class="rule-score ${cls}">${icon} ${score} / ${meta.max}</span>
+            </div>`;
+    }
+
+    // Comparison bars
+    const compCard = document.getElementById('comparison-card');
+    compCard.style.display = 'block';
+    const compBars = document.getElementById('comparison-bars');
+    compBars.innerHTML = '';
+
+    const fullNaiveBytes = m.baseline?.full_payload?.size_download || 0;
+    const fullOptBytes = m.optimized?.full_payload?.size_download || fullNaiveBytes;
+
+    // ── Build payload comparisons dynamically or fallback ──
+    let comparisons = [];
+    const discEps = currentReport.auto_discovery?.discovered_endpoints;
+    if (discEps && discEps.length > 0) {
+        const baseRef = fullOptBytes || fullNaiveBytes;
+        for (const ep of discEps) {
+            if ((ep.size_download || 0) === 0) continue;
+            const label = `${ep.method} ${ep.path}`;
+            comparisons.push({ label, baseline: baseRef, optimized: ep.size_download || 0 });
+        }
+    } else {
+        comparisons = [
+            { label: 'Pagination (DE11)', baseline: fullNaiveBytes, optimized: m.optimized?.pagination?.size_download, rule: 'DE11' },
+            { label: 'Fields filter (DE08)', baseline: fullNaiveBytes, optimized: m.optimized?.fields_filter?.size_download, rule: 'DE08' },
+            { label: 'Gzip compression (DE01)', baseline: fullNaiveBytes, optimized: m.optimized?.gzip_compression?.size_download, rule: 'DE01' },
+            { label: 'ETag 304 (DE02)', baseline: fullNaiveBytes, optimized: m.optimized?.etag_304?.size_download, rule: 'DE02' },
+            { label: 'Delta changes (DE06)', baseline: fullOptBytes, optimized: m.optimized?.delta_changes?.size_download, rule: 'DE06', note: 'vs full optimise' },
+            { label: 'Range 206', baseline: fullNaiveBytes, optimized: m.optimized?.range_206?.size_download, rule: '206' },
+            { label: 'CBOR format (AR02)', baseline: fullOptBytes, optimized: m.optimized?.cbor_format?.size_download, rule: 'AR02', note: 'vs full optimise JSON' },
+        ];
+    }
+
+    const maxBytes = Math.max(...comparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 1);
+
+    for (const c of comparisons) {
+        const b = c.baseline || 0;
+        const o = c.optimized || 0;
+        const gain = b > 0 ? Math.round((1 - o / b) * 100) : 0;
+        const gainCls = gain > 0 ? 'positive' : 'negative';
+        const noteHtml = c.note ? ` <span style="font-size:0.7rem;color:var(--gray-400);">(${c.note})</span>` : '';
+
+        compBars.innerHTML += `
+            <div class="comparison-row">
+                <div class="comparison-label">${c.label}${noteHtml} <span class="gain-badge ${gainCls}">${gain > 0 ? '-' : '+'}${Math.abs(gain)}%</span></div>
+                <div class="comparison-values"><span>Avant: ${formatBytes(b)}</span><span>Après: ${formatBytes(o)}</span></div>
+                <div class="bar-container">
+                    <div class="bar baseline" style="width:${(b/maxBytes*100).toFixed(1)}%">${formatBytes(b)}</div>
+                </div>
+                <div class="bar-container">
+                    <div class="bar optimized" style="width:${(o/maxBytes*100).toFixed(1)}%">${formatBytes(o)}</div>
+                </div>
+            </div>`;
+    }
+
+    // Response Times card
+    const rtCard = document.getElementById('response-times-card');
+    rtCard.style.display = 'block';
+    const rtBars = document.getElementById('response-times-bars');
+    rtBars.innerHTML = '';
+
+    const bFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
+
+    // ── Build time comparisons dynamically or fallback ──
+    let timeComparisons = [];
+    if (discEps && discEps.length > 0) {
+        for (const ep of discEps) {
+            if ((ep.time_total || 0) === 0) continue;
+            const label = `${ep.method} ${ep.path}`;
+            timeComparisons.push({ label, baseline: bFullTime, optimized: ep.time_total || 0 });
+        }
+    } else {
+        timeComparisons = [
+            { label: 'GET /books (full naif)', baseline: bFullTime, optimized: bFullTime },
+            { label: 'GET /books (paginated)', baseline: bFullTime, optimized: m.optimized?.pagination?.time_total },
+            { label: 'GET /books/select (fields)', baseline: bFullTime, optimized: m.optimized?.fields_filter?.time_total },
+            { label: 'GET /books (gzip)', baseline: bFullTime, optimized: m.optimized?.gzip_compression?.time_total },
+            { label: 'GET /books/1 (1er appel)', baseline: bFullTime, optimized: m.optimized?.etag_first_call?.time_total },
+            { label: 'GET /books/1 (ETag 304)', baseline: bFullTime, optimized: m.optimized?.etag_304?.time_total },
+            { label: 'GET /books/changes (delta)', baseline: bFullTime, optimized: m.optimized?.delta_changes?.time_total },
+            { label: 'GET /books/1/summary (range)', baseline: bFullTime, optimized: m.optimized?.range_206?.time_total },
+        ];
+    }
+
+    const maxTime = Math.max(...timeComparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 0.001);
+
+    for (const tc of timeComparisons) {
+        const bt = tc.baseline || 0;
+        const ot = tc.optimized || 0;
+        let speedupHtml = '';
+        if (bt > 0 && ot > 0) {
+            const speedup = Math.round((1 - ot / bt) * 100);
+            const cls = speedup > 0 ? 'faster' : 'slower';
+            speedupHtml = `<span class=\"time-speedup ${cls}\">${speedup > 0 ? '⚡' : '🐢'} ${speedup > 0 ? '-' : '+'}${Math.abs(speedup)}%</span>`;
+        }
+        rtBars.innerHTML += `
+            <div class=\"time-row\">
+                <div class=\"endpoint-label\">${tc.label} ${speedupHtml}</div>
+                ${bt > 0 ? `
+                <div class=\"time-pair\">
+                    <div class=\"label\">Full naive</div>
+                    <div class=\"bar-container\"><div class=\"bar time-baseline\" style=\"width:${(bt/maxTime*100).toFixed(1)}%\"></div></div>
+                    <div class=\"value\">${bt.toFixed(3)}s</div>
+                </div>` : ''}
+                <div class=\"time-pair\">
+                    <div class=\"label\">Mesure</div>
+                    <div class=\"bar-container\"><div class=\"bar time-optimized\" style=\"width:${(ot/maxTime*100).toFixed(1)}%\"></div></div>
+                    <div class=\"value\">${ot.toFixed(3)}s</div>
+                </div>
+            </div>`;
+    }
+
+    // Key metrics
+    const metricsCard = document.getElementById('metrics-card');
+    metricsCard.style.display = 'block';
+    const mg = document.getElementById('metrics-grid');
+    const bFull = m.baseline?.full_payload?.size_download || 0;
+    const oGzip = m.optimized?.gzip_compression?.size_download || 0;
+    const etag304 = m.optimized?.etag_304?.http_code || 0;
+    const totalGain = bFull > 0 ? Math.round((1 - oGzip / bFull) * 100) : 0;
+
+    // Temps moyens
+    const baselineTimes = [m.baseline?.full_payload?.time_total, m.baseline?.single_resource?.time_total].filter(t => t > 0);
+    const optimizedTimes = [
+        m.optimized?.pagination?.time_total,
+        m.optimized?.fields_filter?.time_total,
+        m.optimized?.gzip_compression?.time_total,
+        m.optimized?.etag_first_call?.time_total,
+        m.optimized?.etag_304?.time_total,
+    ].filter(t => t > 0);
+    const avgBaseline = baselineTimes.length > 0 ? baselineTimes.reduce((a,b)=>a+b,0) / baselineTimes.length : 0;
+    const avgOptimized = optimizedTimes.length > 0 ? optimizedTimes.reduce((a,b)=>a+b,0) / optimizedTimes.length : 0;
+    const timeGain = avgBaseline > 0 ? Math.round((1 - avgOptimized / avgBaseline) * 100) : 0;
+
+    mg.innerHTML = `
+        <div class="metric-item"><div class="metric-value">${formatBytes(bFull)}</div><div class="metric-label">Baseline payload</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(oGzip)}</div><div class="metric-label">Optimized + Gzip</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${totalGain>50?'var(--green-400)':'var(--yellow-400)'}">${totalGain}%</div><div class="metric-label">Réduction payload</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${etag304===304?'var(--green-400)':'var(--red-400)'}">${etag304}</div><div class="metric-label">HTTP code ETag</div></div>
+        <div class="metric-item"><div class="metric-value">${avgBaseline.toFixed(3)}s</div><div class="metric-label">Temps moyen baseline</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${avgOptimized.toFixed(3)}s</div><div class="metric-label">Temps moyen optimisé</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${timeGain>0?'var(--green-400)':'var(--red-400)'}">⚡ ${timeGain}%</div><div class="metric-label">Gain temps réponse</div></div>
+        <div class="metric-item"><div class="metric-value">${gs.total}/${maxScore}</div><div class="metric-label">Score (${gs.grade})</div></div>
+    `;
+
+    // ─── Energy Summary card ───────────────────────────────────────
+    const energyCard = document.getElementById('energy-card');
+    energyCard.style.display = 'block';
+    const eg = document.getElementById('energy-grid');
+
+    // Énergie globale : somme de tous les endpoints optimisés vs baseline (full naive × N)
+    const optKeysEnergy = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
+    let optEnergyNet = 0, optEnergySrv = 0, optEndpointCount = 0;
+    for (const k of optKeysEnergy) {
+        const ep = m.optimized?.[k];
+        if (ep) {
+            optEnergyNet += energyNetworkWh(ep.size_download || 0);
+            optEnergySrv += energyServerWh(ep.time_total || 0);
+            optEndpointCount++;
+        }
+    }
+    const optEnergyTotal = optEnergyNet + optEnergySrv;
+
+    // Baseline : 1 appel full payload naïf (même dataset = optimized full)
+    const baselineFullSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
+    const baselineFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
+    const baselineEnergyNet = energyNetworkWh(baselineFullSize);
+    const baselineEnergySrv = energyServerWh(baselineFullTime);
+    const baselineEnergyTotal = baselineEnergyNet + baselineEnergySrv;
+
+    const energyGainPct = baselineEnergyTotal > 0 ? Math.round((1 - optEnergyTotal / baselineEnergyTotal) * 100) : 0;
+    const energySaved = baselineEnergyTotal - optEnergyTotal;
+
+    eg.innerHTML = `
+        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyTotal)}</div><div class="metric-label">Énergie API naive</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyTotal)}</div><div class="metric-label">Énergie API optimisée</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyNet)}</div><div class="metric-label">Réseau (naive)</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyNet)}</div><div class="metric-label">Réseau (optimisé)</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergySrv)}</div><div class="metric-label">Serveur (naive)</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergySrv)}</div><div class="metric-label">Serveur (optimisé)</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${energyGainPct>0?'var(--green-400)':'var(--red-400)'}">⚡ ${energyGainPct}%</div><div class="metric-label">Gain énergie global</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(energySaved)}</div><div class="metric-label">Énergie économisée</div></div>
+    `;
+
+    // ─── CO2 Emissions card ────────────────────────────────────────
+    const co2Card = document.getElementById('co2-card');
+    co2Card.style.display = 'block';
+    const co2g = document.getElementById('co2-grid');
+    const co2Source = document.getElementById('co2-source-label');
+
+    const baselineCO2 = energyWhToCO2g(baselineEnergyTotal);
+    const optCO2 = energyWhToCO2g(optEnergyTotal);
+    const co2Saved = baselineCO2 - optCO2;
+    const co2GainPct = baselineCO2 > 0 ? Math.round((1 - optCO2 / baselineCO2) * 100) : 0;
+
+    // Projection annuelle CO2
+    const reqDay = getReqPerDay();
+    const daysYear = getDaysPerYear();
+    const reqYear = reqDay * daysYear;
+    const co2SavedYear = co2Saved * reqYear;
+
+    co2g.innerHTML = `
+        <div class="metric-item"><div class="metric-value">${formatCO2(baselineCO2)}</div><div class="metric-label">CO₂ naive / appel</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(optCO2)}</div><div class="metric-label">CO₂ optimisée / appel</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2Saved)}</div><div class="metric-label">CO₂ économisé / appel</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${co2GainPct>0?'var(--green-400)':'var(--red-400)'}">🌍 ${co2GainPct}%</div><div class="metric-label">Réduction CO₂</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2SavedYear)}</div><div class="metric-label">CO₂ économisé / an<br><small style="color:var(--gray-400)">(${reqDay.toLocaleString('fr-FR')} req/j × ${daysYear}j)</small></div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_CAR_G_PER_KM))} 🚗</div><div class="metric-label">Équiv. voiture<br><small style="color:var(--gray-400)">${CO2_CAR_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_PLANE_G_PER_KM))} ✈️</div><div class="metric-label">Équiv. avion<br><small style="color:var(--gray-400)">${CO2_PLANE_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_TRAIN_G_PER_KM))} 🚄</div><div class="metric-label">Équiv. train<br><small style="color:var(--gray-400)">${CO2_TRAIN_G_PER_KM} gCO₂/km</small></div></div>
+    `;
+    co2Source.textContent = 'Source : Electricity Maps / AIE 2024 — ' + getSelectedCountryLabel();
+
+    // Update sidebar projection
+    updateProjectionSummary();
+
+    // Measurements table
+    const tableCard = document.getElementById('table-card');
+    tableCard.style.display = 'block';
+    const tbody = document.getElementById('measurements-body');
+    tbody.innerHTML = '';
+
+    // ── Build rows dynamically from auto_discovery or fallback to legacy ──
+    let rows = [];
+    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    if (disc && disc.length > 0) {
+        // Dynamic rows from auto-discovered endpoints
+        for (const ep of disc) {
+            const label = `${ep.method} ${ep.path}${ep.summary ? ' (' + ep.summary + ')' : ''}`;
+            // Try to detect rule from path
+            const pl = ep.path.toLowerCase();
+            let rule = '--';
+            if (pl.includes('change') || pl.includes('delta')) rule = 'DE06';
+            else if (pl.includes('cbor') || pl.includes('protobuf')) rule = 'AR02';
+            else if (pl.includes('select') || pl.includes('fields')) rule = 'DE08';
+            else if (pl.includes('summary')) rule = '206';
+            rows.push({
+                ep: label,
+                http_code: ep.http_code || 0,
+                size_download: ep.size_download || 0,
+                time_total: ep.time_total || 0,
+                speed_download: ep.speed_download || 0,
+                rule: rule,
+            });
+        }
+    } else {
+        // Legacy fallback: hardcoded keys
+        rows = [
+            { ep: 'GET /books (full naif)', ...(m.optimized?.full_payload || m.baseline?.full_payload), rule: '--' },
+            { ep: 'GET /books/1 (baseline)', ...m.baseline?.single_resource, rule: '--' },
+            { ep: 'GET /books?page&size', ...m.optimized?.pagination, rule: 'DE11' },
+            { ep: 'GET /books/select?fields', ...m.optimized?.fields_filter, rule: 'DE08' },
+            { ep: 'GET /books/select (gzip)', ...m.optimized?.gzip_compression, rule: 'DE01' },
+            { ep: 'GET /books/1 (ETag 1st)', ...m.optimized?.etag_first_call, rule: 'DE02' },
+            { ep: 'GET /books/1 (ETag 304)', ...m.optimized?.etag_304, rule: 'DE02/03' },
+            { ep: 'GET /books/changes', ...m.optimized?.delta_changes, rule: 'DE06' },
+            { ep: 'GET /books/1/summary (206)', ...m.optimized?.range_206, rule: '206' },
+            { ep: 'GET /books/cbor', ...m.optimized?.cbor_format, rule: 'AR02' },
+        ].filter(r => r.http_code);
+    }
+
+    for (const r of rows) {
+        const code = r.http_code || 0;
+        const codeColor = code === 304 ? 'var(--blue-400)' : code === 206 ? 'var(--yellow-400)' : code === 200 ? 'var(--green-400)' : 'var(--red-400)';
+        const eNet = energyNetworkWh(r.size_download || 0);
+        const eSrv = energyServerWh(r.time_total || 0);
+        const eTotal = eNet + eSrv;
+        const eCO2 = energyWhToCO2g(eTotal);
+        tbody.innerHTML += `<tr>
+            <td>${r.ep}</td>
+            <td style="color:${codeColor};font-weight:700;">${code}</td>
+            <td>${formatBytes(r.size_download || 0)}</td>
+            <td>${(r.time_total || 0).toFixed(3)}</td>
+            <td>${formatEnergy(eNet)}</td>
+            <td>${formatEnergy(eSrv)}</td>
+            <td style="font-weight:700;color:var(--green-400)">${formatEnergy(eTotal)}</td>
+            <td style="font-weight:700;color:var(--blue-400)">${formatCO2(eCO2)}</td>
+            <td><span style="color:var(--green-400)">${r.rule}</span></td>
+        </tr>`;
+    }
+
+    // History
+    renderHistory();
+    renderEnergyHistory();
+    renderCO2History();
+}
+
+function renderHistory() {
+    const card = document.getElementById('history-card');
+    if (history.length < 1) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+
+    const canvas = document.getElementById('timeline-canvas');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = 200 * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = '200px';
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width;
+    const H = 200;
+    const pad = { top: 20, right: 30, bottom: 40, left: 50 };
+    const plotW = W - pad.left - pad.right;
+    const plotH = H - pad.top - pad.bottom;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Determine max for Y-axis from history
+    const histMax = Math.max(...history.map(h => h.max || 9), 9);
+
+    // Grid
+    ctx.strokeStyle = '#374151';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.top + (plotH / 4) * i;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        ctx.fillStyle = '#9ca3af'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText(Math.round(histMax - (histMax / 4) * i).toString(), pad.left - 8, y + 4);
+    }
+
+    // Plot
+    if (history.length === 1) {
+        const x = pad.left + plotW / 2;
+        const y = pad.top + plotH * (1 - history[0].total / histMax);
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#d1d5db'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(history[0].total + '/' + (history[0].max || histMax) + ' (' + history[0].grade + ')', x, y - 12);
+        ctx.fillText(history[0].timestamp.slice(0, 10), x, H - 8);
+    } else {
+        const n = history.length;
+        const stepX = plotW / (n - 1);
+
+        // Line
+        ctx.beginPath();
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i;
+            const y = pad.top + plotH * (1 - history[i].total / histMax);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Points + labels
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i;
+            const y = pad.top + plotH * (1 - history[i].total / histMax);
+            const pctI = Math.round((history[i].total / (history[i].max || histMax)) * 100);
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = pctI >= 80 ? '#22c55e' : pctI >= 50 ? '#eab308' : '#ef4444';
+            ctx.fill();
+            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(history[i].total + '/' + (history[i].max || histMax), x, y - 10);
+            if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
+                ctx.fillText(history[i].timestamp.slice(5, 10), x, H - 8);
+            }
+        }
+    }
+}
+
+// ─── Accordion ─────────────────────────────────────────────────
+function renderEnergyHistory() {
+    const card = document.getElementById('energy-history-card');
+    const hasData = history.some(h => (h.energyWh || 0) > 0 || (h.naiveEnergyWh || 0) > 0);
+    if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+
+    const canvas = document.getElementById('energy-timeline-canvas');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = 220 * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = '220px';
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width, H = 220;
+    const pad = { top: 20, right: 30, bottom: 40, left: 60 };
+    const plotW = W - pad.left - pad.right;
+    const plotH = H - pad.top - pad.bottom;
+    ctx.clearRect(0, 0, W, H);
+
+    const naiveVals = history.map(h => h.naiveEnergyWh || 0);
+    const energyVals = history.map(h => h.energyWh || 0);
+    const maxY = Math.max(...naiveVals, ...energyVals, 0.0001);
+    const n = history.length;
+
+    // Grid + Y axis
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.top + (plotH / 4) * i;
+        ctx.strokeStyle = '#374151'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        ctx.fillStyle = '#9ca3af'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+        const v = maxY - (maxY / 4) * i;
+        ctx.fillText(v < 0.01 ? v.toExponential(1) : v.toFixed(3), pad.left - 6, y + 4);
+    }
+    // Axis label
+    ctx.save(); ctx.fillStyle = '#9ca3af'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+    ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Énergie (Wh)', 0, 0); ctx.restore();
+
+    function drawCurve(vals, color, dashed) {
+        ctx.setLineDash(dashed ? [6, 3] : []);
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        if (n === 1) {
+            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(vals[0].toFixed(4) + ' Wh', x, y - 12);
+        } else {
+            const stepX = plotW / (n - 1);
+            for (let i = 0; i < n; i++) {
+                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            for (let i = 0; i < n; i++) {
+                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
+                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText(vals[i].toFixed(4), x, y - 8);
+                }
+            }
+        }
+        ctx.setLineDash([]);
+    }
+
+    drawCurve(naiveVals, '#ef4444', true);
+    drawCurve(energyVals, '#22c55e', false);
+
+    // Dates
+    if (n === 1) {
+        ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+    } else {
+        const stepX = plotW / (n - 1);
+        for (let i = 0; i < n; i++) {
+            if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(history[i].timestamp.slice(5, 10), pad.left + stepX * i, H - 8);
+            }
+        }
+    }
+}
+
+function renderCO2History() {
+    const card = document.getElementById('co2-history-card');
+    const hasData = history.some(h => (h.co2g || 0) > 0 || (h.naiveCO2g || 0) > 0);
+    if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+
+    const canvas = document.getElementById('co2-timeline-canvas');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = 220 * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = '220px';
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width, H = 220;
+    const pad = { top: 20, right: 30, bottom: 40, left: 60 };
+    const plotW = W - pad.left - pad.right;
+    const plotH = H - pad.top - pad.bottom;
+    ctx.clearRect(0, 0, W, H);
+
+    const naiveCO2 = history.map(h => h.naiveCO2g || 0);
+    const optCO2 = history.map(h => h.co2g || 0);
+    const maxY = Math.max(...naiveCO2, ...optCO2, 0.0001);
+    const n = history.length;
+
+    // Grid + Y axis
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.top + (plotH / 4) * i;
+        ctx.strokeStyle = '#374151'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        ctx.fillStyle = '#9ca3af'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+        const v = maxY - (maxY / 4) * i;
+        ctx.fillText(v < 0.001 ? v.toExponential(1) : v.toFixed(4), pad.left - 6, y + 4);
+    }
+    // Axis label
+    ctx.save(); ctx.fillStyle = '#9ca3af'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+    ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText('CO₂ (g)', 0, 0); ctx.restore();
+
+    function drawCurve(vals, color, dashed) {
+        ctx.setLineDash(dashed ? [6, 3] : []);
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        if (n === 1) {
+            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(vals[0].toFixed(5) + ' g', x, y - 12);
+        } else {
+            const stepX = plotW / (n - 1);
+            for (let i = 0; i < n; i++) {
+                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            for (let i = 0; i < n; i++) {
+                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
+                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText(vals[i].toFixed(5), x, y - 8);
+                }
+            }
+        }
+        ctx.setLineDash([]);
+    }
+
+    drawCurve(naiveCO2, '#ef4444', true);
+    drawCurve(optCO2, '#3b82f6', false);
+
+    // Dates
+    if (n === 1) {
+        ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+    } else {
+        const stepX = plotW / (n - 1);
+        for (let i = 0; i < n; i++) {
+            if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(history[i].timestamp.slice(5, 10), pad.left + stepX * i, H - 8);
+            }
+        }
+    }
+}
+
+function toggleAccordion(btn) {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    const body = btn.nextElementSibling;
+    if (expanded) {
+        body.classList.add('collapsed');
+    } else {
+        body.classList.remove('collapsed');
+    }
+}
+
+// ─── Helpers ───────────────────────────────────────────────────
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// ─── Energy helpers (paramétrable) ─────────────────────────────
+function getEnergyNetworkKwhPerGb() {
+    const el = document.getElementById('param-network');
+    return el ? parseFloat(el.value) : 0.06;
+}
+function getEnergyServerPowerW() {
+    const el = document.getElementById('param-server');
+    return el ? parseFloat(el.value) : 25;
+}
+function getReqPerDay() {
+    const el = document.getElementById('param-reqday');
+    return el ? parseInt(el.value) || 10000 : 10000;
+}
+function getDaysPerYear() {
+    const el = document.getElementById('param-days');
+    return el ? parseInt(el.value) || 365 : 365;
+}
+
+function energyNetworkWh(bytes) {
+    return (bytes / (1024 * 1024 * 1024)) * getEnergyNetworkKwhPerGb() * 1000;
+}
+function energyServerWh(timeSeconds) {
+    return timeSeconds * (getEnergyServerPowerW() / 3600);
+}
+function energyTotalWh(bytes, timeSeconds) {
+    return energyNetworkWh(bytes) + energyServerWh(timeSeconds);
+}
+function formatEnergy(wh) {
+    if (!isFinite(wh) || wh === 0) return '—';
+    if (wh < 0.001) return (wh * 1000).toFixed(3) + ' mWh';
+    if (wh < 1) return wh.toFixed(4) + ' Wh';
+    if (wh < 1000) return wh.toFixed(2) + ' Wh';
+    return (wh / 1000).toFixed(2) + ' kWh';
+}
+
+// ─── CO2 helpers ───────────────────────────────────────────────
+function getCO2FactorGPerKwh() {
+    const el = document.getElementById('param-country');
+    return el ? parseFloat(el.value) : 53;
+}
+function getSelectedCountryLabel() {
+    const el = document.getElementById('param-country');
+    if (!el) return 'France (53 gCO₂/kWh)';
+    return el.options[el.selectedIndex].text;
+}
+function energyWhToCO2g(wh) {
+    return (wh / 1000) * getCO2FactorGPerKwh();
+}
+function formatCO2(grams) {
+    if (!isFinite(grams) || grams === 0) return '—';
+    if (grams < 0.001) return (grams * 1000).toFixed(3) + ' mg';
+    if (grams < 1) return (grams * 1000).toFixed(1) + ' mg';
+    if (grams < 1000) return grams.toFixed(2) + ' g';
+    return (grams / 1000).toFixed(2) + ' kg';
+}
+
+// ─── Équivalences transport CO₂ ───────────────────────────────
+// Sources ADEME 2024 — gCO₂/km/passager
+const CO2_CAR_G_PER_KM    = 120;   // Voiture thermique moyenne EU
+const CO2_PLANE_G_PER_KM  = 255;   // Avion court-courrier
+const CO2_TRAIN_G_PER_KM  = 14;    // Train moyenne EU (6 pour TGV France)
+
+function co2ToKm(grams, gPerKm) {
+    if (!isFinite(grams) || grams <= 0 || gPerKm <= 0) return 0;
+    return grams / gPerKm;
+}
+function formatDistance(km) {
+    if (!isFinite(km) || km <= 0) return '—';
+    if (km < 1) return (km * 1000).toFixed(0) + ' m';
+    if (km < 100) return km.toFixed(1) + ' km';
+    return Math.round(km).toLocaleString('fr-FR') + ' km';
+}
+
+function updateProjectionSummary() {
+    const el = document.getElementById('projection-summary');
+    if (!el || !currentReport) { if (el) el.textContent = '—'; return; }
+    const m = currentReport.measurements;
+    const bFull = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
+    const bTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
+
+    const reqDay = getReqPerDay();
+    const daysYear = getDaysPerYear();
+    const reqYear = reqDay * daysYear;
+
+    // Énergie globale (somme de tous les endpoints optimisés vs baseline × N)
+    const optKeysProj = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
+    let optCount = 0, optSum = 0;
+    for (const k of optKeysProj) {
+        const ep = m.optimized?.[k];
+        if (ep) { optSum += energyTotalWh(ep.size_download || 0, ep.time_total || 0); optCount++; }
+    }
+    const eNaiveGlobal = energyTotalWh(bFull, bTime);
+    const eOptGlobal = optSum;
+    const eSavedGlobal = eNaiveGlobal - eOptGlobal;
+
+    const naiveYear = eNaiveGlobal * reqYear;
+    const optYear = eOptGlobal * reqYear;
+    const savedYear = naiveYear - optYear;
+
+    el.innerHTML = `
+        <div>⚡ Naive : <strong>${formatEnergy(eNaiveGlobal)}</strong></div>
+        <div>🌿 Optimisé : <strong style="color:var(--green-400)">${formatEnergy(eOptGlobal)}</strong></div>
+        <div>💡 Économie : <strong style="color:var(--green-400)">${formatEnergy(eSavedGlobal)}</strong></div>
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-700);">
+            📆 Naive/an : <strong>${formatEnergy(naiveYear)}</strong>
+        </div>
+        <div>📆 Opt./an : <strong style="color:var(--green-400)">${formatEnergy(optYear)}</strong></div>
+        <div>💡 Économie/an : <strong style="color:var(--green-400)">${formatEnergy(savedYear)}</strong></div>
+    `;
+}
+
+// ─── Sidebar event listeners ──────────────────────────────────
+function initEnergyPanel() {
+    const networkSlider = document.getElementById('param-network');
+    const serverSlider = document.getElementById('param-server');
+    const reqInput = document.getElementById('param-reqday');
+    const daysInput = document.getElementById('param-days');
+    const countrySelect = document.getElementById('param-country');
+
+    function onParamChange() {
+        document.getElementById('val-network').textContent = networkSlider.value;
+        document.getElementById('val-server').textContent = serverSlider.value;
+        document.getElementById('val-reqday').textContent = reqInput.value;
+        document.getElementById('val-days').textContent = daysInput.value;
+        document.getElementById('val-country-co2').textContent = countrySelect.value;
+        // Re-render energy parts
+        if (currentReport) renderReport(currentReport);
+    }
+
+    networkSlider.addEventListener('input', onParamChange);
+    serverSlider.addEventListener('input', onParamChange);
+    reqInput.addEventListener('input', onParamChange);
+    daysInput.addEventListener('input', onParamChange);
+    countrySelect.addEventListener('change', onParamChange);
+}
+
+function resetEnergyParams() {
+    document.getElementById('param-network').value = 0.06;
+    document.getElementById('param-server').value = 25;
+    document.getElementById('param-reqday').value = 10000;
+    document.getElementById('param-days').value = 365;
+    document.getElementById('param-country').value = '53';
+    document.getElementById('val-network').textContent = '0.06';
+    document.getElementById('val-server').textContent = '25';
+    document.getElementById('val-reqday').textContent = '10000';
+    document.getElementById('val-days').textContent = '365';
+    document.getElementById('val-country-co2').textContent = '53';
+    if (currentReport) renderReport(currentReport);
+}
+
+async function exportPng() {
+    try {
+        // Lazy-load html2canvas from CDN
+        if (!window.html2canvas) {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        const node = document.body;
+        const canvas = await window.html2canvas(node, { backgroundColor: '#111827', scale: 2 });
+        const link = document.createElement('a');
+        link.download = `green-score-dashboard-${new Date().toISOString().slice(0,19)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        alert('Export PNG indisponible. Vérifiez votre connexion réseau.');
+        console.error(err);
+    }
+}
+
+// ─── Sample Data ───────────────────────────────────────────────
+function loadSampleData() {
+    const sample = {
+        "timestamp": "2026-03-09T10:30:00Z",
+        "green_score": {
+            "total": 8,
+            "max": 9,
+            "percent": 88.9,
+            "grade": "A",
+            "breakdown": {
+                "DE11_pagination": 1,
+                "DE08_fields": 1,
+                "DE01_compression": 1,
+                "DE02_DE03_cache": 1,
+                "DE06_delta": 1,
+                "range_206": 1,
+                "LO01_observability": 1,
+                "US07_rate_limit": 1,
+                "AR02_format_cbor": 0
+            },
+            "details": {
+                "DE11_pagination": { "passed": true, "baseline_bytes": 48500000, "optimized_bytes": 1940 },
+                "DE08_fields": { "passed": true, "paginated_bytes": 1940, "filtered_bytes": 820 },
+                "DE01_compression": { "passed": true, "uncompressed_bytes": 3200, "gzip_bytes": 480 },
+                "DE02_DE03_cache": { "passed": true, "http_code": 304 },
+                "DE06_delta": { "passed": true, "delta_bytes": 2 },
+                "range_206": { "passed": true, "http_code": 206 },
+                "LO01_observability": { "passed": true },
+                "US07_rate_limit": { "passed": true },
+                "AR02_format_cbor": { "passed": false, "note": "not measured" }
+            }
+        },
+        "measurements": {
+            "baseline": {
+                "full_payload": { "http_code": 200, "size_download": 48500000, "time_total": 4.523, "speed_download": 10725000 },
+                "single_resource": { "http_code": 200, "size_download": 142, "time_total": 0.008, "speed_download": 17750 },
+                "single_repeat": { "http_code": 200, "size_download": 142, "time_total": 0.006, "speed_download": 23666 }
+            },
+            "optimized": {
+                "pagination": { "http_code": 200, "size_download": 1940, "time_total": 0.012, "speed_download": 161666 },
+                "fields_filter": { "http_code": 200, "size_download": 820, "time_total": 0.009, "speed_download": 91111 },
+                "gzip_compression": { "http_code": 200, "size_download": 480, "time_total": 0.011, "speed_download": 43636 },
+                "etag_first_call": { "http_code": 200, "size_download": 185, "time_total": 0.005, "speed_download": 37000 },
+                "etag_304": { "http_code": 304, "size_download": 0, "time_total": 0.003, "speed_download": 0 },
+                "delta_changes": { "http_code": 200, "size_download": 2, "time_total": 0.018, "speed_download": 111 },
+                "range_206": { "http_code": 206, "size_download": 200, "time_total": 0.004, "speed_download": 50000 },
+                "cbor_format": { "http_code": 200, "size_download": 38200000, "time_total": 3.8, "speed_download": 10052631 },
+                "full_payload": { "http_code": 200, "size_download": 48500000, "time_total": 4.1, "speed_download": 11829268 }
+            }
+        }
+    };
+    addToHistory(sample);
+
+    // Add a couple more historical points for demo
+    const h1 = { timestamp: "2026-02-15T14:00:00Z", total: 3, max: 9, grade: "D", breakdown: {} };
+    const h2 = { timestamp: "2026-02-22T10:00:00Z", total: 5, max: 9, grade: "C", breakdown: {} };
+    const h3 = { timestamp: "2026-03-01T09:00:00Z", total: 7, max: 9, grade: "B", breakdown: {} };
+    [h1, h2, h3].forEach(h => {
+        if (!history.find(x => x.timestamp === h.timestamp)) history.push(h);
+    });
+    history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+
+    renderReport(sample);
+}
+
+// ─── Auto-load latest if served from same origin ───────────────
+window.addEventListener('DOMContentLoaded', () => {
+    initEnergyPanel();
+    if (EMBEDDED_REPORT) {
+        addToHistory(EMBEDDED_REPORT);
+        renderReport(EMBEDDED_REPORT);
+    } else {
+        fetch('../reports/latest-report.json')
+            .then(r => { if (!r.ok) throw new Error('no report'); return r.json(); })
+            .then(report => { addToHistory(report); renderReport(report); })
+            .catch(() => { /* no latest report, show empty state */ });
+    }
+    renderHistory();
+    renderEnergyHistory();
+    renderCO2History();
+});
+
+window.addEventListener('resize', () => {
+    if (history.length > 0) { renderHistory(); renderEnergyHistory(); renderCO2History(); }
+});
+</script>
+</body>
+</html>
+
+
+

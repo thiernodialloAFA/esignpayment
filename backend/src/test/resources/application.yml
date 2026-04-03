@@ -45,3 +45,7 @@ app:
     enabled: true
     languages: fra+eng
 
+springdoc:
+  api-docs:
+    enabled: false
+

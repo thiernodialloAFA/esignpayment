@@ -6,6 +6,9 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,12 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/webhooks")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Webhooks", description = "External provider webhooks (Stripe)")
 public class StripeWebhookController {
 
     private final PaymentService paymentService;
     private final StripeConfig stripeConfig;
 
     @PostMapping("/stripe")
+    @Operation(summary = "Stripe webhook endpoint (public)")
+    @SecurityRequirements
     public ResponseEntity<String> handleStripeWebhook(
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {

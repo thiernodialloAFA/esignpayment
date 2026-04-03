@@ -11,6 +11,9 @@ import com.esign.payment.dto.response.OtpResponse;
 import com.esign.payment.model.Document;
 import com.esign.payment.service.DocumentService;
 import com.esign.payment.service.OtpService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "Documents", description = "Document upload, e-signature and OTP signing workflows")
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -99,6 +103,8 @@ public class DocumentController {
     }
 
     @GetMapping("/sign/verify/{token}")
+    @Operation(summary = "Verify a signature token (public)")
+    @SecurityRequirements
     public ResponseEntity<ApiResponse<DocumentSignerResponse>> verifySignatureToken(@PathVariable String token) {
         DocumentSignerResponse signer = documentService.verifySignatureToken(token);
         return ResponseEntity.ok(ApiResponse.success(signer));
@@ -108,6 +114,8 @@ public class DocumentController {
      * Sends an OTP code via SMS to the signer's phone number for signature verification.
      */
     @PostMapping("/sign/{token}/send-otp")
+    @Operation(summary = "Send OTP code via SMS to signer (public)")
+    @SecurityRequirements
     public ResponseEntity<ApiResponse<OtpResponse>> sendOtp(
             @PathVariable String token,
             @Valid @RequestBody SendOtpRequest request) {
@@ -123,6 +131,8 @@ public class DocumentController {
      * Verifies the OTP code provided by the signer.
      */
     @PostMapping("/sign/{token}/verify-otp")
+    @Operation(summary = "Verify OTP code (public)")
+    @SecurityRequirements
     public ResponseEntity<ApiResponse<OtpResponse>> verifyOtp(
             @PathVariable String token,
             @Valid @RequestBody VerifyOtpRequest request) {
@@ -145,6 +155,8 @@ public class DocumentController {
     }
 
     @PostMapping("/sign/{token}")
+    @Operation(summary = "Submit signature for a document (public)")
+    @SecurityRequirements
     public ResponseEntity<ApiResponse<DocumentResponse>> signDocument(
             @PathVariable String token,
             @Valid @RequestBody SignDocumentRequest request,
