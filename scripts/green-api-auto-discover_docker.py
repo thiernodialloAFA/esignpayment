@@ -778,7 +778,8 @@ Examples:
         # Save per-endpoint file
         ep_dir = output_dir / "analysis" / "endpoints"
         ep_dir.mkdir(parents=True, exist_ok=True)
-        ep_file = ep_dir / f"analysis-endpoint-{slugify(f'{ep["method"]}-{ep["path"]}')}.json"
+        ep_slug = slugify(ep["method"] + "-" + ep["path"])
+        ep_file = ep_dir / f"analysis-endpoint-{ep_slug}.json"
         with open(ep_file, "w", encoding="utf-8") as f:
             json.dump(ep_report, f, indent=2)
 

@@ -274,31 +274,45 @@ def run_spectral(spec_source, spectral_config, output_file):
 
 # ─── Step 3: Measure Endpoints ─────────────────────────────────────────────
 
-def measure_endpoint(url, method="GET", headers=None, repeat=3, timeout=30):
-    """Measure an endpoint: avg response time, avg payload size, status."""
+def measure_endpoint(url, method="GET", headers=None, repeat=3, timeout=30, body=None):
+    """Measure an endpoint: avg response time, avg payload size, status.
+
+    If *body* is provided (dict or str), it is sent as JSON with the
+    appropriate Content-Type header for POST/PUT/PATCH methods.
+    """
     total_time = 0.0
     total_bytes = 0
     last_status = 0
     last_headers = {}
-    hdrs = headers or {}
+    hdrs = dict(headers or {})
+
+    body_bytes = None
+    if body is not None:
+        if isinstance(body, (dict, list)):
+            body_bytes = json.dumps(body).encode("utf-8")
+        elif isinstance(body, str):
+            body_bytes = body.encode("utf-8")
+        else:
+            body_bytes = body
+        hdrs.setdefault("Content-Type", "application/json")
 
     for _ in range(max(1, repeat)):
-        req = urllib.request.Request(url, method=method.upper(), headers=hdrs)
+        req = urllib.request.Request(url, method=method.upper(), headers=hdrs, data=body_bytes)
         start = time.perf_counter()
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
-                body = resp.read()
+                resp_body = resp.read()
                 elapsed = time.perf_counter() - start
                 last_status = resp.status
                 last_headers = {k.lower(): v for k, v in resp.getheaders()}
                 total_time += elapsed
-                total_bytes += len(body)
+                total_bytes += len(resp_body)
         except urllib.error.HTTPError as e:
             elapsed = time.perf_counter() - start
             last_status = e.code
-            body = e.read() if hasattr(e, "read") else b""
+            resp_body = e.read() if hasattr(e, "read") else b""
             total_time += elapsed
-            total_bytes += len(body)
+            total_bytes += len(resp_body)
         except Exception:
             elapsed = time.perf_counter() - start
             total_time += elapsed
@@ -737,18 +751,62 @@ Examples:
         else:
             log("No .spectral.yml found. Skipping lint.", "WARN")
 
+    # ── Step 2b: Load test scenario (Green Score data) ──
+    scenario = None
+    if base_url:
+        scenario_url = base_url.rstrip("/") + "/api/test/green-score/scenario"
+        try:
+            sc_status, sc_body, _ = http_get(scenario_url, headers=auth_headers, timeout=10)
+            if sc_status == 200 and sc_body:
+                scenario = json.loads(sc_body.decode("utf-8", errors="replace"))
+                n_params = len(scenario.get("pathParams", {}))
+                n_bodies = len(scenario.get("requestBodies", {}))
+                log(f"Loaded test scenario: {n_params} path mappings, {n_bodies} request bodies", "OK")
+        except Exception as e:
+            log(f"No test scenario available ({e}) — using defaults", "INFO")
+
+    # Build exclusion set from scenario
+    exclude_set = set()
+    if scenario:
+        for ex in scenario.get("excludeEndpoints", []):
+            exclude_set.add(ex.lower())
+
     # ── Step 3: Measure Endpoints ──
+    # Filter out excluded endpoints
+    if exclude_set:
+        before = len(filtered_eps)
+        filtered_eps = [e for e in filtered_eps
+                        if f"{e['method']}:{e['path']}".lower() not in exclude_set]
+        if len(filtered_eps) < before:
+            log(f"Excluded {before - len(filtered_eps)} endpoint(s) per scenario", "INFO")
+
     log(f"Measuring {len(filtered_eps)} endpoints ({args.repeat} repeats each)...")
     measurements = {}
     endpoint_reports = []
 
     for i, ep in enumerate(filtered_eps, 1):
-        url = build_url(base_url, ep["path"], user_params)
+        # ── Resolve path params (scenario-specific > user > default "1") ──
+        ep_params = dict(user_params)
+        if scenario:
+            path_specific = scenario.get("pathParams", {}).get(ep["path"], {})
+            ep_params.update(path_specific)
+
+        url = build_url(base_url, ep["path"], ep_params)
+
+        # ── Resolve request body for POST/PUT ──
+        ep_body = None
+        if scenario and ep["method"] in ("post", "put", "patch"):
+            body_key = f"{ep['method']}:{ep['path']}"
+            ep_body = scenario.get("requestBodies", {}).get(body_key)
+
+        # ── Use repeat=1 for stateful methods (POST/PUT/DELETE/PATCH) ──
+        ep_repeat = args.repeat if ep["method"] == "get" else 1
+
         label = f"[{i}/{len(filtered_eps)}] {ep['method'].upper()} {ep['path']}"
         log(f"  {label}")
 
         m = measure_endpoint(url, method=ep["method"].upper(), headers=auth_headers,
-                             repeat=args.repeat, timeout=30)
+                             repeat=ep_repeat, timeout=30, body=ep_body)
 
         net_wh = bytes_to_wh(m["size_download"], args.network_kwh_per_gb)
         srv_wh = seconds_to_wh(m["time_total"], args.server_power_w)
@@ -778,7 +836,8 @@ Examples:
         # Save per-endpoint file
         ep_dir = output_dir / "analysis" / "endpoints"
         ep_dir.mkdir(parents=True, exist_ok=True)
-        ep_file = ep_dir / f"analysis-endpoint-{slugify(f'{ep["method"]}-{ep["path"]}')}.json"
+        ep_slug = slugify(ep["method"] + "-" + ep["path"])
+        ep_file = ep_dir / f"analysis-endpoint-{ep_slug}.json"
         with open(ep_file, "w", encoding="utf-8") as f:
             json.dump(ep_report, f, indent=2)
 

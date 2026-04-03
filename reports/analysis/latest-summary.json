@@ -1,0 +1,301 @@
+{
+  "timestamp": "2026-04-03T22:13:11Z",
+  "service_base_url": "http://localhost:8080",
+  "green_score": {
+    "total": 10,
+    "max": 100,
+    "grade": "E",
+    "breakdown": {
+      "DE11_pagination": 0,
+      "DE08_fields": 0,
+      "DE01_compression": 0,
+      "DE02_DE03_cache": 0,
+      "DE06_delta": 0,
+      "range_206": 0,
+      "AR02_format_cbor": 0,
+      "LO01_observability": 5,
+      "US07_rate_limit": 5
+    },
+    "details": {
+      "DE11_pagination": {
+        "note": "No pagination params found on collection endpoints"
+      },
+      "DE08_fields": {
+        "note": "No fields filter found"
+      },
+      "DE01_compression": {
+        "note": "Gzip not detected"
+      },
+      "DE02_DE03_cache": {
+        "note": "ETag/304 not detected"
+      },
+      "DE06_delta": {
+        "note": "No delta endpoint found"
+      },
+      "range_206": {
+        "note": "Range not supported"
+      },
+      "AR02_format_cbor": {
+        "note": "No binary format endpoint"
+      },
+      "LO01_observability": {
+        "note": "Actuator/health detected"
+      },
+      "US07_rate_limit": {
+        "note": "Assumed present (API running)"
+      }
+    }
+  },
+  "totals": {
+    "endpoints_discovered": 31,
+    "endpoints_measured": 27,
+    "total_bytes": 28891,
+    "total_time_s": 2.358665999999999,
+    "energy_total_wh": 0.017994035430192946
+  },
+  "endpoints": [
+    {
+      "http_code": 200,
+      "size_download": 917,
+      "time_total": 0.012747,
+      "speed_download": 71937,
+      "energy_network_wh": 5.124136805534362e-05,
+      "energy_server_wh": 8.852083333333333e-05,
+      "energy_total_wh": 0.00013976220138867696
+    },
+    {
+      "http_code": 200,
+      "size_download": 938,
+      "time_total": 0.028844,
+      "speed_download": 32519,
+      "energy_network_wh": 5.241483449935913e-05,
+      "energy_server_wh": 0.00020030555555555557,
+      "energy_total_wh": 0.0002527203900549147
+    },
+    {
+      "http_code": 200,
+      "size_download": 1340,
+      "time_total": 0.031811,
+      "speed_download": 42124,
+      "energy_network_wh": 7.487833499908446e-05,
+      "energy_server_wh": 0.0002209097222222222,
+      "energy_total_wh": 0.00029578805722130664
+    },
+    {
+      "http_code": 200,
+      "size_download": 117,
+      "time_total": 0.006572,
+      "speed_download": 17801,
+      "energy_network_wh": 6.537884473800659e-06,
+      "energy_server_wh": 4.5638888888888885e-05,
+      "energy_total_wh": 5.2176773362689545e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 135,
+      "time_total": 0.006253,
+      "speed_download": 21590,
+      "energy_network_wh": 7.543712854385376e-06,
+      "energy_server_wh": 4.342361111111111e-05,
+      "energy_total_wh": 5.096732396549649e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 1008,
+      "time_total": 0.004442,
+      "speed_download": 226903,
+      "energy_network_wh": 5.632638931274414e-05,
+      "energy_server_wh": 3.0847222222222216e-05,
+      "energy_total_wh": 8.717361153496636e-05
+    },
+    {
+      "http_code": 201,
+      "size_download": 492,
+      "time_total": 0.038019,
+      "speed_download": 12941,
+      "energy_network_wh": 2.7492642402648926e-05,
+      "energy_server_wh": 0.0002640208333333333,
+      "energy_total_wh": 0.0002915134757359822
+    },
+    {
+      "http_code": 200,
+      "size_download": 373,
+      "time_total": 0.004633,
+      "speed_download": 80507,
+      "energy_network_wh": 2.084299921989441e-05,
+      "energy_server_wh": 3.217361111111111e-05,
+      "energy_total_wh": 5.301661033100552e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 384,
+      "time_total": 0.008081,
+      "speed_download": 47519,
+      "energy_network_wh": 2.1457672119140625e-05,
+      "energy_server_wh": 5.611805555555555e-05,
+      "energy_total_wh": 7.757572767469618e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 5228,
+      "time_total": 0.008581,
+      "speed_download": 609243,
+      "energy_network_wh": 0.0002921372652053833,
+      "energy_server_wh": 5.959027777777777e-05,
+      "energy_total_wh": 0.00035172754298316107
+    },
+    {
+      "http_code": 201,
+      "size_download": 756,
+      "time_total": 0.011908,
+      "speed_download": 63485,
+      "energy_network_wh": 4.2244791984558105e-05,
+      "energy_server_wh": 8.269444444444444e-05,
+      "energy_total_wh": 0.00012493923642900253
+    },
+    {
+      "http_code": 200,
+      "size_download": 749,
+      "time_total": 0.006077,
+      "speed_download": 123256,
+      "energy_network_wh": 4.1853636503219604e-05,
+      "energy_server_wh": 4.220138888888888e-05,
+      "energy_total_wh": 8.405502539210848e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 770,
+      "time_total": 0.004784,
+      "speed_download": 160936,
+      "energy_network_wh": 4.30271029472351e-05,
+      "energy_server_wh": 3.322222222222222e-05,
+      "energy_total_wh": 7.624932516945733e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 765,
+      "time_total": 2.062131,
+      "speed_download": 370,
+      "energy_network_wh": 4.2747706174850464e-05,
+      "energy_server_wh": 0.014320354166666665,
+      "energy_total_wh": 0.014363101872841516
+    },
+    {
+      "http_code": 200,
+      "size_download": 6844,
+      "time_total": 0.009473,
+      "speed_download": 722439,
+      "energy_network_wh": 0.0003824383020401001,
+      "energy_server_wh": 6.578472222222222e-05,
+      "energy_total_wh": 0.00044822302426232233
+    },
+    {
+      "http_code": 201,
+      "size_download": 930,
+      "time_total": 0.015797,
+      "speed_download": 58870,
+      "energy_network_wh": 5.19677996635437e-05,
+      "energy_server_wh": 0.00010970138888888888,
+      "energy_total_wh": 0.0001616691885524326
+    },
+    {
+      "http_code": 200,
+      "size_download": 1949,
+      "time_total": 0.008425,
+      "speed_download": 231341,
+      "energy_network_wh": 0.00010890886187553406,
+      "energy_server_wh": 5.850694444444444e-05,
+      "energy_total_wh": 0.0001674158063199785
+    },
+    {
+      "http_code": 200,
+      "size_download": 1317,
+      "time_total": 0.024158,
+      "speed_download": 54516,
+      "energy_network_wh": 7.359310984611511e-05,
+      "energy_server_wh": 0.00016776388888888887,
+      "energy_total_wh": 0.00024135699873500398
+    },
+    {
+      "http_code": 201,
+      "size_download": 363,
+      "time_total": 0.011112,
+      "speed_download": 32667,
+      "energy_network_wh": 2.028420567512512e-05,
+      "energy_server_wh": 7.716666666666667e-05,
+      "energy_total_wh": 9.745087234179179e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 1142,
+      "time_total": 0.031175,
+      "speed_download": 36631,
+      "energy_network_wh": 6.381422281265259e-05,
+      "energy_server_wh": 0.00021649305555555555,
+      "energy_total_wh": 0.00028030727836820813
+    },
+    {
+      "http_code": 200,
+      "size_download": 229,
+      "time_total": 0.003297,
+      "speed_download": 69447,
+      "energy_network_wh": 1.2796372175216675e-05,
+      "energy_server_wh": 2.2895833333333332e-05,
+      "energy_total_wh": 3.569220550855001e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 359,
+      "time_total": 0.003809,
+      "speed_download": 94262,
+      "energy_network_wh": 2.0060688257217407e-05,
+      "energy_server_wh": 2.6451388888888887e-05,
+      "energy_total_wh": 4.6512077146106294e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 79,
+      "time_total": 0.001795,
+      "speed_download": 44018,
+      "energy_network_wh": 4.414469003677368e-06,
+      "energy_server_wh": 1.2465277777777776e-05,
+      "energy_total_wh": 1.6879746781455144e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 721,
+      "time_total": 0.003055,
+      "speed_download": 235973,
+      "energy_network_wh": 4.02890145778656e-05,
+      "energy_server_wh": 2.1215277777777775e-05,
+      "energy_total_wh": 6.150429235564337e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 220,
+      "time_total": 0.004403,
+      "speed_download": 49968,
+      "energy_network_wh": 1.2293457984924316e-05,
+      "energy_server_wh": 3.0576388888888885e-05,
+      "energy_total_wh": 4.28698468738132e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 207,
+      "time_total": 0.002755,
+      "speed_download": 75122,
+      "energy_network_wh": 1.1567026376724243e-05,
+      "energy_server_wh": 1.9131944444444445e-05,
+      "energy_total_wh": 3.069897082116869e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 559,
+      "time_total": 0.004529,
+      "speed_download": 123425,
+      "energy_network_wh": 3.123655915260315e-05,
+      "energy_server_wh": 3.1451388888888886e-05,
+      "energy_total_wh": 6.268794804149204e-05
+    }
+  ]
+}
