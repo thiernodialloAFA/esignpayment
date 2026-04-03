@@ -363,7 +363,7 @@ jobs:
   deploy-pages:
     name: "🌐 Deploy Dashboard to GitHub Pages"
     needs: green-score
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
