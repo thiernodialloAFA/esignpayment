@@ -17,12 +17,8 @@ spring:
     host: localhost
     port: 1025
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9090/realms/esignpayment
-          jwk-set-uri: http://localhost:9090/realms/esignpayment/protocol/openid-connect/certs
+  # OAuth2/Keycloak disabled for tests — see TestSecurityConfig
+  # security.oauth2.resourceserver.jwt is intentionally omitted
 
 stripe:
   api-key: sk_test_placeholder
@@ -42,7 +38,7 @@ management:
 app:
   frontend-url: http://localhost:3000
   ocr:
-    enabled: true
+    enabled: false
     languages: fra+eng
 
 springdoc:

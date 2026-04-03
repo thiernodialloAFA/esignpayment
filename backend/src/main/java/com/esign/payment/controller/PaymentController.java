@@ -20,6 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
+@Tag(name = "Payments", description = "Stripe payments with 3D Secure")
 public class PaymentController {
 
     private final PaymentService paymentService;

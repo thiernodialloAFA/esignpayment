@@ -21,6 +21,8 @@ public class TwilioConfig {
 
     @PostConstruct
     public void init() {
-        Twilio.init(accountSid, authToken);
+        if (accountSid != null && !accountSid.startsWith("AC_placeholder")) {
+            Twilio.init(accountSid, authToken);
+        }
     }
 }
