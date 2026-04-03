@@ -1,1 +1,1893 @@
-{"openapi":"3.1.0","info":{"title":"OpenAPI definition","version":"v0"},"servers":[{"url":"http://localhost:8081","description":"Generated server url"}],"paths":{"/books/{id}":{"get":{"tags":["book-controller"],"operationId":"byId","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"If-None-Match","in":"header","required":false,"schema":{"type":"string"}},{"name":"If-Modified-Since","in":"header","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}},"put":{"tags":["book-controller"],"operationId":"updateBook","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Book"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}},"/reactive/books/{id}/summary":{"get":{"tags":["book-reactive-controller"],"operationId":"summaryRange","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"Range","in":"header","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string","format":"byte"}}}}}},"post":{"tags":["book-reactive-controller"],"operationId":"updateSummary","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"content":{"application/json":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}},"/books/{id}/summary":{"get":{"tags":["book-controller"],"operationId":"summaryRange_1","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"Range","in":"header","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string","format":"byte"}}}}}},"post":{"tags":["book-controller"],"operationId":"updateSummary_1","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"content":{"application/json":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}},"/reactive/books":{"get":{"tags":["book-reactive-controller"],"operationId":"allBooksWithoutCache","parameters":[{"name":"page","in":"query","required":true,"schema":{"type":"integer","format":"int32","minimum":0}},{"name":"size","in":"query","required":true,"schema":{"type":"integer","format":"int32","maximum":100,"minimum":1}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/reactive/books/{id}":{"get":{"tags":["book-reactive-controller"],"operationId":"byId_1","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"If-None-Match","in":"header","required":false,"schema":{"type":"string"}},{"name":"If-Modified-Since","in":"header","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}},"/reactive/books/select":{"get":{"tags":["book-reactive-controller"],"operationId":"select","parameters":[{"name":"fields","in":"query","required":false,"schema":{"type":"string","default":"id,title,author"}},{"name":"page","in":"query","required":false,"schema":{"type":"integer","format":"int32","default":0,"minimum":0}},{"name":"size","in":"query","required":false,"schema":{"type":"integer","format":"int32","default":20,"maximum":100,"minimum":1}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{}}}}}}}},"/reactive/books/changes":{"get":{"tags":["book-reactive-controller"],"operationId":"changes","parameters":[{"name":"since","in":"query","required":true,"schema":{"type":"string","format":"date-time"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/reactive/books/cbor":{"get":{"tags":["book-reactive-controller"],"operationId":"getBooksCbor","responses":{"200":{"description":"OK","content":{"application/cbor":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/reactive/books/cacheable":{"get":{"tags":["book-reactive-controller"],"operationId":"allBooks","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books":{"get":{"tags":["book-controller"],"operationId":"all","parameters":[{"name":"page","in":"query","required":true,"schema":{"type":"integer","format":"int32","minimum":0}},{"name":"size","in":"query","required":true,"schema":{"type":"integer","format":"int32","maximum":100,"minimum":1}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books/select":{"get":{"tags":["book-controller"],"operationId":"select_1","parameters":[{"name":"fields","in":"query","required":false,"schema":{"type":"string","default":"id,title,author"}},{"name":"page","in":"query","required":false,"schema":{"type":"integer","format":"int32","default":0,"minimum":0}},{"name":"size","in":"query","required":false,"schema":{"type":"integer","format":"int32","default":20,"maximum":100,"minimum":1}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"type":"object","additionalProperties":{}}}}}}}}},"/books/noCache/{id}":{"get":{"tags":["book-controller"],"operationId":"byId_2","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}},"/books/changes":{"get":{"tags":["book-controller"],"operationId":"changes_1","parameters":[{"name":"since","in":"query","required":true,"schema":{"type":"string","format":"date-time"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books/cbor":{"get":{"tags":["book-controller"],"operationId":"getBooksCbor_1","responses":{"200":{"description":"OK","content":{"application/cbor":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books/batch":{"get":{"tags":["book-controller"],"operationId":"batch","parameters":[{"name":"ids","in":"query","required":true,"schema":{"type":"array","items":{"type":"integer","format":"int64"},"maxItems":100,"minItems":1}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books/async":{"get":{"tags":["book-controller"],"operationId":"getBooksAsync","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Book"}}}}}}}},"/books/async/{id}":{"get":{"tags":["book-controller"],"operationId":"getBookByIdAsync","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Book"}}}}}}}},"components":{"schemas":{"Book":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"title":{"type":"string"},"author":{"type":"string"},"published_date":{"type":"integer","format":"int32"},"pages":{"type":"integer","format":"int32"},"summary":{"type":"string"},"lastModified":{"type":"string","format":"date-time"},"version":{"type":"integer","format":"int64"}}}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ESignPay API",
+    "description": "API for managing document e-signatures, payments (Stripe 3D Secure), account opening with KYC/OCR verification, and OTP signing via Twilio SMS.",
+    "contact": {
+      "name": "ESignPay Team"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Current user identity (synced from Keycloak)"
+    },
+    {
+      "name": "Account Applications",
+      "description": "Account opening, KYC upload, OCR verification and contract generation"
+    },
+    {
+      "name": "Payments",
+      "description": "Stripe payments with 3D Secure"
+    },
+    {
+      "name": "Documents",
+      "description": "Document upload, e-signature and OTP signing workflows"
+    },
+    {
+      "name": "Webhooks",
+      "description": "External provider webhooks (Stripe)"
+    }
+  ],
+  "paths": {
+    "/api/account-applications/{id}": {
+      "get": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Get account application detail",
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Update an account application",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Delete an account application",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/stripe": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Stripe webhook endpoint (public)",
+        "operationId": "handleStripeWebhook",
+        "parameters": [
+          {
+            "name": "Stripe-Signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/sign/{token}": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Submit signature for a document (public)",
+        "operationId": "signDocument",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignDocumentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/sign/{token}/verify-otp": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Verify OTP code (public)",
+        "operationId": "verifyOtp",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOtpResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/sign/{token}/send-otp": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Send OTP code via SMS to signer (public)",
+        "operationId": "sendOtp",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOtpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOtpResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/payments": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "List my payments",
+        "operationId": "getMyPayments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "operationId": "createPayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Cancel a payment",
+        "operationId": "cancelPayment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/confirm": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Confirm payment after 3D Secure",
+        "operationId": "confirmPayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "getMyDocuments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "createDocument",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/{id}/send": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "sendForSignature",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/{id}/resend": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "resendForSignature",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/{id}/live-sign/{signerId}": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "liveSign",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "signerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignDocumentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications": {
+      "get": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "List my account applications",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Create a new account application",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/{id}/submit": {
+      "post": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Submit an account application for review",
+        "operationId": "submit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/{id}/regenerate-contract": {
+      "post": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Regenerate contract PDF",
+        "operationId": "regenerateContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/{id}/kyc": {
+      "post": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Upload a KYC document (base64)",
+        "operationId": "uploadKyc",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadKycDocumentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseKycDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/{id}/generate-contract": {
+      "post": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Generate contract PDF for the application",
+        "operationId": "generateContract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sign/verify/{token}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Verify a signature token (public)",
+        "operationId": "verifySignatureToken",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentSignerResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get payment detail",
+        "operationId": "getPayment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/config": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Stripe publishable key",
+        "operationId": "getPaymentConfig",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMapStringString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/{id}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "deleteDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/{id}/download": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "downloadDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get current authenticated user",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-types": {
+      "get": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "List available account types",
+        "operationId": "getAccountTypes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAccountTypeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/{id}/kyc/{kycId}": {
+      "delete": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Delete a KYC document",
+        "operationId": "deleteKyc",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kycId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateAccountApplicationRequest": {
+        "type": "object",
+        "properties": {
+          "accountTypeCode": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "employmentStatus": {
+            "type": "string"
+          },
+          "employerName": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "monthlyIncome": {
+            "type": "number"
+          }
+        }
+      },
+      "AccountApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referenceNumber": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "KYC_PENDING",
+              "KYC_VERIFIED",
+              "CONTRACT_PENDING",
+              "CONTRACT_SIGNED",
+              "APPROVED",
+              "ACTIVE"
+            ]
+          },
+          "accountType": {
+            "$ref": "#/components/schemas/AccountTypeResponse"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "employmentStatus": {
+            "type": "string",
+            "enum": [
+              "EMPLOYED",
+              "SELF_EMPLOYED",
+              "UNEMPLOYED",
+              "STUDENT",
+              "RETIRED"
+            ]
+          },
+          "employerName": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "monthlyIncome": {
+            "type": "number"
+          },
+          "contractDocumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kycDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KycDocumentResponse"
+            }
+          },
+          "statusHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusHistoryResponse"
+            }
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountTypeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "monthlyFee": {
+            "type": "number"
+          }
+        }
+      },
+      "ApiResponseAccountApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AccountApplicationResponse"
+          }
+        }
+      },
+      "KycDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentType": {
+            "type": "string",
+            "enum": [
+              "ID_CARD",
+              "PASSPORT",
+              "PROOF_OF_ADDRESS",
+              "INCOME_PROOF"
+            ]
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "rejectionReason": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ocrStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "VERIFIED",
+              "MISMATCH",
+              "FAILED",
+              "NOT_AVAILABLE"
+            ]
+          },
+          "ocrMatchScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "documentTypeValid": {
+            "type": "boolean"
+          },
+          "ocrDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OcrVerificationDetail"
+            }
+          },
+          "ocrWarnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "OcrVerificationDetail": {
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          },
+          "fieldLabel": {
+            "type": "string"
+          },
+          "declaredValue": {
+            "type": "string"
+          },
+          "extractedValue": {
+            "type": "string"
+          },
+          "matchScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matched": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StatusHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "fromStatus": {
+            "type": "string"
+          },
+          "toStatus": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SignDocumentRequest": {
+        "type": "object",
+        "properties": {
+          "signatureData": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "signatureData"
+        ]
+      },
+      "ApiResponseDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DocumentResponse"
+          }
+        }
+      },
+      "DocumentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_SIGNATURE",
+              "PARTIALLY_SIGNED",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "owner": {
+            "$ref": "#/components/schemas/UserResponse"
+          },
+          "signers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentSignerResponse"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DocumentSignerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SIGNED",
+              "DECLINED"
+            ]
+          },
+          "otpVerified": {
+            "type": "boolean"
+          },
+          "signedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ROLE_USER",
+              "ROLE_ADMIN"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VerifyOtpRequest": {
+        "type": "object",
+        "properties": {
+          "otpCode": {
+            "type": "string",
+            "maxLength": 6,
+            "minLength": 6
+          }
+        },
+        "required": [
+          "otpCode"
+        ]
+      },
+      "ApiResponseOtpResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OtpResponse"
+          }
+        }
+      },
+      "OtpResponse": {
+        "type": "object",
+        "properties": {
+          "sent": {
+            "type": "boolean"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SendOtpRequest": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\+[1-9]\\d{1,14}$"
+          }
+        },
+        "required": [
+          "phoneNumber"
+        ]
+      },
+      "CreatePaymentRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "minimum": 0.01
+          },
+          "currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "ApiResponsePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PaymentResponse"
+          }
+        }
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED",
+              "REFUNDED"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "providerReference": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "stripePublishableKey": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ConfirmPaymentRequest": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "paymentIntentId"
+        ]
+      },
+      "CreateDocumentRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contentType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fileContent": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SignerRequest"
+            }
+          }
+        },
+        "required": [
+          "contentType",
+          "fileContent",
+          "fileName",
+          "title"
+        ]
+      },
+      "SignerRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "name"
+        ]
+      },
+      "CreateAccountApplicationRequest": {
+        "type": "object",
+        "properties": {
+          "accountTypeCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dateOfBirth": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "employmentStatus": {
+            "type": "string"
+          },
+          "employerName": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "monthlyIncome": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "accountTypeCode"
+        ]
+      },
+      "UploadKycDocumentRequest": {
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fileName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contentType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fileContent": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "contentType",
+          "documentType",
+          "fileContent",
+          "fileName"
+        ]
+      },
+      "ApiResponseKycDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/KycDocumentResponse"
+          }
+        }
+      },
+      "ApiResponseDocumentSignerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DocumentSignerResponse"
+          }
+        }
+      },
+      "ApiResponseListPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponse"
+            }
+          }
+        }
+      },
+      "ApiResponseMapStringString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ApiResponseListDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentResponse"
+            }
+          }
+        }
+      },
+      "ApiResponseUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        }
+      },
+      "ApiResponseListAccountTypeResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountTypeResponse"
+            }
+          }
+        }
+      },
+      "ApiResponseListAccountApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountApplicationResponse"
+            }
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {}
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Keycloak JWT Bearer token \u2014 obtain from POST to http://localhost:9090/realms/esignpayment/protocol/openid-connect/token",
+        "name": "bearerAuth",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -62,14 +62,6 @@ jobs:
       - name: Start backend (H2 in-memory, no Keycloak)
         run: |
           nohup java -jar backend/target/*.jar \
-            --spring.datasource.url='jdbc:h2:mem:greentest;DB_CLOSE_DELAY=-1;MODE=PostgreSQL' \
-            --spring.datasource.driver-class-name=org.h2.Driver \
-            --spring.datasource.username=sa \
-            --spring.datasource.password= \
-            --spring.jpa.hibernate.ddl-auto=create-drop \
-            --spring.flyway.enabled=false \
-            --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
-            --management.tracing.sampling.probability=0 \
             --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &
@@ -148,7 +140,14 @@ jobs:
           fi
 
           echo "=== Green Score Report ==="
-          python3 -m json.tool "$REPORT" | head -40
+          python3 -c "
+          import json
+          r = json.load(open('$REPORT'))
+          print(json.dumps(r.get('green_score', {}), indent=2))
+          disc = r.get('auto_discovery', {})
+          print(f'Endpoints discovered: {disc.get(\"endpoints_discovered\", 0)}')
+          print(f'Endpoints measured: {disc.get(\"endpoints_measured\", 0)}')
+          "
 
           TOTAL=$(python3 -c "import json;print(json.load(open('$REPORT'))['green_score']['total'])")
           GRADE=$(python3 -c "import json;print(json.load(open('$REPORT'))['green_score']['grade'])")
@@ -290,14 +289,6 @@ jobs:
       - name: Start backend
         run: |
           nohup java -jar backend/target/*.jar \
-            --spring.datasource.url='jdbc:h2:mem:linttest;DB_CLOSE_DELAY=-1;MODE=PostgreSQL' \
-            --spring.datasource.driver-class-name=org.h2.Driver \
-            --spring.datasource.username=sa \
-            --spring.datasource.password= \
-            --spring.jpa.hibernate.ddl-auto=create-drop \
-            --spring.flyway.enabled=false \
-            --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
-            --management.tracing.sampling.probability=0 \
             --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &
@@ -345,14 +336,6 @@ jobs:
       - name: Start backend
         run: |
           nohup java -jar backend/target/*.jar \
-            --spring.datasource.url='jdbc:h2:mem:discovertest;DB_CLOSE_DELAY=-1;MODE=PostgreSQL' \
-            --spring.datasource.driver-class-name=org.h2.Driver \
-            --spring.datasource.username=sa \
-            --spring.datasource.password= \
-            --spring.jpa.hibernate.ddl-auto=create-drop \
-            --spring.flyway.enabled=false \
-            --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
-            --management.tracing.sampling.probability=0 \
             --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &

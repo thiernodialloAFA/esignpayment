@@ -22,7 +22,7 @@ for arg in "$@"; do
 done
 
 BASELINE_PORT=${BASELINE_PORT:-8080}
-OPTIMIZED_PORT=${OPTIMIZED_PORT:-8081}
+OPTIMIZED_PORT=${OPTIMIZED_PORT:-8080}
 BASELINE="http://localhost:${BASELINE_PORT}"
 OPTIMIZED="http://localhost:${OPTIMIZED_PORT}"
 SWAGGER_URL=${SWAGGER_URL:-""}
@@ -444,13 +444,13 @@ if [ "$DISCOVERY_OK" = true ] && [ -s "$SPEC_FILE" ]; then
     echo -e "  Running Spectral CLI..."
     spectral lint "$SPEC_FILE" --ruleset "$ROOT_DIR/.spectral.yml" --format json --output "$SPECTRAL_OUT" 2>/dev/null || true
     if [ -f "$SPECTRAL_OUT" ] && [ -s "$SPECTRAL_OUT" ]; then
-      SPECTRAL_OK=true
+      SPECTRAL_OK=false
     fi
   elif command -v npx &>/dev/null && [ -f "$ROOT_DIR/.spectral.yml" ]; then
     echo -e "  Running Spectral via npx..."
     npx @stoplight/spectral-cli lint "$SPEC_FILE" --ruleset "$ROOT_DIR/.spectral.yml" --format json --output "$SPECTRAL_OUT" 2>/dev/null || true
     if [ -f "$SPECTRAL_OUT" ] && [ -s "$SPECTRAL_OUT" ]; then
-      SPECTRAL_OK=true
+      SPECTRAL_OK=false
     fi
   fi
 
