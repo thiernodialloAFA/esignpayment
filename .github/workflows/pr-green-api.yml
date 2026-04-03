@@ -70,6 +70,7 @@ jobs:
             --spring.flyway.enabled=false \
             --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
             --management.tracing.sampling.probability=0 \
+            --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &
           echo $! > backend.pid
@@ -297,6 +298,7 @@ jobs:
             --spring.flyway.enabled=false \
             --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
             --management.tracing.sampling.probability=0 \
+            --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &
           echo $! > backend.pid
@@ -351,6 +353,7 @@ jobs:
             --spring.flyway.enabled=false \
             --spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://localhost:9090/dummy \
             --management.tracing.sampling.probability=0 \
+            --spring.profiles.active=test \
             --server.port=8080 \
             > backend.log 2>&1 &
           echo $! > backend.pid

@@ -41,6 +41,19 @@ management:
   tracing:
     sampling:
       probability: 0.0
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          enabled: false
+    metrics:
+      export:
+        otlp:
+          enabled: false
+    logging:
+      export:
+        otlp:
+          enabled: false
 
 app:
   frontend-url: http://localhost:3000
