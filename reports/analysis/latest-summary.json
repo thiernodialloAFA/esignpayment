@@ -1,16 +1,16 @@
 {
-  "appname": "esignpaymentstarter-main",
-  "timestamp": "2026-04-04T15:07:58Z",
+  "appname": "esignpaym-api",
+  "timestamp": "2026-04-04T21:07:20Z",
   "service_base_url": "http://localhost:8080",
   "green_score": {
-    "total": 85,
+    "total": 100,
     "max": 100,
-    "grade": "A",
+    "grade": "A+",
     "breakdown": {
       "DE11_pagination": 15,
       "DE08_fields": 15,
       "DE01_compression": 15,
-      "DE02_DE03_cache": 0,
+      "DE02_DE03_cache": 15,
       "DE06_delta": 10,
       "range_206": 10,
       "AR02_format_cbor": 10,
@@ -28,7 +28,8 @@
         "note": "Gzip compression active (OpenAPI servers.x-server-compression.enabled=true)"
       },
       "DE02_DE03_cache": {
-        "note": "ETag/304 not detected"
+        "http_code": 304,
+        "note": "ETag + 304 supported (OpenAPI servers.x-server-etag-support.enabled=true)"
       },
       "DE06_delta": {
         "note": "Delta endpoint(s) found: 3"
@@ -438,75 +439,39 @@
           {
             "method": "GET",
             "path": "/api/account-applications/{id}",
-            "matched": false,
-            "reason": "No ETag header in HEAD response"
+            "matched": true,
+            "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
           },
           {
             "method": "GET",
             "path": "/api/sign/verify/{token}",
-            "matched": false,
-            "reason": "No ETag header in HEAD response"
+            "matched": true,
+            "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
           },
           {
             "method": "GET",
             "path": "/api/payments/{id}",
-            "matched": false,
-            "reason": "No ETag header in HEAD response"
+            "matched": true,
+            "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
           },
           {
             "method": "GET",
             "path": "/api/documents/{id}",
-            "matched": false,
-            "reason": "No ETag header in HEAD response"
+            "matched": true,
+            "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
           },
           {
             "method": "GET",
             "path": "/api/documents/{id}/download",
-            "matched": false,
-            "reason": "No ETag header in HEAD response"
+            "matched": true,
+            "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
           }
         ],
-        "validated": false,
-        "score": 0,
-        "matched_count": 0,
+        "validated": true,
+        "score": 15,
+        "matched_count": 5,
         "candidate_count": 5,
-        "suggestions": [
-          {
-            "target": "GET /api/account-applications/{id}",
-            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-            "priority": "high",
-            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-          },
-          {
-            "target": "GET /api/sign/verify/{token}",
-            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-            "priority": "high",
-            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-          },
-          {
-            "target": "GET /api/payments/{id}",
-            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-            "priority": "high",
-            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-          },
-          {
-            "target": "GET /api/documents/{id}",
-            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-            "priority": "high",
-            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-          },
-          {
-            "target": "GET /api/documents/{id}/download",
-            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-            "priority": "high",
-            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-          }
-        ]
+        "suggestions": []
       },
       "DE06_delta": {
         "id": "DE06",
@@ -1427,307 +1392,307 @@
   "totals": {
     "endpoints_discovered": 34,
     "endpoints_measured": 33,
-    "total_bytes": 5643,
-    "total_time_s": 0.7400340000000003,
-    "energy_total_wh": 0.005454452197313308
+    "total_bytes": 5645,
+    "total_time_s": 0.629716,
+    "energy_total_wh": 0.004688466733800039
   },
   "endpoints": [
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.00906,
-      "speed_download": 10926,
+      "time_total": 0.00955,
+      "speed_download": 10366,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 6.291666666666666e-05,
-      "energy_total_wh": 6.84487227598826e-05
+      "energy_server_wh": 6.631944444444444e-05,
+      "energy_total_wh": 7.185150053766038e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.027094,
-      "speed_download": 3653,
+      "time_total": 0.024236,
+      "speed_download": 4084,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 0.00018815277777777778,
-      "energy_total_wh": 0.00019368483387099372
+      "energy_server_wh": 0.00016830555555555555,
+      "energy_total_wh": 0.0001738376116487715
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.006235,
-      "speed_download": 15877,
+      "time_total": 0.004956,
+      "speed_download": 19975,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 4.329861111111111e-05,
-      "energy_total_wh": 4.883066720432705e-05
+      "energy_server_wh": 3.4416666666666665e-05,
+      "energy_total_wh": 3.994872275988261e-05
     },
     {
       "http_code": 200,
-      "size_download": 1343,
-      "time_total": 0.032524,
-      "speed_download": 41293,
-      "energy_network_wh": 7.504597306251526e-05,
-      "energy_server_wh": 0.0002258611111111111,
-      "energy_total_wh": 0.00030090708417362635
+      "size_download": 1344,
+      "time_total": 0.033006,
+      "speed_download": 40719,
+      "energy_network_wh": 7.510185241699219e-05,
+      "energy_server_wh": 0.00022920833333333333,
+      "energy_total_wh": 0.0003043101857503255
     },
     {
       "http_code": 200,
       "size_download": 117,
-      "time_total": 0.007156,
-      "speed_download": 16350,
+      "time_total": 0.007876,
+      "speed_download": 14854,
       "energy_network_wh": 6.537884473800659e-06,
-      "energy_server_wh": 4.969444444444444e-05,
-      "energy_total_wh": 5.62323289182451e-05
+      "energy_server_wh": 5.469444444444444e-05,
+      "energy_total_wh": 6.12323289182451e-05
     },
     {
       "http_code": 200,
       "size_download": 135,
-      "time_total": 0.007665,
-      "speed_download": 17613,
+      "time_total": 0.007249,
+      "speed_download": 18624,
       "energy_network_wh": 7.543712854385376e-06,
-      "energy_server_wh": 5.322916666666666e-05,
-      "energy_total_wh": 6.077287952105204e-05
+      "energy_server_wh": 5.034027777777778e-05,
+      "energy_total_wh": 5.7883990632163155e-05
     },
     {
       "http_code": 200,
       "size_download": 356,
-      "time_total": 0.008909,
-      "speed_download": 39961,
+      "time_total": 0.009217,
+      "speed_download": 38622,
       "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 6.186805555555556e-05,
-      "energy_total_wh": 8.176110574934218e-05
+      "energy_server_wh": 6.400694444444444e-05,
+      "energy_total_wh": 8.389999463823106e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.059599,
-      "speed_download": 1174,
+      "time_total": 0.058916,
+      "speed_download": 1188,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.0004138819444444444,
-      "energy_total_wh": 0.00041779349925782943
+      "energy_server_wh": 0.0004091388888888889,
+      "energy_total_wh": 0.0004130504437022739
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.00519,
-      "speed_download": 18304,
+      "time_total": 0.006068,
+      "speed_download": 15656,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 3.6041666666666664e-05,
-      "energy_total_wh": 4.135020534197489e-05
+      "energy_server_wh": 4.213888888888888e-05,
+      "energy_total_wh": 4.744742756419711e-05
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.008461,
-      "speed_download": 11228,
+      "time_total": 0.012399,
+      "speed_download": 7661,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 5.875694444444444e-05,
-      "energy_total_wh": 6.406548311975268e-05
+      "energy_server_wh": 8.610416666666666e-05,
+      "energy_total_wh": 9.141270534197489e-05
     },
     {
       "http_code": 200,
       "size_download": 356,
-      "time_total": 0.012158,
-      "speed_download": 29280,
+      "time_total": 0.006267,
+      "speed_download": 56804,
       "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 8.443055555555556e-05,
-      "energy_total_wh": 0.00010432360574934218
+      "energy_server_wh": 4.352083333333333e-05,
+      "energy_total_wh": 6.341388352711995e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.049517,
-      "speed_download": 1413,
+      "time_total": 0.01206,
+      "speed_download": 5804,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00034386805555555554,
-      "energy_total_wh": 0.00034777961036894055
+      "energy_server_wh": 8.374999999999999e-05,
+      "energy_total_wh": 8.7661554813385e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.012787,
-      "speed_download": 7507,
+      "time_total": 0.005517,
+      "speed_download": 17400,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 8.879861111111111e-05,
-      "energy_total_wh": 9.416302914089627e-05
+      "energy_server_wh": 3.8312499999999996e-05,
+      "energy_total_wh": 4.367691802978515e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.005602,
-      "speed_download": 17137,
+      "time_total": 0.005148,
+      "speed_download": 18648,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 3.890277777777778e-05,
-      "energy_total_wh": 4.4267195807562935e-05
+      "energy_server_wh": 3.5749999999999995e-05,
+      "energy_total_wh": 4.111441802978515e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.011037,
-      "speed_download": 8698,
+      "time_total": 0.005027,
+      "speed_download": 19096,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 7.664583333333332e-05,
-      "energy_total_wh": 8.201025136311848e-05
+      "energy_server_wh": 3.490972222222222e-05,
+      "energy_total_wh": 4.0274140252007376e-05
     },
     {
       "http_code": 200,
       "size_download": 356,
-      "time_total": 0.007186,
-      "speed_download": 49540,
+      "time_total": 0.004796,
+      "speed_download": 74228,
       "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 4.9902777777777775e-05,
-      "energy_total_wh": 6.97958279715644e-05
+      "energy_server_wh": 3.330555555555555e-05,
+      "energy_total_wh": 5.3198605749342174e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.017002,
-      "speed_download": 4117,
+      "time_total": 0.011344,
+      "speed_download": 6170,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00011806944444444443,
-      "energy_total_wh": 0.00012198099925782944
+      "energy_server_wh": 7.877777777777778e-05,
+      "energy_total_wh": 8.268933259116279e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.011106,
-      "speed_download": 8913,
+      "time_total": 0.008641,
+      "speed_download": 11457,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 7.712499999999999e-05,
-      "energy_total_wh": 8.265705609321593e-05
+      "energy_server_wh": 6.000694444444444e-05,
+      "energy_total_wh": 6.553900053766038e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.010379,
-      "speed_download": 9538,
+      "time_total": 0.005565,
+      "speed_download": 17790,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 7.207638888888888e-05,
-      "energy_total_wh": 7.760844498210483e-05
+      "energy_server_wh": 3.864583333333333e-05,
+      "energy_total_wh": 4.417788942654927e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.01367,
-      "speed_download": 7241,
+      "time_total": 0.006193,
+      "speed_download": 15984,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 9.493055555555555e-05,
-      "energy_total_wh": 0.0001004626116487715
+      "energy_server_wh": 4.300694444444444e-05,
+      "energy_total_wh": 4.853900053766038e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.281258,
-      "speed_download": 248,
+      "time_total": 0.320612,
+      "speed_download": 218,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.0019531805555555557,
-      "energy_total_wh": 0.0019570921103689407
+      "energy_server_wh": 0.002226472222222222,
+      "energy_total_wh": 0.002230383777035607
     },
     {
       "http_code": 200,
-      "size_download": 228,
-      "time_total": 0.003575,
-      "speed_download": 63783,
-      "energy_network_wh": 1.2740492820739746e-05,
-      "energy_server_wh": 2.4826388888888888e-05,
-      "energy_total_wh": 3.7566881709628634e-05
+      "size_download": 229,
+      "time_total": 0.003626,
+      "speed_download": 63154,
+      "energy_network_wh": 1.2796372175216675e-05,
+      "energy_server_wh": 2.5180555555555552e-05,
+      "energy_total_wh": 3.7976927730772227e-05
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.004739,
-      "speed_download": 20046,
+      "time_total": 0.006696,
+      "speed_download": 14186,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 3.290972222222222e-05,
-      "energy_total_wh": 3.8218260897530446e-05
+      "energy_server_wh": 4.65e-05,
+      "energy_total_wh": 5.1808538675308226e-05
     },
     {
       "http_code": 200,
       "size_download": 79,
-      "time_total": 0.005411,
-      "speed_download": 14599,
+      "time_total": 0.002791,
+      "speed_download": 28303,
       "energy_network_wh": 4.414469003677368e-06,
-      "energy_server_wh": 3.7576388888888886e-05,
-      "energy_total_wh": 4.1990857892566254e-05
+      "energy_server_wh": 1.9381944444444444e-05,
+      "energy_total_wh": 2.3796413448121812e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.010433,
-      "speed_download": 6709,
+      "time_total": 0.003615,
+      "speed_download": 19361,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 7.245138888888888e-05,
-      "energy_total_wh": 7.636294370227389e-05
+      "energy_server_wh": 2.5104166666666666e-05,
+      "energy_total_wh": 2.9015721480051676e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.012786,
-      "speed_download": 7508,
+      "time_total": 0.004524,
+      "speed_download": 21220,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 8.879166666666667e-05,
-      "energy_total_wh": 9.415608469645182e-05
+      "energy_server_wh": 3.141666666666667e-05,
+      "energy_total_wh": 3.678108469645182e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.012151,
-      "speed_download": 7900,
+      "time_total": 0.0079,
+      "speed_download": 12152,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 8.438194444444445e-05,
-      "energy_total_wh": 8.97463624742296e-05
+      "energy_server_wh": 5.486111111111111e-05,
+      "energy_total_wh": 6.022552914089627e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.013032,
-      "speed_download": 7366,
+      "time_total": 0.006095,
+      "speed_download": 15751,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 9.049999999999999e-05,
-      "energy_total_wh": 9.586441802978515e-05
+      "energy_server_wh": 4.2326388888888886e-05,
+      "energy_total_wh": 4.769080691867404e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.008465,
-      "speed_download": 8268,
+      "time_total": 0.003487,
+      "speed_download": 20071,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 5.8784722222222224e-05,
-      "energy_total_wh": 6.269627703560723e-05
+      "energy_server_wh": 2.4215277777777777e-05,
+      "energy_total_wh": 2.8126832591162787e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.016023,
-      "speed_download": 4368,
+      "time_total": 0.006594,
+      "speed_download": 10615,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00011127083333333333,
-      "energy_total_wh": 0.00011518238814671833
+      "energy_server_wh": 4.5791666666666664e-05,
+      "energy_total_wh": 4.9703221480051674e-05
     },
     {
       "http_code": 200,
       "size_download": 559,
-      "time_total": 0.020199,
-      "speed_download": 27674,
+      "time_total": 0.007691,
+      "speed_download": 72681,
       "energy_network_wh": 3.123655915260315e-05,
-      "energy_server_wh": 0.00014027083333333334,
-      "energy_total_wh": 0.0001715073924859365
+      "energy_server_wh": 5.3409722222222216e-05,
+      "energy_total_wh": 8.464628137482537e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.007336,
-      "speed_download": 9542,
+      "time_total": 0.005116,
+      "speed_download": 13681,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 5.094444444444444e-05,
-      "energy_total_wh": 5.485599925782945e-05
+      "energy_server_wh": 3.552777777777778e-05,
+      "energy_total_wh": 3.943933259116279e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.022289,
-      "speed_download": 4441,
+      "time_total": 0.006938,
+      "speed_download": 14269,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 0.0001547847222222222,
-      "energy_total_wh": 0.00016031677831543814
+      "energy_server_wh": 4.818055555555555e-05,
+      "energy_total_wh": 5.371261164877149e-05
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
-  "appname": "esignpaymentstarter-main",
-  "timestamp": "2026-04-04T15:07:58Z",
+  "appname": "esignpaym-api",
+  "timestamp": "2026-04-04T21:07:20Z",
   "service_base_url": "http://localhost:8080",
   "green_score_summary": {
-    "total": 85,
+    "total": 100,
     "max": 100,
-    "grade": "A"
+    "grade": "A+"
   },
   "rule_resource_mapping": {
     "DE11_pagination": {
@@ -398,75 +398,39 @@
         {
           "method": "GET",
           "path": "/api/account-applications/{id}",
-          "matched": false,
-          "reason": "No ETag header in HEAD response"
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
         },
         {
           "method": "GET",
           "path": "/api/sign/verify/{token}",
-          "matched": false,
-          "reason": "No ETag header in HEAD response"
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
         },
         {
           "method": "GET",
           "path": "/api/payments/{id}",
-          "matched": false,
-          "reason": "No ETag header in HEAD response"
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
         },
         {
           "method": "GET",
           "path": "/api/documents/{id}",
-          "matched": false,
-          "reason": "No ETag header in HEAD response"
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
         },
         {
           "method": "GET",
           "path": "/api/documents/{id}/download",
-          "matched": false,
-          "reason": "No ETag header in HEAD response"
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-etag-support.enabled=true"
         }
       ],
-      "validated": false,
-      "score": 0,
-      "matched_count": 0,
+      "validated": true,
+      "score": 15,
+      "matched_count": 5,
       "candidate_count": 5,
-      "suggestions": [
-        {
-          "target": "GET /api/account-applications/{id}",
-          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-          "priority": "high",
-          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-        },
-        {
-          "target": "GET /api/sign/verify/{token}",
-          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-          "priority": "high",
-          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-        },
-        {
-          "target": "GET /api/payments/{id}",
-          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-          "priority": "high",
-          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-        },
-        {
-          "target": "GET /api/documents/{id}",
-          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-          "priority": "high",
-          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-        },
-        {
-          "target": "GET /api/documents/{id}/download",
-          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
-          "priority": "high",
-          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
-          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
-        }
-      ]
+      "suggestions": []
     },
     "DE06_delta": {
       "id": "DE06",
