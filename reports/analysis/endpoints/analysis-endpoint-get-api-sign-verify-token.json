@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-04-04T09:00:01Z",
+  "service_base_url": "http://localhost:8080",
+  "endpoint": {
+    "method": "get",
+    "path": "/api/sign/verify/{token}",
+    "url": "http://localhost:8080/api/sign/verify/test-token-verify",
+    "http_code": 200,
+    "size_download": 228,
+    "time_total": 0.005028,
+    "speed_download": 45346,
+    "energy_network_wh": 1.2740492820739746e-05,
+    "energy_server_wh": 3.4916666666666664e-05,
+    "energy_total_wh": 4.765715948740641e-05
+  }
+}

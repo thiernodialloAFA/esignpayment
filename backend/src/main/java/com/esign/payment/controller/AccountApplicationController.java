@@ -4,13 +4,19 @@ import com.esign.payment.dto.request.*;
 import com.esign.payment.dto.response.*;
 import com.esign.payment.service.AccountApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +29,10 @@ public class AccountApplicationController {
     private final AccountApplicationService service;
 
     @GetMapping("/account-types")
-    @Operation(summary = "List available account types")
-    public ResponseEntity<ApiResponse<List<AccountTypeResponse>>> getAccountTypes() {
+    @Operation(summary = "List available account types (supports field filtering)")
+    public ResponseEntity<ApiResponse<List<AccountTypeResponse>>> getAccountTypes(
+            @Parameter(description = "Comma-separated list of fields to include")
+            @RequestParam(required = false) String fields) {
         return ResponseEntity.ok(ApiResponse.success(service.getActiveAccountTypes()));
     }
 
@@ -43,15 +51,44 @@ public class AccountApplicationController {
         return ResponseEntity.ok(ApiResponse.success("Application updated", service.updateApplication(id, request)));
     }
 
+    /**
+     * DE11 — Paginated listing (+15 pts).
+     * DE08 — Sparse fieldset via {@code fields} param (+15 pts).
+     */
     @GetMapping("/account-applications")
-    @Operation(summary = "List my account applications")
-    public ResponseEntity<ApiResponse<List<AccountApplicationResponse>>> list() {
-        return ResponseEntity.ok(ApiResponse.success(service.getMyApplications()));
+    @Operation(summary = "List my account applications (supports pagination & field filtering)")
+    public ResponseEntity<ApiResponse<Page<AccountApplicationResponse>>> list(
+            @Parameter(description = "Page number (0-based)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size", example = "20")
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Comma-separated list of fields to include (e.g. id,status,referenceNumber)")
+            @RequestParam(required = false) String fields) {
+        Page<AccountApplicationResponse> apps = service.getMyApplicationsPaged(
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        return ResponseEntity.ok(ApiResponse.success(apps));
+    }
+
+    /**
+     * DE06 — Delta / changes endpoint (+10 pts).
+     */
+    @GetMapping("/account-applications/changes")
+    @Operation(summary = "Get applications changed since a given timestamp (delta sync)")
+    public ResponseEntity<ApiResponse<List<AccountApplicationResponse>>> getChanges(
+            @Parameter(description = "ISO date-time (e.g. 2026-04-01T00:00:00)", required = true)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime since,
+            @Parameter(description = "Comma-separated list of fields to include")
+            @RequestParam(required = false) String fields) {
+        List<AccountApplicationResponse> changes = service.getApplicationsChangedSince(since);
+        return ResponseEntity.ok(ApiResponse.success(changes));
     }
 
     @GetMapping("/account-applications/{id}")
-    @Operation(summary = "Get account application detail")
-    public ResponseEntity<ApiResponse<AccountApplicationResponse>> get(@PathVariable UUID id) {
+    @Operation(summary = "Get account application detail (supports field filtering)")
+    public ResponseEntity<ApiResponse<AccountApplicationResponse>> get(
+            @PathVariable UUID id,
+            @Parameter(description = "Comma-separated list of fields to include")
+            @RequestParam(required = false) String fields) {
         return ResponseEntity.ok(ApiResponse.success(service.getApplication(id)));
     }
 

@@ -89,7 +89,7 @@ class SmokeIntegrationTest {
         mockMvc.perform(get("/api/documents").with(jwt().jwt(testJwt())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data", hasSize(greaterThanOrEqualTo(2))));
+                .andExpect(jsonPath("$.data.content", hasSize(greaterThanOrEqualTo(2))));
     }
 
     @Test
@@ -155,7 +155,7 @@ class SmokeIntegrationTest {
         mockMvc.perform(get("/api/payments").with(jwt().jwt(testJwt())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data", hasSize(greaterThanOrEqualTo(2))));
+                .andExpect(jsonPath("$.data.content", hasSize(greaterThanOrEqualTo(2))));
     }
 
     @Test
@@ -207,7 +207,7 @@ class SmokeIntegrationTest {
         mockMvc.perform(get("/api/account-applications").with(jwt().jwt(testJwt())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
+                .andExpect(jsonPath("$.data.content", hasSize(greaterThanOrEqualTo(1))));
     }
 
     @Test

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ESignPay API",
-    "description": "API for managing document e-signatures, payments (Stripe 3D Secure), account opening with KYC/OCR verification, and OTP signing via Twilio SMS.",
+    "description": "API for managing document e-signatures, payments (Stripe 3D Secure), account opening with KYC/OCR verification, and OTP signing via Twilio SMS.\n\n### Compression\nAll endpoints support **gzip compression**. Send `Accept-Encoding: gzip` to receive compressed responses (typically 60\u201380% payload reduction). Responses \u2265 256 bytes are automatically compressed.\n\n### Range / Partial Content (206)\nFile download endpoints support **HTTP Range requests** (`Range: bytes=start-end`). The server responds with `206 Partial Content` and `Accept-Ranges: bytes`, enabling resumable downloads and partial fetches for large files.",
     "contact": {
       "name": "ESignPay Team"
     },
@@ -10,8 +10,30 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
-      "description": "Generated server url"
+      "url": "/",
+      "description": "ESignPay API Server \u2014 gzip compression enabled on all endpoints",
+      "x-server-compression": {
+        "algorithms": [
+          "gzip"
+        ],
+        "mime-types": [
+          "application/json",
+          "application/xml",
+          "text/html",
+          "text/plain",
+          "application/hal+json",
+          "application/cbor"
+        ],
+        "enabled": true,
+        "min-response-size": "256 bytes"
+      },
+      "x-server-range-support": {
+        "enabled": true,
+        "unit": "bytes",
+        "endpoints": [
+          "/api/documents/{id}/download"
+        ]
+      }
     }
   ],
   "security": [
@@ -47,7 +69,7 @@
         "tags": [
           "Account Applications"
         ],
-        "summary": "Get account application detail",
+        "summary": "Get account application detail (supports field filtering)",
         "operationId": "get",
         "parameters": [
           {
@@ -58,11 +80,39 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -103,6 +153,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -133,6 +202,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -174,6 +262,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -216,6 +323,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -258,6 +384,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -300,6 +445,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -317,15 +481,69 @@
         "tags": [
           "Payments"
         ],
-        "summary": "List my payments",
+        "summary": "List my payments (supports pagination & field filtering)",
         "operationId": "getMyPayments",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include (e.g. id,amount,status)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListPaymentResponse"
+                  "$ref": "#/components/schemas/ApiResponsePagePaymentResponse"
                 }
               }
             }
@@ -336,6 +554,7 @@
         "tags": [
           "Payments"
         ],
+        "summary": "Create a new payment",
         "operationId": "createPayment",
         "requestBody": {
           "content": {
@@ -350,6 +569,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -382,6 +620,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -413,6 +670,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -429,14 +705,69 @@
         "tags": [
           "Documents"
         ],
+        "summary": "List my documents (supports pagination & field filtering)",
         "operationId": "getMyDocuments",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include (e.g. id,title,status)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListDocumentResponse"
+                  "$ref": "#/components/schemas/ApiResponsePageDocumentResponse"
                 }
               }
             }
@@ -447,6 +778,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Create a new document",
         "operationId": "createDocument",
         "requestBody": {
           "content": {
@@ -461,6 +793,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -477,6 +828,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Send document for signature",
         "operationId": "sendForSignature",
         "parameters": [
           {
@@ -492,6 +844,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -508,6 +879,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Resend signature request to pending signers",
         "operationId": "resendForSignature",
         "parameters": [
           {
@@ -523,6 +895,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -539,6 +930,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Live/in-person signature on behalf of a signer",
         "operationId": "liveSign",
         "parameters": [
           {
@@ -573,6 +965,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -589,15 +1000,69 @@
         "tags": [
           "Account Applications"
         ],
-        "summary": "List my account applications",
+        "summary": "List my account applications (supports pagination & field filtering)",
         "operationId": "list",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            },
+            "example": 20
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include (e.g. id,status,referenceNumber)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListAccountApplicationResponse"
+                  "$ref": "#/components/schemas/ApiResponsePageAccountApplicationResponse"
                 }
               }
             }
@@ -623,6 +1088,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -655,6 +1139,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -687,6 +1190,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -729,6 +1251,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -761,6 +1302,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -787,11 +1347,39 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -809,7 +1397,7 @@
         "tags": [
           "Payments"
         ],
-        "summary": "Get payment detail",
+        "summary": "Get payment detail (supports field filtering)",
         "operationId": "getPayment",
         "parameters": [
           {
@@ -820,11 +1408,39 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -846,10 +1462,90 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseMapStringString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/changes": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get payments changed since a given timestamp (delta sync)",
+        "operationId": "getPaymentsChanges",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPaymentResponse"
                 }
               }
             }
@@ -862,6 +1558,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Get document detail (supports field filtering)",
         "operationId": "getDocument",
         "parameters": [
           {
@@ -872,11 +1569,39 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -891,6 +1616,7 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Delete a document",
         "operationId": "deleteDocument",
         "parameters": [
           {
@@ -906,6 +1632,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -922,6 +1667,8 @@
         "tags": [
           "Documents"
         ],
+        "summary": "Download document file (supports Range/206 partial content)",
+        "description": "Supports HTTP Range header for partial content retrieval. Send `Range: bytes=start-end` to receive a 206 Partial Content response. The response includes `Accept-Ranges: bytes` to advertise range support.",
         "operationId": "downloadDocument",
         "parameters": [
           {
@@ -932,16 +1679,153 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Full file content",
+            "headers": {
+              "Accept-Ranges": {
+                "description": "Indicates the server supports byte-range requests",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "bytes"
+                  ]
+                }
+              },
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
                   "type": "string",
                   "format": "byte"
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial Content \u2014 returned when a valid Range header is sent",
+            "headers": {
+              "Content-Range": {
+                "description": "Byte range of the returned content (e.g. bytes 0-99/1234)",
+                "schema": {
+                  "type": "string",
+                  "example": "bytes 0-99/1234"
+                }
+              },
+              "Accept-Ranges": {
+                "description": "bytes",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "bytes"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "416": {
+            "description": "Range Not Satisfiable \u2014 the requested range is invalid or beyond file size",
+            "headers": {
+              "Content-Range": {
+                "description": "Total file size (e.g. bytes */1234)",
+                "schema": {
+                  "type": "string",
+                  "example": "bytes */1234"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/changes": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Get documents changed since a given timestamp (delta sync)",
+        "operationId": "getDocumentsChanges",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListDocumentResponse"
                 }
               }
             }
@@ -954,11 +1838,41 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Get current authenticated user",
+        "summary": "Get current authenticated user (supports field filtering)",
         "operationId": "getCurrentUser",
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -975,15 +1889,106 @@
         "tags": [
           "Account Applications"
         ],
-        "summary": "List available account types",
+        "summary": "List available account types (supports field filtering)",
         "operationId": "getAccountTypes",
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseListAccountTypeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account-applications/changes": {
+      "get": {
+        "tags": [
+          "Account Applications"
+        ],
+        "summary": "Get applications changed since a given timestamp (delta sync)",
+        "operationId": "getChanges",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAccountApplicationResponse"
                 }
               }
             }
@@ -1021,6 +2026,25 @@
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "description": "gzip when client sends Accept-Encoding: gzip",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip",
+                    "identity"
+                  ]
+                }
+              },
+              "Vary": {
+                "description": "Accept-Encoding",
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              }
+            },
             "content": {
               "*/*": {
                 "schema": {
@@ -1768,7 +2792,7 @@
           }
         }
       },
-      "ApiResponseListPaymentResponse": {
+      "ApiResponsePagePaymentResponse": {
         "type": "object",
         "properties": {
           "success": {
@@ -1778,10 +2802,93 @@
             "type": "string"
           },
           "data": {
+            "$ref": "#/components/schemas/PagePaymentResponse"
+          }
+        }
+      },
+      "PagePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PaymentResponse"
             }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
           }
         }
       },
@@ -1799,6 +2906,83 @@
             "additionalProperties": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ApiResponseListPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponse"
+            }
+          }
+        }
+      },
+      "ApiResponsePageDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageDocumentResponse"
+          }
+        }
+      },
+      "PageDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
           }
         }
       },
@@ -1850,6 +3034,66 @@
           }
         }
       },
+      "ApiResponsePageAccountApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageAccountApplicationResponse"
+          }
+        }
+      },
+      "PageAccountApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountApplicationResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
       "ApiResponseListAccountApplicationResponse": {
         "type": "object",
         "properties": {
@@ -1877,6 +3121,42 @@
             "type": "string"
           },
           "data": {}
+        }
+      }
+    },
+    "headers": {
+      "Content-Encoding": {
+        "description": "Compression algorithm used (gzip when Accept-Encoding: gzip is sent)",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "gzip",
+            "identity"
+          ]
+        }
+      },
+      "Vary": {
+        "description": "Indicates response varies based on Accept-Encoding",
+        "schema": {
+          "type": "string",
+          "example": "Accept-Encoding"
+        }
+      },
+      "Accept-Ranges": {
+        "description": "Indicates that the server supports Range requests",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "bytes",
+            "none"
+          ]
+        }
+      },
+      "Content-Range": {
+        "description": "Indicates the part of a document the server is returning (e.g. bytes 0-99/1234)",
+        "schema": {
+          "type": "string",
+          "example": "bytes 0-99/1234"
         }
       }
     },

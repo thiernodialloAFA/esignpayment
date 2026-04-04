@@ -29,15 +29,17 @@ public class TestKeycloakUserService extends KeycloakUserService {
         this.userRepository = userRepository;
     }
 
+    private static final String TEST_KEYCLOAK_ID = "test-user-keycloak-id";
+
     @Override
     @Transactional
     public User getCurrentUser() {
-        return userRepository.findByKeycloakId("test-user")
+        return userRepository.findByKeycloakId(TEST_KEYCLOAK_ID)
                 .orElseGet(() -> {
-                    log.info("[TEST] Auto-creating test user (keycloakId=test-user)");
+                    log.info("[TEST] Auto-creating test user (keycloakId={})", TEST_KEYCLOAK_ID);
                     return userRepository.save(
                             User.builder()
-                                    .keycloakId("test-user")
+                                    .keycloakId(TEST_KEYCLOAK_ID)
                                     .email("test@esignpay.com")
                                     .firstName("Test")
                                     .lastName("User")

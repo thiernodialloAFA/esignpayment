@@ -11,10 +11,13 @@ import com.stripe.model.PaymentIntent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -112,6 +115,22 @@ public class PaymentService {
     public List<PaymentResponse> getMyPayments() {
         User user = currentUser();
         return paymentRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
+                .stream()
+                .map(this::toPaymentResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getMyPaymentsPaged(Pageable pageable) {
+        User user = currentUser();
+        return paymentRepository.findByUserId(user.getId(), pageable)
+                .map(this::toPaymentResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getPaymentsChangedSince(LocalDateTime since) {
+        User user = currentUser();
+        return paymentRepository.findByUserIdAndUpdatedAtAfterOrderByUpdatedAtDesc(user.getId(), since)
                 .stream()
                 .map(this::toPaymentResponse)
                 .collect(Collectors.toList());
