@@ -754,9 +754,9 @@
             </div>
         </div>
 
-        <!-- Before/After Comparison -->
+        <!-- Payload per endpoint -->
         <div class="card" id="comparison-card" style="display:none;">
-            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Avant / Après — Payload (bytes) <span class="chevron">▼</span></button>
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Payload par endpoint (bytes) <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="comparison-accordion">
                 <div id="comparison-bars"></div>
             </div>
@@ -845,8 +845,8 @@
             <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⚡ Historique Consommation Énergie <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="energy-history-accordion">
                 <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
-                    <span style="color:#ef4444;">● Énergie naive / full (Wh)</span>
-                    <span style="color:#22c55e;">● Énergie optimisée (Wh)</span>
+                    <span style="color:#22c55e;">● Énergie totale API (Wh)</span>
+                    <span style="color:#9ca3af;font-style:italic;">Somme de tous les endpoints découverts</span>
                 </div>
                 <canvas id="energy-timeline-canvas"></canvas>
             </div>
@@ -857,8 +857,8 @@
             <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">🌍 Historique Émissions CO₂ <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="co2-history-accordion">
                 <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
-                    <span style="color:#ef4444;">● CO₂ naive (g)</span>
-                    <span style="color:#3b82f6;">● CO₂ optimisée (g)</span>
+                    <span style="color:#3b82f6;">● CO₂ total API (g)</span>
+                    <span style="color:#9ca3af;font-style:italic;">Somme de tous les endpoints découverts</span>
                 </div>
                 <canvas id="co2-timeline-canvas"></canvas>
             </div>
@@ -889,7 +889,7 @@
 <script>
 const STORAGE_KEY_PREFIX = 'green-api-score-history';
 const APP_LIST_KEY = 'green-api-score-apps';
-const RAW_EMBEDDED = {"appname": "esignpaym-api", "report": {"timestamp": "2026-04-04T21:34:30Z", "green_score": {"total": 65, "max": 100, "grade": "B", "breakdown": {"DE11_pagination": 5, "DE08_fields": 13, "DE01_compression": 15, "DE02_DE03_cache": 15, "DE06_delta": 2, "range_206": 10, "AR02_format_cbor": 0, "LO01_observability": 4, "US07_rate_limit": 1}, "details": {"DE11_pagination": {"note": "Pagination on 3/9 collection endpoint(s)"}, "DE08_fields": {"note": "Field filtering on 12 endpoint(s)"}, "DE01_compression": {"note": "Gzip compression active (OpenAPI servers.x-server-compression.enabled=true)"}, "DE02_DE03_cache": {"http_code": 304, "note": "ETag + 304 supported (OpenAPI servers.x-server-etag-support.enabled=true)"}, "DE06_delta": {"note": "Delta endpoint(s) found: 3"}, "range_206": {"http_code": 206, "note": "Range/206 supported (OpenAPI servers.x-server-range-support.enabled=true)"}, "AR02_format_cbor": {"note": "Binary format on 1 endpoint(s)"}, "LO01_observability": {"note": "Actuator/health detected"}, "US07_rate_limit": {"note": "Rate-limit headers detected"}}, "rule_resource_mapping": {"DE11_pagination": {"id": "DE11", "label": "Pagination", "description": "Les endpoints de collection doivent supporter la pagination (page/size ou limit/offset).", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/payments", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}], "validated": true, "score": 5, "matched_count": 3, "candidate_count": 9, "suggestions": [{"target": "GET /api/payments/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/documents/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/account-types", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/account-applications/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}]}, "DE08_fields": {"id": "DE08", "label": "Filtrage de champs", "description": "Supporter un parametre 'fields' pour reduire le payload.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Field filter params: fields"}], "validated": true, "score": 13, "matched_count": 12, "candidate_count": 14, "suggestions": []}, "DE01_compression": {"id": "DE01", "label": "Compression", "description": "Le serveur doit supporter Accept-Encoding: gzip.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/confirm", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}], "validated": true, "score": 15, "matched_count": 34, "candidate_count": 34, "suggestions": []}, "DE02_DE03_cache": {"id": "DE02/DE03", "label": "Cache ETag/304", "description": "Les ressources unitaires doivent supporter ETag + If-None-Match -> 304.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}], "validated": true, "score": 15, "matched_count": 5, "candidate_count": 5, "suggestions": []}, "DE06_delta": {"id": "DE06", "label": "Delta / Changes", "description": "Un endpoint /changes?since= ou equivalent doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}], "validated": true, "score": 2, "matched_count": 3, "candidate_count": 14, "suggestions": [{"target": "GET /api/payments/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."}, {"target": "GET /api/documents/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."}, {"target": "GET /api/account-applications/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."}]}, "range_206": {"id": "206", "label": "Range / Partial Content", "description": "Supporter le header Range pour les gros payloads.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}], "validated": true, "score": 10, "matched_count": 14, "candidate_count": 14, "suggestions": []}, "AR02_format_cbor": {"id": "AR02", "label": "Format binaire (CBOR)", "description": "Un endpoint en format binaire (CBOR, protobuf...) doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/confirm", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "Binary format (CBOR/protobuf/octet-stream)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": false, "reason": "Standard JSON format"}], "validated": true, "score": 0, "matched_count": 1, "candidate_count": 34, "suggestions": [{"target": "GET /api/payments  (add CBOR variant)", "action": "Add a binary format alternative (CBOR or Protobuf)", "priority": "low", "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON", "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."}, {"target": "GET /api/documents  (add CBOR variant)", "action": "Add a binary format alternative (CBOR or Protobuf)", "priority": "low", "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON", "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."}]}, "LO01_observability": {"id": "LO01", "label": "Observabilite", "description": "Actuator / health / metrics doit etre expose.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/actuator/health", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/health", "matched": false, "reason": "HTTP 500"}, {"method": "GET", "path": "/actuator", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/metrics", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/info", "matched": true, "reason": "HTTP 200 OK"}], "validated": true, "score": 4, "matched_count": 4, "candidate_count": 5, "suggestions": [{"target": "/actuator/health, /actuator/metrics", "action": "Expose Spring Boot Actuator endpoints", "priority": "high", "impact": "+5 pts \u2014 essential for production monitoring", "how": "Spring Boot application.yml:\n  management:\n    endpoints:\n      web:\n        exposure:\n          include: health,info,metrics\n    endpoint:\n      health:\n        show-details: when-authorized\n\nAdd dependency: spring-boot-starter-actuator (likely already present)."}]}, "US07_rate_limit": {"id": "US07", "label": "Rate Limiting", "description": "Un mecanisme de rate limiting doit etre present.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/sign/{token}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/payments", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/payments/confirm", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": false, "reason": "No rate-limit headers in response"}], "validated": true, "score": 1, "matched_count": 6, "candidate_count": 34, "suggestions": [{"target": "ALL endpoints (server-level)", "action": "Add rate-limit response headers", "priority": "medium", "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients", "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"}]}}, "endpoint_rules": {"get:/api/payments": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/config": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/auth/me": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-types": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/sign/verify/{token}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}/download": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "put:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/webhooks/stripe": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/verify-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/send-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/{id}/cancel": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/confirm": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/send": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/resend": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/live-sign/{signerId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/submit": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/regenerate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/kyc": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/generate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/documents/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}/kyc/{kycId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "get:/actuator/health": ["LO01_observability"], "get:/health": ["LO01_observability"], "get:/actuator": ["LO01_observability"], "get:/actuator/metrics": ["LO01_observability"], "get:/actuator/info": ["LO01_observability"]}}, "measurements": {"baseline": {"full_payload": {"http_code": 500, "size_download": 70, "time_total": 0.023979, "speed_download": 2919}, "single_resource": {"http_code": 500, "size_download": 70, "time_total": 0.011218, "speed_download": 6239}, "single_repeat": {"http_code": 500, "size_download": 70, "time_total": 0.010213, "speed_download": 6854}}, "optimized": {"delta_changes": {"http_code": 500, "size_download": 70, "time_total": 0.008521, "speed_download": 8215}, "full_payload": {"http_code": 200, "size_download": 559, "time_total": 0.005134, "speed_download": 108889}}}, "auto_discovery": {"base_url": "http://localhost:8080", "endpoints_discovered": 33, "endpoints_measured": 33, "all_measurements": {"get:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.061476, "speed_download": 1610}, "put:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.026967, "speed_download": 3671}, "delete:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.011743, "speed_download": 8430}, "post:/api/sign/{token}": {"http_code": 409, "size_download": 80, "time_total": 0.016234, "speed_download": 4927}, "post:/api/sign/{token}/verify-otp": {"http_code": 500, "size_download": 70, "time_total": 0.051485, "speed_download": 1359}, "post:/api/sign/{token}/send-otp": {"http_code": 500, "size_download": 70, "time_total": 0.017789, "speed_download": 3934}, "get:/api/payments": {"http_code": 200, "size_download": 356, "time_total": 0.006844, "speed_download": 52017}, "post:/api/payments": {"http_code": 500, "size_download": 70, "time_total": 0.020344, "speed_download": 3440}, "post:/api/payments/{id}/cancel": {"http_code": 403, "size_download": 95, "time_total": 0.005647, "speed_download": 16824}, "post:/api/payments/confirm": {"http_code": 403, "size_download": 95, "time_total": 0.009705, "speed_download": 9789}, "get:/api/documents": {"http_code": 200, "size_download": 356, "time_total": 0.008126, "speed_download": 43810}, "post:/api/documents": {"http_code": 500, "size_download": 70, "time_total": 0.026456, "speed_download": 2645}, "post:/api/documents/{id}/send": {"http_code": 403, "size_download": 96, "time_total": 0.009944, "speed_download": 9654}, "post:/api/documents/{id}/resend": {"http_code": 403, "size_download": 96, "time_total": 0.009064, "speed_download": 10591}, "post:/api/documents/{id}/live-sign/{signerId}": {"http_code": 403, "size_download": 96, "time_total": 0.006997, "speed_download": 13719}, "get:/api/account-applications": {"http_code": 200, "size_download": 356, "time_total": 0.007171, "speed_download": 49647}, "post:/api/account-applications": {"http_code": 500, "size_download": 70, "time_total": 0.023808, "speed_download": 2940}, "post:/api/account-applications/{id}/submit": {"http_code": 403, "size_download": 99, "time_total": 0.008549, "speed_download": 11580}, "post:/api/account-applications/{id}/regenerate-contract": {"http_code": 403, "size_download": 99, "time_total": 0.009779, "speed_download": 10123}, "post:/api/account-applications/{id}/kyc": {"http_code": 403, "size_download": 99, "time_total": 0.00842, "speed_download": 11757}, "post:/api/account-applications/{id}/generate-contract": {"http_code": 500, "size_download": 70, "time_total": 0.045578, "speed_download": 1535}, "get:/api/sign/verify/{token}": {"http_code": 200, "size_download": 229, "time_total": 0.006259, "speed_download": 36588}, "get:/api/payments/{id}": {"http_code": 403, "size_download": 95, "time_total": 0.007057, "speed_download": 13462}, "get:/api/payments/config": {"http_code": 200, "size_download": 79, "time_total": 0.002849, "speed_download": 27728}, "get:/api/payments/changes": {"http_code": 500, "size_download": 70, "time_total": 0.008521, "speed_download": 8215}, "get:/api/documents/{id}": {"http_code": 403, "size_download": 96, "time_total": 0.007415, "speed_download": 12947}, "delete:/api/documents/{id}": {"http_code": 403, "size_download": 96, "time_total": 0.004783, "speed_download": 20071}, "get:/api/documents/{id}/download": {"http_code": 403, "size_download": 96, "time_total": 0.005554, "speed_download": 17285}, "get:/api/documents/changes": {"http_code": 500, "size_download": 70, "time_total": 0.008071, "speed_download": 8673}, "get:/api/auth/me": {"http_code": 500, "size_download": 70, "time_total": 0.014924, "speed_download": 4690}, "get:/api/account-types": {"http_code": 200, "size_download": 559, "time_total": 0.005134, "speed_download": 108889}, "get:/api/account-applications/changes": {"http_code": 500, "size_download": 70, "time_total": 0.007323, "speed_download": 9558}, "delete:/api/account-applications/{id}/kyc/{kycId}": {"http_code": 403, "size_download": 99, "time_total": 0.006545, "speed_download": 15126}}, "discovered_endpoints": [{"method": "GET", "path": "/api/account-applications/{id}", "operationId": "get", "summary": "Get account application detail (supports field filtering)", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.061476, "speed_download": 1610}, {"method": "PUT", "path": "/api/account-applications/{id}", "operationId": "update", "summary": "Update an account application", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.026967, "speed_download": 3671}, {"method": "DELETE", "path": "/api/account-applications/{id}", "operationId": "delete", "summary": "Delete an account application", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.011743, "speed_download": 8430}, {"method": "POST", "path": "/api/sign/{token}", "operationId": "signDocument", "summary": "Submit signature for a document (public)", "tags": ["Documents"], "http_code": 409, "size_download": 80, "time_total": 0.016234, "speed_download": 4927}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "operationId": "verifyOtp", "summary": "Verify OTP code (public)", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.051485, "speed_download": 1359}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "operationId": "sendOtp", "summary": "Send OTP code via SMS to signer (public)", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.017789, "speed_download": 3934}, {"method": "GET", "path": "/api/payments", "operationId": "getMyPayments", "summary": "List my payments (supports pagination & field filtering)", "tags": ["Payments"], "http_code": 200, "size_download": 356, "time_total": 0.006844, "speed_download": 52017}, {"method": "POST", "path": "/api/payments", "operationId": "createPayment", "summary": "Create a new payment", "tags": ["Payments"], "http_code": 500, "size_download": 70, "time_total": 0.020344, "speed_download": 3440}, {"method": "POST", "path": "/api/payments/{id}/cancel", "operationId": "cancelPayment", "summary": "Cancel a payment", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.005647, "speed_download": 16824}, {"method": "POST", "path": "/api/payments/confirm", "operationId": "confirmPayment", "summary": "Confirm payment after 3D Secure", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.009705, "speed_download": 9789}, {"method": "GET", "path": "/api/documents", "operationId": "getMyDocuments", "summary": "List my documents (supports pagination & field filtering)", "tags": ["Documents"], "http_code": 200, "size_download": 356, "time_total": 0.008126, "speed_download": 43810}, {"method": "POST", "path": "/api/documents", "operationId": "createDocument", "summary": "Create a new document", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.026456, "speed_download": 2645}, {"method": "POST", "path": "/api/documents/{id}/send", "operationId": "sendForSignature", "summary": "Send document for signature", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.009944, "speed_download": 9654}, {"method": "POST", "path": "/api/documents/{id}/resend", "operationId": "resendForSignature", "summary": "Resend signature request to pending signers", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.009064, "speed_download": 10591}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "operationId": "liveSign", "summary": "Live/in-person signature on behalf of a signer", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.006997, "speed_download": 13719}, {"method": "GET", "path": "/api/account-applications", "operationId": "list", "summary": "List my account applications (supports pagination & field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 356, "time_total": 0.007171, "speed_download": 49647}, {"method": "POST", "path": "/api/account-applications", "operationId": "create", "summary": "Create a new account application", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.023808, "speed_download": 2940}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "operationId": "submit", "summary": "Submit an account application for review", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.008549, "speed_download": 11580}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "operationId": "regenerateContract", "summary": "Regenerate contract PDF", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.009779, "speed_download": 10123}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "operationId": "uploadKyc", "summary": "Upload a KYC document (base64)", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.00842, "speed_download": 11757}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "operationId": "generateContract", "summary": "Generate contract PDF for the application", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.045578, "speed_download": 1535}, {"method": "GET", "path": "/api/sign/verify/{token}", "operationId": "verifySignatureToken", "summary": "Verify a signature token (public)", "tags": ["Documents"], "http_code": 200, "size_download": 229, "time_total": 0.006259, "speed_download": 36588}, {"method": "GET", "path": "/api/payments/{id}", "operationId": "getPayment", "summary": "Get payment detail (supports field filtering)", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.007057, "speed_download": 13462}, {"method": "GET", "path": "/api/payments/config", "operationId": "getPaymentConfig", "summary": "Get Stripe publishable key", "tags": ["Payments"], "http_code": 200, "size_download": 79, "time_total": 0.002849, "speed_download": 27728}, {"method": "GET", "path": "/api/payments/changes", "operationId": "getPaymentsChanges", "summary": "Get payments changed since a given timestamp (delta sync)", "tags": ["Payments"], "http_code": 500, "size_download": 70, "time_total": 0.008521, "speed_download": 8215}, {"method": "GET", "path": "/api/documents/{id}", "operationId": "getDocument", "summary": "Get document detail (supports field filtering)", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.007415, "speed_download": 12947}, {"method": "DELETE", "path": "/api/documents/{id}", "operationId": "deleteDocument", "summary": "Delete a document", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.004783, "speed_download": 20071}, {"method": "GET", "path": "/api/documents/{id}/download", "operationId": "downloadDocument", "summary": "Download document file (supports Range/206 partial content)", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.005554, "speed_download": 17285}, {"method": "GET", "path": "/api/documents/changes", "operationId": "getDocumentsChanges", "summary": "Get documents changed since a given timestamp (delta sync)", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.008071, "speed_download": 8673}, {"method": "GET", "path": "/api/auth/me", "operationId": "getCurrentUser", "summary": "Get current authenticated user (supports field filtering)", "tags": ["Authentication"], "http_code": 500, "size_download": 70, "time_total": 0.014924, "speed_download": 4690}, {"method": "GET", "path": "/api/account-types", "operationId": "getAccountTypes", "summary": "List available account types (supports field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 559, "time_total": 0.005134, "speed_download": 108889}, {"method": "GET", "path": "/api/account-applications/changes", "operationId": "getChanges", "summary": "Get applications changed since a given timestamp (delta sync)", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.007323, "speed_download": 9558}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "operationId": "deleteKyc", "summary": "Delete a KYC document", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.006545, "speed_download": 15126}]}}};
+const RAW_EMBEDDED = {"appname": "esignpaym-api", "report": {"timestamp": "2026-04-04T22:19:08Z", "green_score": {"total": 69, "max": 100, "grade": "B", "breakdown": {"DE11_pagination": 5, "DE08_fields": 13, "DE01_compression": 15, "DE02_DE03_cache": 15, "DE06_delta": 2, "range_206": 10, "AR02_format_cbor": 0, "LO01_observability": 4, "US07_rate_limit": 5}, "details": {"DE11_pagination": {"note": "Pagination on 3/9 collection endpoint(s)"}, "DE08_fields": {"note": "Field filtering on 12 endpoint(s)"}, "DE01_compression": {"note": "Gzip compression active (OpenAPI servers.x-server-compression.enabled=true)"}, "DE02_DE03_cache": {"http_code": 304, "note": "ETag + 304 supported (OpenAPI servers.x-server-etag-support.enabled=true)"}, "DE06_delta": {"note": "Delta endpoint(s) found: 3"}, "range_206": {"http_code": 206, "note": "Range/206 supported (OpenAPI servers.x-server-range-support.enabled=true)"}, "AR02_format_cbor": {"note": "Binary format on 1 endpoint(s)"}, "LO01_observability": {"note": "Actuator/health detected"}, "US07_rate_limit": {"note": "Rate-limit headers detected"}}, "rule_resource_mapping": {"DE11_pagination": {"id": "DE11", "label": "Pagination", "description": "Les endpoints de collection doivent supporter la pagination (page/size ou limit/offset).", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/payments", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}], "validated": true, "score": 5, "matched_count": 3, "candidate_count": 9, "suggestions": [{"target": "GET /api/payments/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/documents/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/account-types", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}, {"target": "GET /api/account-applications/changes", "action": "Add pagination parameters (page & size)", "priority": "high", "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections", "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."}]}, "DE08_fields": {"id": "DE08", "label": "Filtrage de champs", "description": "Supporter un parametre 'fields' pour reduire le payload.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Field filter params: fields"}], "validated": true, "score": 13, "matched_count": 12, "candidate_count": 14, "suggestions": []}, "DE01_compression": {"id": "DE01", "label": "Compression", "description": "Le serveur doit supporter Accept-Encoding: gzip.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/confirm", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}], "validated": true, "score": 15, "matched_count": 34, "candidate_count": 34, "suggestions": []}, "DE02_DE03_cache": {"id": "DE02/DE03", "label": "Cache ETag/304", "description": "Les ressources unitaires doivent supporter ETag + If-None-Match -> 304.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-etag-support.enabled=true"}], "validated": true, "score": 15, "matched_count": 5, "candidate_count": 5, "suggestions": []}, "DE06_delta": {"id": "DE06", "label": "Delta / Changes", "description": "Un endpoint /changes?since= ou equivalent doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}], "validated": true, "score": 2, "matched_count": 3, "candidate_count": 14, "suggestions": [{"target": "GET /api/payments/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."}, {"target": "GET /api/documents/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."}, {"target": "GET /api/account-applications/changes  (new endpoint)", "action": "Add a delta/changes endpoint with a 'since' parameter", "priority": "medium", "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync", "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."}]}, "range_206": {"id": "206", "label": "Range / Partial Content", "description": "Supporter le header Range pour les gros payloads.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}], "validated": true, "score": 10, "matched_count": 14, "candidate_count": 14, "suggestions": []}, "AR02_format_cbor": {"id": "AR02", "label": "Format binaire (CBOR)", "description": "Un endpoint en format binaire (CBOR, protobuf...) doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/confirm", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "Binary format (CBOR/protobuf/octet-stream)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": false, "reason": "Standard JSON format"}], "validated": true, "score": 0, "matched_count": 1, "candidate_count": 34, "suggestions": [{"target": "GET /api/payments  (add CBOR variant)", "action": "Add a binary format alternative (CBOR or Protobuf)", "priority": "low", "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON", "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."}, {"target": "GET /api/documents  (add CBOR variant)", "action": "Add a binary format alternative (CBOR or Protobuf)", "priority": "low", "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON", "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."}]}, "LO01_observability": {"id": "LO01", "label": "Observabilite", "description": "Actuator / health / metrics doit etre expose.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/actuator/health", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/health", "matched": false, "reason": "HTTP 500"}, {"method": "GET", "path": "/actuator", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/metrics", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/info", "matched": true, "reason": "HTTP 200 OK"}], "validated": true, "score": 4, "matched_count": 4, "candidate_count": 5, "suggestions": [{"target": "/actuator/health, /actuator/metrics", "action": "Expose Spring Boot Actuator endpoints", "priority": "high", "impact": "+5 pts \u2014 essential for production monitoring", "how": "Spring Boot application.yml:\n  management:\n    endpoints:\n      web:\n        exposure:\n          include: health,info,metrics\n    endpoint:\n      health:\n        show-details: when-authorized\n\nAdd dependency: spring-boot-starter-actuator (likely already present)."}]}, "US07_rate_limit": {"id": "US07", "label": "Rate Limiting", "description": "Un mecanisme de rate limiting doit etre present.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/sign/{token}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/payments", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/payments/confirm", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}], "validated": true, "score": 5, "matched_count": 32, "candidate_count": 34, "suggestions": [{"target": "ALL endpoints (server-level)", "action": "Add rate-limit response headers", "priority": "medium", "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients", "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"}]}}, "endpoint_rules": {"get:/api/payments": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/config": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/auth/me": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-types": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/sign/verify/{token}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}/download": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "put:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/webhooks/stripe": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/verify-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/send-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/{id}/cancel": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/confirm": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/send": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/resend": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/live-sign/{signerId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/submit": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/regenerate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/kyc": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/generate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/documents/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}/kyc/{kycId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "get:/actuator/health": ["LO01_observability"], "get:/health": ["LO01_observability"], "get:/actuator": ["LO01_observability"], "get:/actuator/metrics": ["LO01_observability"], "get:/actuator/info": ["LO01_observability"]}}, "measurements": {"baseline": {"full_payload": {"http_code": 500, "size_download": 70, "time_total": 0.023979, "speed_download": 2919}, "single_resource": {"http_code": 500, "size_download": 70, "time_total": 0.011218, "speed_download": 6239}, "single_repeat": {"http_code": 500, "size_download": 70, "time_total": 0.010213, "speed_download": 6854}}, "optimized": {"delta_changes": {"http_code": 200, "size_download": 1335, "time_total": 0.005262, "speed_download": 253697}, "full_payload": {"http_code": 200, "size_download": 8083, "time_total": 0.00921, "speed_download": 877644}}}, "auto_discovery": {"base_url": "http://localhost:8080", "endpoints_discovered": 33, "endpoints_measured": 33, "all_measurements": {"get:/api/account-applications/{id}": {"http_code": 200, "size_download": 917, "time_total": 0.01218, "speed_download": 75289}, "put:/api/account-applications/{id}": {"http_code": 200, "size_download": 938, "time_total": 0.026554, "speed_download": 35324}, "delete:/api/account-applications/{id}": {"http_code": 200, "size_download": 60, "time_total": 0.014051, "speed_download": 4270}, "post:/api/sign/{token}": {"http_code": 200, "size_download": 1343, "time_total": 0.030165, "speed_download": 44521}, "post:/api/sign/{token}/verify-otp": {"http_code": 200, "size_download": 117, "time_total": 0.007123, "speed_download": 16426}, "post:/api/sign/{token}/send-otp": {"http_code": 200, "size_download": 135, "time_total": 0.006969, "speed_download": 19371}, "get:/api/payments": {"http_code": 200, "size_download": 1324, "time_total": 0.007222, "speed_download": 183335}, "post:/api/payments": {"http_code": 201, "size_download": 492, "time_total": 0.049703, "speed_download": 9898}, "post:/api/payments/{id}/cancel": {"http_code": 200, "size_download": 373, "time_total": 0.007267, "speed_download": 51330}, "post:/api/payments/confirm": {"http_code": 200, "size_download": 384, "time_total": 0.008981, "speed_download": 42755}, "get:/api/documents": {"http_code": 200, "size_download": 5560, "time_total": 0.007605, "speed_download": 731115}, "post:/api/documents": {"http_code": 201, "size_download": 758, "time_total": 0.012957, "speed_download": 58503}, "post:/api/documents/{id}/send": {"http_code": 200, "size_download": 752, "time_total": 0.00809, "speed_download": 92952}, "post:/api/documents/{id}/resend": {"http_code": 200, "size_download": 772, "time_total": 0.007194, "speed_download": 107307}, "post:/api/documents/{id}/live-sign/{signerId}": {"http_code": 200, "size_download": 768, "time_total": 0.311664, "speed_download": 2464}, "get:/api/account-applications": {"http_code": 200, "size_download": 6275, "time_total": 0.010123, "speed_download": 619869}, "post:/api/account-applications": {"http_code": 201, "size_download": 931, "time_total": 0.010609, "speed_download": 87753}, "post:/api/account-applications/{id}/submit": {"http_code": 200, "size_download": 1949, "time_total": 0.008794, "speed_download": 221638}, "post:/api/account-applications/{id}/regenerate-contract": {"http_code": 200, "size_download": 1318, "time_total": 0.016543, "speed_download": 79668}, "post:/api/account-applications/{id}/kyc": {"http_code": 201, "size_download": 363, "time_total": 0.008503, "speed_download": 42691}, "post:/api/account-applications/{id}/generate-contract": {"http_code": 200, "size_download": 1143, "time_total": 0.011311, "speed_download": 101048}, "get:/api/sign/verify/{token}": {"http_code": 200, "size_download": 229, "time_total": 0.003028, "speed_download": 75636}, "get:/api/payments/{id}": {"http_code": 200, "size_download": 359, "time_total": 0.002747, "speed_download": 130699}, "get:/api/payments/config": {"http_code": 200, "size_download": 79, "time_total": 0.001926, "speed_download": 41027}, "get:/api/payments/changes": {"http_code": 200, "size_download": 1335, "time_total": 0.005262, "speed_download": 253697}, "get:/api/documents/{id}": {"http_code": 200, "size_download": 723, "time_total": 0.003337, "speed_download": 216686}, "delete:/api/documents/{id}": {"http_code": 200, "size_download": 70, "time_total": 0.003959, "speed_download": 17679}, "get:/api/documents/{id}/download": {"http_code": 404, "size_download": 106, "time_total": 0.003553, "speed_download": 29834}, "get:/api/documents/changes": {"http_code": 200, "size_download": 5998, "time_total": 0.00595, "speed_download": 1007999}, "get:/api/auth/me": {"http_code": 200, "size_download": 209, "time_total": 0.002586, "speed_download": 80833}, "get:/api/account-types": {"http_code": 200, "size_download": 559, "time_total": 0.009055, "speed_download": 61736}, "get:/api/account-applications/changes": {"http_code": 200, "size_download": 8083, "time_total": 0.00921, "speed_download": 877644}, "delete:/api/account-applications/{id}/kyc/{kycId}": {"http_code": 200, "size_download": 61, "time_total": 0.006441, "speed_download": 9470}}, "discovered_endpoints": [{"method": "GET", "path": "/api/account-applications/{id}", "operationId": "get", "summary": "Get account application detail (supports field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 917, "time_total": 0.01218, "speed_download": 75289}, {"method": "PUT", "path": "/api/account-applications/{id}", "operationId": "update", "summary": "Update an account application", "tags": ["Account Applications"], "http_code": 200, "size_download": 938, "time_total": 0.026554, "speed_download": 35324}, {"method": "DELETE", "path": "/api/account-applications/{id}", "operationId": "delete", "summary": "Delete an account application", "tags": ["Account Applications"], "http_code": 200, "size_download": 60, "time_total": 0.014051, "speed_download": 4270}, {"method": "POST", "path": "/api/sign/{token}", "operationId": "signDocument", "summary": "Submit signature for a document (public)", "tags": ["Documents"], "http_code": 200, "size_download": 1343, "time_total": 0.030165, "speed_download": 44521}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "operationId": "verifyOtp", "summary": "Verify OTP code (public)", "tags": ["Documents"], "http_code": 200, "size_download": 117, "time_total": 0.007123, "speed_download": 16426}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "operationId": "sendOtp", "summary": "Send OTP code via SMS to signer (public)", "tags": ["Documents"], "http_code": 200, "size_download": 135, "time_total": 0.006969, "speed_download": 19371}, {"method": "GET", "path": "/api/payments", "operationId": "getMyPayments", "summary": "List my payments (supports pagination & field filtering)", "tags": ["Payments"], "http_code": 200, "size_download": 1324, "time_total": 0.007222, "speed_download": 183335}, {"method": "POST", "path": "/api/payments", "operationId": "createPayment", "summary": "Create a new payment", "tags": ["Payments"], "http_code": 201, "size_download": 492, "time_total": 0.049703, "speed_download": 9898}, {"method": "POST", "path": "/api/payments/{id}/cancel", "operationId": "cancelPayment", "summary": "Cancel a payment", "tags": ["Payments"], "http_code": 200, "size_download": 373, "time_total": 0.007267, "speed_download": 51330}, {"method": "POST", "path": "/api/payments/confirm", "operationId": "confirmPayment", "summary": "Confirm payment after 3D Secure", "tags": ["Payments"], "http_code": 200, "size_download": 384, "time_total": 0.008981, "speed_download": 42755}, {"method": "GET", "path": "/api/documents", "operationId": "getMyDocuments", "summary": "List my documents (supports pagination & field filtering)", "tags": ["Documents"], "http_code": 200, "size_download": 5560, "time_total": 0.007605, "speed_download": 731115}, {"method": "POST", "path": "/api/documents", "operationId": "createDocument", "summary": "Create a new document", "tags": ["Documents"], "http_code": 201, "size_download": 758, "time_total": 0.012957, "speed_download": 58503}, {"method": "POST", "path": "/api/documents/{id}/send", "operationId": "sendForSignature", "summary": "Send document for signature", "tags": ["Documents"], "http_code": 200, "size_download": 752, "time_total": 0.00809, "speed_download": 92952}, {"method": "POST", "path": "/api/documents/{id}/resend", "operationId": "resendForSignature", "summary": "Resend signature request to pending signers", "tags": ["Documents"], "http_code": 200, "size_download": 772, "time_total": 0.007194, "speed_download": 107307}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "operationId": "liveSign", "summary": "Live/in-person signature on behalf of a signer", "tags": ["Documents"], "http_code": 200, "size_download": 768, "time_total": 0.311664, "speed_download": 2464}, {"method": "GET", "path": "/api/account-applications", "operationId": "list", "summary": "List my account applications (supports pagination & field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 6275, "time_total": 0.010123, "speed_download": 619869}, {"method": "POST", "path": "/api/account-applications", "operationId": "create", "summary": "Create a new account application", "tags": ["Account Applications"], "http_code": 201, "size_download": 931, "time_total": 0.010609, "speed_download": 87753}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "operationId": "submit", "summary": "Submit an account application for review", "tags": ["Account Applications"], "http_code": 200, "size_download": 1949, "time_total": 0.008794, "speed_download": 221638}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "operationId": "regenerateContract", "summary": "Regenerate contract PDF", "tags": ["Account Applications"], "http_code": 200, "size_download": 1318, "time_total": 0.016543, "speed_download": 79668}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "operationId": "uploadKyc", "summary": "Upload a KYC document (base64)", "tags": ["Account Applications"], "http_code": 201, "size_download": 363, "time_total": 0.008503, "speed_download": 42691}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "operationId": "generateContract", "summary": "Generate contract PDF for the application", "tags": ["Account Applications"], "http_code": 200, "size_download": 1143, "time_total": 0.011311, "speed_download": 101048}, {"method": "GET", "path": "/api/sign/verify/{token}", "operationId": "verifySignatureToken", "summary": "Verify a signature token (public)", "tags": ["Documents"], "http_code": 200, "size_download": 229, "time_total": 0.003028, "speed_download": 75636}, {"method": "GET", "path": "/api/payments/{id}", "operationId": "getPayment", "summary": "Get payment detail (supports field filtering)", "tags": ["Payments"], "http_code": 200, "size_download": 359, "time_total": 0.002747, "speed_download": 130699}, {"method": "GET", "path": "/api/payments/config", "operationId": "getPaymentConfig", "summary": "Get Stripe publishable key", "tags": ["Payments"], "http_code": 200, "size_download": 79, "time_total": 0.001926, "speed_download": 41027}, {"method": "GET", "path": "/api/payments/changes", "operationId": "getPaymentsChanges", "summary": "Get payments changed since a given timestamp (delta sync)", "tags": ["Payments"], "http_code": 200, "size_download": 1335, "time_total": 0.005262, "speed_download": 253697}, {"method": "GET", "path": "/api/documents/{id}", "operationId": "getDocument", "summary": "Get document detail (supports field filtering)", "tags": ["Documents"], "http_code": 200, "size_download": 723, "time_total": 0.003337, "speed_download": 216686}, {"method": "DELETE", "path": "/api/documents/{id}", "operationId": "deleteDocument", "summary": "Delete a document", "tags": ["Documents"], "http_code": 200, "size_download": 70, "time_total": 0.003959, "speed_download": 17679}, {"method": "GET", "path": "/api/documents/{id}/download", "operationId": "downloadDocument", "summary": "Download document file (supports Range/206 partial content)", "tags": ["Documents"], "http_code": 404, "size_download": 106, "time_total": 0.003553, "speed_download": 29834}, {"method": "GET", "path": "/api/documents/changes", "operationId": "getDocumentsChanges", "summary": "Get documents changed since a given timestamp (delta sync)", "tags": ["Documents"], "http_code": 200, "size_download": 5998, "time_total": 0.00595, "speed_download": 1007999}, {"method": "GET", "path": "/api/auth/me", "operationId": "getCurrentUser", "summary": "Get current authenticated user (supports field filtering)", "tags": ["Authentication"], "http_code": 200, "size_download": 209, "time_total": 0.002586, "speed_download": 80833}, {"method": "GET", "path": "/api/account-types", "operationId": "getAccountTypes", "summary": "List available account types (supports field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 559, "time_total": 0.009055, "speed_download": 61736}, {"method": "GET", "path": "/api/account-applications/changes", "operationId": "getChanges", "summary": "Get applications changed since a given timestamp (delta sync)", "tags": ["Account Applications"], "http_code": 200, "size_download": 8083, "time_total": 0.00921, "speed_download": 877644}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "operationId": "deleteKyc", "summary": "Delete a KYC document", "tags": ["Account Applications"], "http_code": 200, "size_download": 61, "time_total": 0.006441, "speed_download": 9470}]}}};
 
 // ─── Unwrap envelope {appname, report} ─────────────────────────
 function unwrapEnvelope(data) {
@@ -1044,34 +1044,44 @@ function loadFromUrl() {
 function addToHistory(report) {
     // Avoid duplicates by timestamp
     if (!history.find(h => h.timestamp === report.timestamp)) {
-        // Compute energy & CO2 for this report
-        const m = report.measurements || {};
-        const optKeys = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
+        // Compute energy & CO₂ from ALL discovered endpoints (single API model)
+        const disc = report.auto_discovery?.discovered_endpoints;
         let eWh = 0;
-        for (const k of optKeys) {
-            const ep = m.optimized?.[k];
-            if (ep) {
+        let epCount = 0;
+        let totalBytes = 0;
+
+        if (disc && disc.length > 0) {
+            // Sum energy from every discovered endpoint
+            for (const ep of disc) {
                 eWh += energyNetworkWh(ep.size_download || 0) + energyServerWh(ep.time_total || 0);
+                totalBytes += (ep.size_download || 0);
+                epCount++;
+            }
+        } else {
+            // Legacy fallback: sum from all optimized + baseline measurements
+            const m = report.measurements || {};
+            for (const section of [m.optimized || {}, m.baseline || {}]) {
+                for (const [k, ep] of Object.entries(section)) {
+                    if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                        eWh += energyNetworkWh(ep.size_download || 0) + energyServerWh(ep.time_total || 0);
+                        totalBytes += (ep.size_download || 0);
+                        epCount++;
+                    }
+                }
             }
         }
         const co2 = energyWhToCO2g(eWh);
 
-        // Naive full payload energy (non optimisé)
-        const naiveSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-        const naiveTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-        const naiveWh = energyNetworkWh(naiveSize) + energyServerWh(naiveTime);
-        const naiveCO2 = energyWhToCO2g(naiveWh);
-
         history.push({
             timestamp: report.timestamp,
             total: report.green_score.total,
-            max: report.green_score.max || 9,
+            max: report.green_score.max || 100,
             grade: report.green_score.grade,
             breakdown: report.green_score.breakdown,
             energyWh: eWh,
             co2g: co2,
-            naiveEnergyWh: naiveWh,
-            naiveCO2g: naiveCO2
+            endpointCount: epCount,
+            totalBytes: totalBytes
         });
         history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
         // Keep last 50
@@ -1165,112 +1175,102 @@ function renderReport(report) {
             </div>`;
     }
 
-    // Comparison bars
+    // Comparison bars — Payload per endpoint
     const compCard = document.getElementById('comparison-card');
     compCard.style.display = 'block';
     const compBars = document.getElementById('comparison-bars');
     compBars.innerHTML = '';
 
-    const fullNaiveBytes = m.baseline?.full_payload?.size_download || 0;
-    const fullOptBytes = m.optimized?.full_payload?.size_download || fullNaiveBytes;
-
-    // ── Build payload comparisons dynamically or fallback ──
+    // ── Build payload list from discovered endpoints or legacy ──
     let comparisons = [];
     const discEps = currentReport.auto_discovery?.discovered_endpoints;
     if (discEps && discEps.length > 0) {
-        const baseRef = fullOptBytes || fullNaiveBytes;
         for (const ep of discEps) {
             if ((ep.size_download || 0) === 0) continue;
             const label = `${ep.method} ${ep.path}`;
-            comparisons.push({ label, baseline: baseRef, optimized: ep.size_download || 0 });
+            comparisons.push({ label, size: ep.size_download || 0 });
         }
     } else {
-        comparisons = [
-            { label: 'Pagination (DE11)', baseline: fullNaiveBytes, optimized: m.optimized?.pagination?.size_download, rule: 'DE11' },
-            { label: 'Fields filter (DE08)', baseline: fullNaiveBytes, optimized: m.optimized?.fields_filter?.size_download, rule: 'DE08' },
-            { label: 'Gzip compression (DE01)', baseline: fullNaiveBytes, optimized: m.optimized?.gzip_compression?.size_download, rule: 'DE01' },
-            { label: 'ETag 304 (DE02)', baseline: fullNaiveBytes, optimized: m.optimized?.etag_304?.size_download, rule: 'DE02' },
-            { label: 'Delta changes (DE06)', baseline: fullOptBytes, optimized: m.optimized?.delta_changes?.size_download, rule: 'DE06', note: 'vs full optimise' },
-            { label: 'Range 206', baseline: fullNaiveBytes, optimized: m.optimized?.range_206?.size_download, rule: '206' },
-            { label: 'CBOR format (AR02)', baseline: fullOptBytes, optimized: m.optimized?.cbor_format?.size_download, rule: 'AR02', note: 'vs full optimise JSON' },
+        // Legacy fallback
+        const fullRef = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
+        const legacyEntries = [
+            { label: 'Full payload', key: 'full_payload' },
+            { label: 'Pagination (DE11)', key: 'pagination' },
+            { label: 'Fields filter (DE08)', key: 'fields_filter' },
+            { label: 'Gzip (DE01)', key: 'gzip_compression' },
+            { label: 'ETag 304 (DE02)', key: 'etag_304' },
+            { label: 'Delta (DE06)', key: 'delta_changes' },
+            { label: 'Range 206', key: 'range_206' },
+            { label: 'CBOR (AR02)', key: 'cbor_format' },
         ];
+        for (const e of legacyEntries) {
+            const ep = m.optimized?.[e.key] || m.baseline?.[e.key];
+            if (ep && (ep.size_download || 0) > 0) {
+                comparisons.push({ label: e.label, size: ep.size_download });
+            }
+        }
     }
 
-    const maxBytes = Math.max(...comparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 1);
+    // Sort by size descending for visual impact
+    comparisons.sort((a, b) => b.size - a.size);
+    const maxBytes = comparisons.length > 0 ? comparisons[0].size : 1;
 
     for (const c of comparisons) {
-        const b = c.baseline || 0;
-        const o = c.optimized || 0;
-        const gain = b > 0 ? Math.round((1 - o / b) * 100) : 0;
-        const gainCls = gain > 0 ? 'positive' : 'negative';
-        const noteHtml = c.note ? ` <span style="font-size:0.7rem;color:var(--gray-400);">(${c.note})</span>` : '';
-
+        const pct = maxBytes > 0 ? (c.size / maxBytes * 100).toFixed(1) : 0;
         compBars.innerHTML += `
             <div class="comparison-row">
-                <div class="comparison-label">${c.label}${noteHtml} <span class="gain-badge ${gainCls}">${gain > 0 ? '-' : '+'}${Math.abs(gain)}%</span></div>
-                <div class="comparison-values"><span>Avant: ${formatBytes(b)}</span><span>Après: ${formatBytes(o)}</span></div>
+                <div class="comparison-label">${c.label} <span style="color:var(--gray-400);font-size:0.78rem;">${formatBytes(c.size)}</span></div>
                 <div class="bar-container">
-                    <div class="bar baseline" style="width:${(b/maxBytes*100).toFixed(1)}%">${formatBytes(b)}</div>
-                </div>
-                <div class="bar-container">
-                    <div class="bar optimized" style="width:${(o/maxBytes*100).toFixed(1)}%">${formatBytes(o)}</div>
+                    <div class="bar optimized" style="width:${pct}%">${formatBytes(c.size)}</div>
                 </div>
             </div>`;
     }
 
-    // Response Times card
+    // Response Times card — time per endpoint
     const rtCard = document.getElementById('response-times-card');
     rtCard.style.display = 'block';
     const rtBars = document.getElementById('response-times-bars');
     rtBars.innerHTML = '';
 
-    const bFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-
-    // ── Build time comparisons dynamically or fallback ──
-    let timeComparisons = [];
+    // ── Build time list from discovered endpoints or legacy ──
+    let timeEntries = [];
     if (discEps && discEps.length > 0) {
         for (const ep of discEps) {
             if ((ep.time_total || 0) === 0) continue;
             const label = `${ep.method} ${ep.path}`;
-            timeComparisons.push({ label, baseline: bFullTime, optimized: ep.time_total || 0 });
+            timeEntries.push({ label, time: ep.time_total || 0 });
         }
     } else {
-        timeComparisons = [
-            { label: 'GET /books (full naif)', baseline: bFullTime, optimized: bFullTime },
-            { label: 'GET /books (paginated)', baseline: bFullTime, optimized: m.optimized?.pagination?.time_total },
-            { label: 'GET /books/select (fields)', baseline: bFullTime, optimized: m.optimized?.fields_filter?.time_total },
-            { label: 'GET /books (gzip)', baseline: bFullTime, optimized: m.optimized?.gzip_compression?.time_total },
-            { label: 'GET /books/1 (1er appel)', baseline: bFullTime, optimized: m.optimized?.etag_first_call?.time_total },
-            { label: 'GET /books/1 (ETag 304)', baseline: bFullTime, optimized: m.optimized?.etag_304?.time_total },
-            { label: 'GET /books/changes (delta)', baseline: bFullTime, optimized: m.optimized?.delta_changes?.time_total },
-            { label: 'GET /books/1/summary (range)', baseline: bFullTime, optimized: m.optimized?.range_206?.time_total },
+        const legacyTimeEntries = [
+            { label: 'Full payload', key: 'full_payload' },
+            { label: 'Pagination', key: 'pagination' },
+            { label: 'Fields filter', key: 'fields_filter' },
+            { label: 'Gzip', key: 'gzip_compression' },
+            { label: 'ETag 1st call', key: 'etag_first_call' },
+            { label: 'ETag 304', key: 'etag_304' },
+            { label: 'Delta', key: 'delta_changes' },
+            { label: 'Range 206', key: 'range_206' },
         ];
+        for (const e of legacyTimeEntries) {
+            const ep = m.optimized?.[e.key] || m.baseline?.[e.key];
+            if (ep && (ep.time_total || 0) > 0) {
+                timeEntries.push({ label: e.label, time: ep.time_total });
+            }
+        }
     }
 
-    const maxTime = Math.max(...timeComparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 0.001);
+    // Sort by time descending
+    timeEntries.sort((a, b) => b.time - a.time);
+    const maxTime = timeEntries.length > 0 ? timeEntries[0].time : 0.001;
 
-    for (const tc of timeComparisons) {
-        const bt = tc.baseline || 0;
-        const ot = tc.optimized || 0;
-        let speedupHtml = '';
-        if (bt > 0 && ot > 0) {
-            const speedup = Math.round((1 - ot / bt) * 100);
-            const cls = speedup > 0 ? 'faster' : 'slower';
-            speedupHtml = `<span class=\"time-speedup ${cls}\">${speedup > 0 ? '⚡' : '🐢'} ${speedup > 0 ? '-' : '+'}${Math.abs(speedup)}%</span>`;
-        }
+    for (const tc of timeEntries) {
+        const pct = maxTime > 0 ? (tc.time / maxTime * 100).toFixed(1) : 0;
         rtBars.innerHTML += `
-            <div class=\"time-row\">
-                <div class=\"endpoint-label\">${tc.label} ${speedupHtml}</div>
-                ${bt > 0 ? `
-                <div class=\"time-pair\">
-                    <div class=\"label\">Full naive</div>
-                    <div class=\"bar-container\"><div class=\"bar time-baseline\" style=\"width:${(bt/maxTime*100).toFixed(1)}%\"></div></div>
-                    <div class=\"value\">${bt.toFixed(3)}s</div>
-                </div>` : ''}
-                <div class=\"time-pair\">
-                    <div class=\"label\">Mesure</div>
-                    <div class=\"bar-container\"><div class=\"bar time-optimized\" style=\"width:${(ot/maxTime*100).toFixed(1)}%\"></div></div>
-                    <div class=\"value\">${ot.toFixed(3)}s</div>
+            <div class="time-row">
+                <div class="endpoint-label">${tc.label} <span style="color:var(--gray-400);font-size:0.78rem;">${tc.time.toFixed(3)}s</span></div>
+                <div class="time-pair">
+                    <div class="bar-container"><div class="bar time-optimized" style="width:${pct}%"></div></div>
+                    <div class="value">${tc.time.toFixed(3)}s</div>
                 </div>
             </div>`;
     }
@@ -1279,33 +1279,41 @@ function renderReport(report) {
     const metricsCard = document.getElementById('metrics-card');
     metricsCard.style.display = 'block';
     const mg = document.getElementById('metrics-grid');
-    const bFull = m.baseline?.full_payload?.size_download || 0;
-    const oGzip = m.optimized?.gzip_compression?.size_download || 0;
-    const etag304 = m.optimized?.etag_304?.http_code || 0;
-    const totalGain = bFull > 0 ? Math.round((1 - oGzip / bFull) * 100) : 0;
 
-    // Temps moyens
-    const baselineTimes = [m.baseline?.full_payload?.time_total, m.baseline?.single_resource?.time_total].filter(t => t > 0);
-    const optimizedTimes = [
-        m.optimized?.pagination?.time_total,
-        m.optimized?.fields_filter?.time_total,
-        m.optimized?.gzip_compression?.time_total,
-        m.optimized?.etag_first_call?.time_total,
-        m.optimized?.etag_304?.time_total,
-    ].filter(t => t > 0);
-    const avgBaseline = baselineTimes.length > 0 ? baselineTimes.reduce((a,b)=>a+b,0) / baselineTimes.length : 0;
-    const avgOptimized = optimizedTimes.length > 0 ? optimizedTimes.reduce((a,b)=>a+b,0) / optimizedTimes.length : 0;
-    const timeGain = avgBaseline > 0 ? Math.round((1 - avgOptimized / avgBaseline) * 100) : 0;
+    // Compute from discovered endpoints or legacy
+    const discEpsMet = currentReport.auto_discovery?.discovered_endpoints;
+    let totalTransfer = 0, epCountMet = 0;
+    let allTimes = [];
+
+    if (discEpsMet && discEpsMet.length > 0) {
+        for (const ep of discEpsMet) {
+            totalTransfer += (ep.size_download || 0);
+            if ((ep.time_total || 0) > 0) allTimes.push(ep.time_total);
+            epCountMet++;
+        }
+    } else {
+        // Legacy fallback
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    totalTransfer += (ep.size_download || 0);
+                    if ((ep.time_total || 0) > 0) allTimes.push(ep.time_total);
+                    epCountMet++;
+                }
+            }
+        }
+    }
+    const avgTime = allTimes.length > 0 ? allTimes.reduce((a,b)=>a+b,0) / allTimes.length : 0;
+    const avgTransfer = epCountMet > 0 ? Math.round(totalTransfer / epCountMet) : 0;
+    const etag304 = m.optimized?.etag_304?.http_code || 0;
 
     mg.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatBytes(bFull)}</div><div class="metric-label">Baseline payload</div></div>
-        <div class="metric-item"><div class="metric-value">${formatBytes(oGzip)}</div><div class="metric-label">Optimized + Gzip</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${totalGain>50?'var(--green-400)':'var(--yellow-400)'}">${totalGain}%</div><div class="metric-label">Réduction payload</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${etag304===304?'var(--green-400)':'var(--red-400)'}">${etag304}</div><div class="metric-label">HTTP code ETag</div></div>
-        <div class="metric-item"><div class="metric-value">${avgBaseline.toFixed(3)}s</div><div class="metric-label">Temps moyen baseline</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${avgOptimized.toFixed(3)}s</div><div class="metric-label">Temps moyen optimisé</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${timeGain>0?'var(--green-400)':'var(--red-400)'}">⚡ ${timeGain}%</div><div class="metric-label">Gain temps réponse</div></div>
-        <div class="metric-item"><div class="metric-value">${gs.total}/${maxScore}</div><div class="metric-label">Score (${gs.grade})</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(totalTransfer)}</div><div class="metric-label">📦 Transfert total</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(avgTransfer)}</div><div class="metric-label">📊 Transfert moy. / ep</div></div>
+        <div class="metric-item"><div class="metric-value">${avgTime.toFixed(3)}s</div><div class="metric-label">⏱️ Temps moyen</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${etag304===304?'var(--green-400)':'var(--red-400)'}">${etag304}</div><div class="metric-label">💾 HTTP code ETag</div></div>
+        <div class="metric-item"><div class="metric-value">${epCountMet}</div><div class="metric-label">🔍 Endpoints mesurés</div></div>
+        <div class="metric-item"><div class="metric-value">${gs.total}/${maxScore}</div><div class="metric-label">🌿 Score (${gs.grade})</div></div>
     `;
 
     // ─── Energy Summary card ───────────────────────────────────────
@@ -1313,38 +1321,49 @@ function renderReport(report) {
     energyCard.style.display = 'block';
     const eg = document.getElementById('energy-grid');
 
-    // Énergie globale : somme de tous les endpoints optimisés vs baseline (full naive × N)
-    const optKeysEnergy = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
-    let optEnergyNet = 0, optEnergySrv = 0, optEndpointCount = 0;
-    for (const k of optKeysEnergy) {
-        const ep = m.optimized?.[k];
-        if (ep) {
-            optEnergyNet += energyNetworkWh(ep.size_download || 0);
-            optEnergySrv += energyServerWh(ep.time_total || 0);
-            optEndpointCount++;
+    // Compute energy from ALL discovered endpoints (single API model)
+    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    let apiEnergyNet = 0, apiEnergySrv = 0, apiEndpointCount = 0, apiTotalBytes = 0;
+
+    if (disc && disc.length > 0) {
+        for (const ep of disc) {
+            apiEnergyNet += energyNetworkWh(ep.size_download || 0);
+            apiEnergySrv += energyServerWh(ep.time_total || 0);
+            apiTotalBytes += (ep.size_download || 0);
+            apiEndpointCount++;
+        }
+    } else {
+        // Legacy fallback: all measurements
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    apiEnergyNet += energyNetworkWh(ep.size_download || 0);
+                    apiEnergySrv += energyServerWh(ep.time_total || 0);
+                    apiTotalBytes += (ep.size_download || 0);
+                    apiEndpointCount++;
+                }
+            }
         }
     }
-    const optEnergyTotal = optEnergyNet + optEnergySrv;
+    const apiEnergyTotal = apiEnergyNet + apiEnergySrv;
+    const avgEnergyPerEp = apiEndpointCount > 0 ? apiEnergyTotal / apiEndpointCount : 0;
 
-    // Baseline : 1 appel full payload naïf (même dataset = optimized full)
-    const baselineFullSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-    const baselineFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-    const baselineEnergyNet = energyNetworkWh(baselineFullSize);
-    const baselineEnergySrv = energyServerWh(baselineFullTime);
-    const baselineEnergyTotal = baselineEnergyNet + baselineEnergySrv;
-
-    const energyGainPct = baselineEnergyTotal > 0 ? Math.round((1 - optEnergyTotal / baselineEnergyTotal) * 100) : 0;
-    const energySaved = baselineEnergyTotal - optEnergyTotal;
+    // Projection
+    const reqDay = getReqPerDay();
+    const daysYear = getDaysPerYear();
+    const reqYear = reqDay * daysYear;
+    const energyPerDay = apiEnergyTotal * reqDay;
+    const energyPerYear = apiEnergyTotal * reqYear;
 
     eg.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyTotal)}</div><div class="metric-label">Énergie API naive</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyTotal)}</div><div class="metric-label">Énergie API optimisée</div></div>
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyNet)}</div><div class="metric-label">Réseau (naive)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyNet)}</div><div class="metric-label">Réseau (optimisé)</div></div>
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergySrv)}</div><div class="metric-label">Serveur (naive)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergySrv)}</div><div class="metric-label">Serveur (optimisé)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${energyGainPct>0?'var(--green-400)':'var(--red-400)'}">⚡ ${energyGainPct}%</div><div class="metric-label">Gain énergie global</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(energySaved)}</div><div class="metric-label">Énergie économisée</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergyTotal)}</div><div class="metric-label">⚡ Énergie totale API<br><small style="color:var(--gray-400)">${apiEndpointCount} endpoints</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergyNet)}</div><div class="metric-label">🌐 Réseau</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergySrv)}</div><div class="metric-label">🖥️ Serveur</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(avgEnergyPerEp)}</div><div class="metric-label">📊 Moyenne / endpoint</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(apiTotalBytes)}</div><div class="metric-label">📦 Transfert total</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(energyPerDay)}</div><div class="metric-label">📆 Énergie / jour<br><small style="color:var(--gray-400)">${reqDay.toLocaleString('fr-FR')} req/j</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(energyPerYear)}</div><div class="metric-label">📅 Énergie / an<br><small style="color:var(--gray-400)">${reqYear.toLocaleString('fr-FR')} req/an</small></div></div>
+        <div class="metric-item"><div class="metric-value">${apiEndpointCount > 0 ? formatBytes(Math.round(apiTotalBytes / apiEndpointCount)) : '—'}</div><div class="metric-label">📊 Transfert moy. / ep</div></div>
     `;
 
     // ─── CO2 Emissions card ────────────────────────────────────────
@@ -1353,26 +1372,22 @@ function renderReport(report) {
     const co2g = document.getElementById('co2-grid');
     const co2Source = document.getElementById('co2-source-label');
 
-    const baselineCO2 = energyWhToCO2g(baselineEnergyTotal);
-    const optCO2 = energyWhToCO2g(optEnergyTotal);
-    const co2Saved = baselineCO2 - optCO2;
-    const co2GainPct = baselineCO2 > 0 ? Math.round((1 - optCO2 / baselineCO2) * 100) : 0;
+    const apiCO2 = energyWhToCO2g(apiEnergyTotal);
+    const avgCO2PerEp = apiEndpointCount > 0 ? apiCO2 / apiEndpointCount : 0;
 
     // Projection annuelle CO2
-    const reqDay = getReqPerDay();
-    const daysYear = getDaysPerYear();
-    const reqYear = reqDay * daysYear;
-    const co2SavedYear = co2Saved * reqYear;
+    const co2PerDay = apiCO2 * reqDay;
+    const co2PerYear = apiCO2 * reqYear;
 
     co2g.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatCO2(baselineCO2)}</div><div class="metric-label">CO₂ naive / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(optCO2)}</div><div class="metric-label">CO₂ optimisée / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2Saved)}</div><div class="metric-label">CO₂ économisé / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${co2GainPct>0?'var(--green-400)':'var(--red-400)'}">🌍 ${co2GainPct}%</div><div class="metric-label">Réduction CO₂</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2SavedYear)}</div><div class="metric-label">CO₂ économisé / an<br><small style="color:var(--gray-400)">(${reqDay.toLocaleString('fr-FR')} req/j × ${daysYear}j)</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_CAR_G_PER_KM))} 🚗</div><div class="metric-label">Équiv. voiture<br><small style="color:var(--gray-400)">${CO2_CAR_G_PER_KM} gCO₂/km</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_PLANE_G_PER_KM))} ✈️</div><div class="metric-label">Équiv. avion<br><small style="color:var(--gray-400)">${CO2_PLANE_G_PER_KM} gCO₂/km</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_TRAIN_G_PER_KM))} 🚄</div><div class="metric-label">Équiv. train<br><small style="color:var(--gray-400)">${CO2_TRAIN_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(apiCO2)}</div><div class="metric-label">🌍 CO₂ total API / appel</div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(avgCO2PerEp)}</div><div class="metric-label">📊 CO₂ moyen / endpoint</div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(co2PerDay)}</div><div class="metric-label">📆 CO₂ / jour<br><small style="color:var(--gray-400)">${reqDay.toLocaleString('fr-FR')} req/j</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(co2PerYear)}</div><div class="metric-label">📅 CO₂ / an<br><small style="color:var(--gray-400)">${reqYear.toLocaleString('fr-FR')} req/an</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_CAR_G_PER_KM))} 🚗</div><div class="metric-label">Équiv. voiture / an<br><small style="color:var(--gray-400)">${CO2_CAR_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_PLANE_G_PER_KM))} ✈️</div><div class="metric-label">Équiv. avion / an<br><small style="color:var(--gray-400)">${CO2_PLANE_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_TRAIN_G_PER_KM))} 🚄</div><div class="metric-label">Équiv. train / an<br><small style="color:var(--gray-400)">${CO2_TRAIN_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${apiEndpointCount}</div><div class="metric-label">🔍 Endpoints mesurés</div></div>
     `;
     co2Source.textContent = 'Source : Electricity Maps / AIE 2024 — ' + getSelectedCountryLabel();
 
@@ -1390,7 +1405,7 @@ function renderReport(report) {
 
     // ── Build rows dynamically from auto_discovery or fallback to legacy ──
     let rows = [];
-    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    // disc already declared above — reuse it
     if (disc && disc.length > 0) {
         // Dynamic rows from auto-discovered endpoints
         for (const ep of disc) {
@@ -1536,7 +1551,7 @@ function renderHistory() {
 // ─── Accordion ─────────────────────────────────────────────────
 function renderEnergyHistory() {
     const card = document.getElementById('energy-history-card');
-    const hasData = history.some(h => (h.energyWh || 0) > 0 || (h.naiveEnergyWh || 0) > 0);
+    const hasData = history.some(h => (h.energyWh || 0) > 0);
     if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
     card.style.display = 'block';
 
@@ -1556,9 +1571,8 @@ function renderEnergyHistory() {
     const plotH = H - pad.top - pad.bottom;
     ctx.clearRect(0, 0, W, H);
 
-    const naiveVals = history.map(h => h.naiveEnergyWh || 0);
     const energyVals = history.map(h => h.energyWh || 0);
-    const maxY = Math.max(...naiveVals, ...energyVals, 0.0001);
+    const maxY = Math.max(...energyVals, 0.0001);
     const n = history.length;
 
     // Grid + Y axis
@@ -1575,42 +1589,50 @@ function renderEnergyHistory() {
     ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
     ctx.fillText('Énergie (Wh)', 0, 0); ctx.restore();
 
-    function drawCurve(vals, color, dashed) {
-        ctx.setLineDash(dashed ? [6, 3] : []);
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
-        if (n === 1) {
-            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
-            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(vals[0].toFixed(4) + ' Wh', x, y - 12);
-        } else {
-            const stepX = plotW / (n - 1);
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
-                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText(vals[i].toFixed(4), x, y - 8);
-                }
-            }
-        }
-        ctx.setLineDash([]);
-    }
-
-    drawCurve(naiveVals, '#ef4444', true);
-    drawCurve(energyVals, '#22c55e', false);
-
-    // Dates
+    // Single curve — total API energy
+    const color = '#22c55e';
     if (n === 1) {
+        const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - energyVals[0] / maxY);
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
         ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+        ctx.fillText(energyVals[0].toFixed(4) + ' Wh', x, y - 12);
+        const epCount = history[0].endpointCount || '?';
+        ctx.fillText(`(${epCount} eps)`, x, y + 16);
+        ctx.fillText(history[0].timestamp.slice(0, 10), x, H - 8);
     } else {
         const stepX = plotW / (n - 1);
+
+        // Area fill
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top + plotH);
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(pad.left + stepX * (n - 1), pad.top + plotH);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(34,197,94,0.12)';
+        ctx.fill();
+
+        // Line
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Points + labels
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(energyVals[i].toFixed(4), x, y - 8);
+            }
+        }
+
+        // Dates
         for (let i = 0; i < n; i++) {
             if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
                 ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
@@ -1622,7 +1644,7 @@ function renderEnergyHistory() {
 
 function renderCO2History() {
     const card = document.getElementById('co2-history-card');
-    const hasData = history.some(h => (h.co2g || 0) > 0 || (h.naiveCO2g || 0) > 0);
+    const hasData = history.some(h => (h.co2g || 0) > 0);
     if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
     card.style.display = 'block';
 
@@ -1642,9 +1664,8 @@ function renderCO2History() {
     const plotH = H - pad.top - pad.bottom;
     ctx.clearRect(0, 0, W, H);
 
-    const naiveCO2 = history.map(h => h.naiveCO2g || 0);
-    const optCO2 = history.map(h => h.co2g || 0);
-    const maxY = Math.max(...naiveCO2, ...optCO2, 0.0001);
+    const co2Vals = history.map(h => h.co2g || 0);
+    const maxY = Math.max(...co2Vals, 0.0001);
     const n = history.length;
 
     // Grid + Y axis
@@ -1661,42 +1682,48 @@ function renderCO2History() {
     ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
     ctx.fillText('CO₂ (g)', 0, 0); ctx.restore();
 
-    function drawCurve(vals, color, dashed) {
-        ctx.setLineDash(dashed ? [6, 3] : []);
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
-        if (n === 1) {
-            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
-            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(vals[0].toFixed(5) + ' g', x, y - 12);
-        } else {
-            const stepX = plotW / (n - 1);
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
-                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText(vals[i].toFixed(5), x, y - 8);
-                }
-            }
-        }
-        ctx.setLineDash([]);
-    }
-
-    drawCurve(naiveCO2, '#ef4444', true);
-    drawCurve(optCO2, '#3b82f6', false);
-
-    // Dates
+    // Single curve — total API CO₂
+    const color = '#3b82f6';
     if (n === 1) {
+        const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - co2Vals[0] / maxY);
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
         ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+        ctx.fillText(co2Vals[0].toFixed(5) + ' g', x, y - 12);
+        ctx.fillText(history[0].timestamp.slice(0, 10), x, H - 8);
     } else {
         const stepX = plotW / (n - 1);
+
+        // Area fill
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top + plotH);
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(pad.left + stepX * (n - 1), pad.top + plotH);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(59,130,246,0.10)';
+        ctx.fill();
+
+        // Line
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Points + labels
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(co2Vals[i].toFixed(5), x, y - 8);
+            }
+        }
+
+        // Dates
         for (let i = 0; i < n; i++) {
             if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
                 ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
@@ -2033,38 +2060,48 @@ function formatDistance(km) {
 function updateProjectionSummary() {
     const el = document.getElementById('projection-summary');
     if (!el || !currentReport) { if (el) el.textContent = '—'; return; }
-    const m = currentReport.measurements;
-    const bFull = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-    const bTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
 
     const reqDay = getReqPerDay();
     const daysYear = getDaysPerYear();
     const reqYear = reqDay * daysYear;
 
-    // Énergie globale (somme de tous les endpoints optimisés vs baseline × N)
-    const optKeysProj = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
-    let optCount = 0, optSum = 0;
-    for (const k of optKeysProj) {
-        const ep = m.optimized?.[k];
-        if (ep) { optSum += energyTotalWh(ep.size_download || 0, ep.time_total || 0); optCount++; }
-    }
-    const eNaiveGlobal = energyTotalWh(bFull, bTime);
-    const eOptGlobal = optSum;
-    const eSavedGlobal = eNaiveGlobal - eOptGlobal;
+    // Compute energy from all discovered endpoints (single API model)
+    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    const m = currentReport.measurements || {};
+    let eTotal = 0, epCount = 0, totalBytes = 0;
 
-    const naiveYear = eNaiveGlobal * reqYear;
-    const optYear = eOptGlobal * reqYear;
-    const savedYear = naiveYear - optYear;
+    if (disc && disc.length > 0) {
+        for (const ep of disc) {
+            eTotal += energyTotalWh(ep.size_download || 0, ep.time_total || 0);
+            totalBytes += (ep.size_download || 0);
+            epCount++;
+        }
+    } else {
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    eTotal += energyTotalWh(ep.size_download || 0, ep.time_total || 0);
+                    totalBytes += (ep.size_download || 0);
+                    epCount++;
+                }
+            }
+        }
+    }
+
+    const eDay = eTotal * reqDay;
+    const eYear = eTotal * reqYear;
+    const co2Total = energyWhToCO2g(eTotal);
+    const co2Year = co2Total * reqYear;
 
     el.innerHTML = `
-        <div>⚡ Naive : <strong>${formatEnergy(eNaiveGlobal)}</strong></div>
-        <div>🌿 Optimisé : <strong style="color:var(--green-400)">${formatEnergy(eOptGlobal)}</strong></div>
-        <div>💡 Économie : <strong style="color:var(--green-400)">${formatEnergy(eSavedGlobal)}</strong></div>
+        <div>⚡ Énergie / appel : <strong>${formatEnergy(eTotal)}</strong></div>
+        <div>📦 Transfert : <strong>${formatBytes(totalBytes)}</strong> (${epCount} eps)</div>
+        <div>🌍 CO₂ / appel : <strong>${formatCO2(co2Total)}</strong></div>
         <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-700);">
-            📆 Naive/an : <strong>${formatEnergy(naiveYear)}</strong>
+            📆 Énergie / jour : <strong>${formatEnergy(eDay)}</strong>
         </div>
-        <div>📆 Opt./an : <strong style="color:var(--green-400)">${formatEnergy(optYear)}</strong></div>
-        <div>💡 Économie/an : <strong style="color:var(--green-400)">${formatEnergy(savedYear)}</strong></div>
+        <div>📅 Énergie / an : <strong>${formatEnergy(eYear)}</strong></div>
+        <div>🌍 CO₂ / an : <strong>${formatCO2(co2Year)}</strong></div>
     `;
 }
 

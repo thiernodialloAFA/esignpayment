@@ -1,9 +1,9 @@
 {
   "appname": "esignpaym-api",
-  "timestamp": "2026-04-04T21:34:30Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "green_score_summary": {
-    "total": 65,
+    "total": 69,
     "max": 100,
     "grade": "B"
   },
@@ -969,20 +969,20 @@
         {
           "method": "GET",
           "path": "/api/account-applications/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "PUT",
           "path": "/api/account-applications/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "DELETE",
           "path": "/api/account-applications/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
@@ -993,20 +993,20 @@
         {
           "method": "POST",
           "path": "/api/sign/{token}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/sign/{token}/verify-otp",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/sign/{token}/send-otp",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1017,20 +1017,20 @@
         {
           "method": "POST",
           "path": "/api/payments",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/payments/{id}/cancel",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/payments/confirm",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1041,26 +1041,26 @@
         {
           "method": "POST",
           "path": "/api/documents",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/documents/{id}/send",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/documents/{id}/resend",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/documents/{id}/live-sign/{signerId}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1071,32 +1071,32 @@
         {
           "method": "POST",
           "path": "/api/account-applications",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/account-applications/{id}/submit",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/account-applications/{id}/regenerate-contract",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/account-applications/{id}/kyc",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "POST",
           "path": "/api/account-applications/{id}/generate-contract",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1107,8 +1107,8 @@
         {
           "method": "GET",
           "path": "/api/payments/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1119,20 +1119,20 @@
         {
           "method": "GET",
           "path": "/api/payments/changes",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
           "path": "/api/documents/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "DELETE",
           "path": "/api/documents/{id}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1143,14 +1143,14 @@
         {
           "method": "GET",
           "path": "/api/documents/changes",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
           "path": "/api/auth/me",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "GET",
@@ -1161,19 +1161,19 @@
         {
           "method": "GET",
           "path": "/api/account-applications/changes",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         },
         {
           "method": "DELETE",
           "path": "/api/account-applications/{id}/kyc/{kycId}",
-          "matched": false,
-          "reason": "No rate-limit headers in response"
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
         }
       ],
       "validated": true,
-      "score": 1,
-      "matched_count": 6,
+      "score": 5,
+      "matched_count": 32,
       "candidate_count": 34,
       "suggestions": [
         {

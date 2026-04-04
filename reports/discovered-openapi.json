@@ -13,7 +13,6 @@
       "url": "/",
       "description": "ESignPay API Server \u2014 gzip compression enabled on all endpoints",
       "x-server-compression": {
-        "min-response-size": "256 bytes",
         "algorithms": [
           "gzip"
         ],
@@ -25,7 +24,8 @@
           "application/hal+json",
           "application/cbor"
         ],
-        "enabled": true
+        "enabled": true,
+        "min-response-size": "256 bytes"
       },
       "x-server-range-support": {
         "enabled": true,
@@ -35,10 +35,10 @@
         ]
       },
       "x-server-etag-support": {
-        "mechanism": "If-None-Match \u2192 304 Not Modified",
         "scope": "all GET /api/* endpoints",
         "filter": "ShallowEtagHeaderFilter",
-        "enabled": true
+        "enabled": true,
+        "mechanism": "If-None-Match \u2192 304 Not Modified"
       }
     }
   ],
@@ -1652,7 +1652,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -2006,7 +2006,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -2229,7 +2229,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -3157,19 +3157,19 @@
       "PageableObject": {
         "type": "object",
         "properties": {
-          "unpaged": {
-            "type": "boolean"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
           "paged": {
             "type": "boolean"
           },
           "pageNumber": {
             "type": "integer",
             "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
           },
           "offset": {
             "type": "integer",
@@ -3183,10 +3183,10 @@
       "SortObject": {
         "type": "object",
         "properties": {
-          "unsorted": {
+          "sorted": {
             "type": "boolean"
           },
-          "sorted": {
+          "unsorted": {
             "type": "boolean"
           },
           "empty": {

@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T21:34:30Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/payments/{id}/cancel",
-    "url": "http://localhost:8080/api/payments/436066e4-4621-431e-8588-8518aacd0162/cancel",
-    "http_code": 403,
-    "size_download": 95,
-    "time_total": 0.005647,
-    "speed_download": 16824,
-    "energy_network_wh": 5.3085386753082275e-06,
-    "energy_server_wh": 3.921527777777778e-05,
-    "energy_total_wh": 4.452381645308601e-05
+    "url": "http://localhost:8080/api/payments/2d671fad-d4a4-4825-a740-99ceb0951bab/cancel",
+    "http_code": 200,
+    "size_download": 373,
+    "time_total": 0.007267,
+    "speed_download": 51330,
+    "energy_network_wh": 2.084299921989441e-05,
+    "energy_server_wh": 5.0465277777777775e-05,
+    "energy_total_wh": 7.130827699767218e-05
   }
 }

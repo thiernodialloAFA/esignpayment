@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T21:34:30Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "delete",
     "path": "/api/account-applications/{id}",
-    "url": "http://localhost:8080/api/account-applications/c2d80821-f881-49ee-abe2-fef183fb32f6",
-    "http_code": 403,
-    "size_download": 99,
-    "time_total": 0.011743,
-    "speed_download": 8430,
-    "energy_network_wh": 5.5320560932159415e-06,
-    "energy_server_wh": 8.154861111111111e-05,
-    "energy_total_wh": 8.708066720432705e-05
+    "url": "http://localhost:8080/api/account-applications/7e1e8d6f-e7cb-4789-b2be-c711fc9b86f8",
+    "http_code": 200,
+    "size_download": 60,
+    "time_total": 0.014051,
+    "speed_download": 4270,
+    "energy_network_wh": 3.3527612686157222e-06,
+    "energy_server_wh": 9.757638888888888e-05,
+    "energy_total_wh": 0.0001009291501575046
   }
 }

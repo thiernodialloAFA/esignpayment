@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T21:34:30Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/documents/{id}/live-sign/{signerId}",
-    "url": "http://localhost:8080/api/documents/cb223969-43b9-4bd9-80e0-6fdfd9c6ef04/live-sign/b8e247a6-45a5-4a49-9284-640e146ae5ba",
-    "http_code": 403,
-    "size_download": 96,
-    "time_total": 0.006997,
-    "speed_download": 13719,
-    "energy_network_wh": 5.364418029785156e-06,
-    "energy_server_wh": 4.859027777777777e-05,
-    "energy_total_wh": 5.3954695807562926e-05
+    "url": "http://localhost:8080/api/documents/8625cf16-792a-458d-b0b0-6f15eef77b36/live-sign/590c06fb-6be9-4a27-85d1-ff1eeb0449b5",
+    "http_code": 200,
+    "size_download": 768,
+    "time_total": 0.311664,
+    "speed_download": 2464,
+    "energy_network_wh": 4.291534423828125e-05,
+    "energy_server_wh": 0.002164333333333333,
+    "energy_total_wh": 0.0022072486775716145
   }
 }
