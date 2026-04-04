@@ -947,10 +947,22 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
         _init_rule(rule_key)  # ensure entry even if no candidates
         rd = mapping[rule_key]
         matched = [c for c in rd["candidates"] if c["matched"]]
-        rd["validated"] = len(matched) > 0
-        rd["score"] = scores.get(rule_key, 0)
-        rd["matched_count"] = len(matched)
-        rd["candidate_count"] = len(rd["candidates"])
+        total_candidates = len(rd["candidates"])
+        matched_count = len(matched)
+
+        # Proportional scoring: score = max_pts × matched / candidates
+        max_pts = rd["max_pts"]
+        if total_candidates > 0:
+            proportional = round(max_pts * matched_count / total_candidates)
+        else:
+            proportional = 0
+
+        rd["validated"] = matched_count > 0
+        rd["score"] = proportional
+        rd["matched_count"] = matched_count
+        rd["candidate_count"] = total_candidates
+        # Override the flat scores dict with the proportional score
+        scores[rule_key] = proportional
 
     # ═══════════════════════════════════════════════════════════════════
     # Generate improvement suggestions for unvalidated rules
@@ -983,10 +995,13 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
 
 
 def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_eps):
-    """Populate ``suggestions`` for every **unvalidated** rule.
+    """Populate ``suggestions`` for every rule that has unmatched endpoints.
 
-    Each suggestion targets a specific API resource and explains *what* to
-    change and *how* (code-level guidance), with a priority and impact note.
+    With proportional scoring (score = max_pts × matched / candidates),
+    suggestions are generated for *partially* validated rules too — not only
+    fully unvalidated ones.  Each suggestion targets a specific API resource
+    and explains *what* to change and *how* (code-level guidance), with a
+    priority and impact note.
     """
 
     # Helpers — pick the N most relevant collection / single endpoints
@@ -997,12 +1012,22 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
         return [e["path"] for e in single_eps[:n]]
 
     for rule_key, rd in mapping.items():
-        if rd["validated"]:
+        unmatched = [c for c in rd["candidates"] if not c["matched"]]
+
+        # No unmatched endpoints → nothing to suggest (perfect score)
+        if not unmatched:
             rd["suggestions"] = []
             continue
 
         suggestions = []
-        unmatched = [c for c in rd["candidates"] if not c["matched"]]
+
+        # Compute potential gain: how many pts each additional endpoint is worth
+        max_pts = rd["max_pts"]
+        total_candidates = rd["candidate_count"]
+        current_score = rd["score"]
+        remaining_gap = max_pts - current_score
+        per_ep_gain = round(max_pts / total_candidates, 1) if total_candidates > 0 else 0
+        gain_label = f"+{per_ep_gain} pts/endpoint (total gap: {remaining_gap} pts)"
 
         # ── DE11 — Pagination ─────────────────────────────────────────
         if rule_key == "DE11_pagination":
@@ -1016,7 +1041,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add pagination parameters (page & size)",
                     "priority": "high",
-                    "impact": f"+{rd['max_pts']} pts — reduces payload size for large collections",
+                    "impact": f"{gain_label} — reduces payload size for large collections",
                     "how": (
                         "Spring Boot: Change return type from List<T> to Page<T> and add "
                         "@RequestParam defaultValue parameters:\n"
@@ -1043,7 +1068,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add a 'fields' query parameter for sparse fieldsets",
                     "priority": "high" if is_collection else "medium",
-                    "impact": f"+{rd['max_pts']} pts — lets clients request only needed fields, reducing payload",
+                    "impact": f"{gain_label} — lets clients request only needed fields, reducing payload",
                     "how": (
                         "Spring Boot: Add an optional @RequestParam and filter the DTO:\n"
                         "  @GetMapping\n"
@@ -1065,7 +1090,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                 "target": "ALL endpoints (server-level)",
                 "action": "Enable gzip compression on the server",
                 "priority": "high",
-                "impact": f"+{rd['max_pts']} pts — typically 60-80% payload reduction",
+                "impact": f"{gain_label} — typically 60-80% payload reduction",
                 "how": (
                     "Option 1 — Spring Boot application.yml:\n"
                     "  server:\n"
@@ -1089,7 +1114,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add ETag support and If-None-Match → 304 Not Modified",
                     "priority": "high",
-                    "impact": f"+{rd['max_pts']} pts — avoids resending unchanged resources, saves bandwidth",
+                    "impact": f"{gain_label} — avoids resending unchanged resources, saves bandwidth",
                     "how": (
                         "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n"
                         "  Option A — Global filter (easiest):\n"
@@ -1114,7 +1139,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"GET {path}/changes  (new endpoint)",
                     "action": "Add a delta/changes endpoint with a 'since' parameter",
                     "priority": "medium",
-                    "impact": f"+{rd['max_pts']} pts — clients fetch only what changed since last sync",
+                    "impact": f"{gain_label} — clients fetch only what changed since last sync",
                     "how": (
                         "Spring Boot: Add a new endpoint that filters by updatedAt:\n"
                         "  @GetMapping(\"/changes\")\n"

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-04T21:07:20Z",
+  "timestamp": "2026-04-04T21:34:30Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "delete",
@@ -7,10 +7,10 @@
     "url": "http://localhost:8080/api/account-applications/c2d80821-f881-49ee-abe2-fef183fb32f6",
     "http_code": 403,
     "size_download": 99,
-    "time_total": 0.004956,
-    "speed_download": 19975,
+    "time_total": 0.011743,
+    "speed_download": 8430,
     "energy_network_wh": 5.5320560932159415e-06,
-    "energy_server_wh": 3.4416666666666665e-05,
-    "energy_total_wh": 3.994872275988261e-05
+    "energy_server_wh": 8.154861111111111e-05,
+    "energy_total_wh": 8.708066720432705e-05
   }
 }

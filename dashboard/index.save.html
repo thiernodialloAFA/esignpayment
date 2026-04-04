@@ -115,6 +115,7 @@
         }
         .rule-score.good { background: var(--green-800); color: var(--green-200); }
         .rule-score.medium { background: rgba(234,179,8,0.2); color: var(--yellow-400); }
+        .rule-score.partial { background: rgba(234,179,8,0.2); color: #facc15; }
         .rule-score.bad { background: rgba(239,68,68,0.2); color: var(--red-400); }
         .bar-container { width: 100%; background: var(--gray-700); border-radius: 6px; height: 21px; overflow: hidden; margin: 5px 0; }
         .bar { height: 100%; border-radius: 6px; transition: width 0.8s ease; display: flex; align-items: center; padding-left: 7px; font-size: 0.7rem; font-weight: 600; color: white; }
@@ -480,6 +481,10 @@
         .suggestion-rule-header .rule-status.passed {
             background: var(--green-800);
             color: var(--green-200);
+        }
+        .suggestion-rule-header .rule-status.partial {
+            background: rgba(234,179,8,0.2);
+            color: #facc15;
         }
         .suggestion-rule-header .chevron-small {
             color: var(--gray-400);
@@ -1120,32 +1125,43 @@ function renderReport(report) {
     rulesList.innerHTML = '';
 
     const ruleLabels = {
-        'DE11_pagination': { name: 'DE11 — Pagination', max: 1, icon: '📄' },
-        'DE08_fields': { name: 'DE08 — Filtrage champs', max: 1, icon: '🔍' },
-        'DE01_compression': { name: 'DE01 — Compression Gzip', max: 1, icon: '🗜️' },
-        'DE02_DE03_cache': { name: 'DE02/03 — Cache ETag/304', max: 1, icon: '💾' },
-        'DE06_delta': { name: 'DE06 — Delta changes', max: 1, icon: '🔄' },
-        'range_206': { name: '206 — Partial Content', max: 1, icon: '✂️' },
-        'LO01_observability': { name: 'LO01 — Observabilité', max: 1, icon: '👁️' },
-        'US07_rate_limit': { name: 'US07 — Rate Limiting', max: 1, icon: '🚦' },
-        'AR02_format_cbor': { name: 'AR02 — Format CBOR', max: 1, icon: '📦' },
+        'DE11_pagination': { name: 'DE11 — Pagination', defaultMax: 15, icon: '📄' },
+        'DE08_fields': { name: 'DE08 — Filtrage champs', defaultMax: 15, icon: '🔍' },
+        'DE01_compression': { name: 'DE01 — Compression Gzip', defaultMax: 15, icon: '🗜️' },
+        'DE02_DE03_cache': { name: 'DE02/03 — Cache ETag/304', defaultMax: 15, icon: '💾' },
+        'DE06_delta': { name: 'DE06 — Delta changes', defaultMax: 10, icon: '🔄' },
+        'range_206': { name: '206 — Partial Content', defaultMax: 10, icon: '✂️' },
+        'LO01_observability': { name: 'LO01 — Observabilité', defaultMax: 5, icon: '👁️' },
+        'US07_rate_limit': { name: 'US07 — Rate Limiting', defaultMax: 5, icon: '🚦' },
+        'AR02_format_cbor': { name: 'AR02 — Format CBOR', defaultMax: 10, icon: '📦' },
     };
+
+    const rrm = gs.rule_resource_mapping || {};
 
     for (const [key, meta] of Object.entries(ruleLabels)) {
         const score = gs.breakdown[key] || 0;
-        const passed = score >= meta.max;
-        const cls = passed ? 'good' : 'bad';
+        const rrmEntry = rrm[key] || {};
+        const maxPts = rrmEntry.max_pts || meta.defaultMax;
+        const matchedCount = rrmEntry.matched_count;
+        const candidateCount = rrmEntry.candidate_count;
+        const hasMapping = matchedCount !== undefined && candidateCount !== undefined;
+
+        const passed = score >= maxPts;
+        const isPartial = !passed && score > 0;
+        const cls = passed ? 'good' : isPartial ? 'partial' : 'bad';
+        const icon = passed ? '✅' : isPartial ? '⚠️' : '❌';
         const detail = gs.details && gs.details[key] ? gs.details[key] : {};
         const note = detail.reduction_pct ? `(-${detail.reduction_pct}%)` : (detail.note || '');
-        const icon = passed ? '✅' : '❌';
+        const epInfo = hasMapping ? ` <span style="font-size:0.7rem;color:var(--gray-500);">(${matchedCount}/${candidateCount} endpoints)</span>` : '';
 
         rulesList.innerHTML += `
             <div class="rule-row">
                 <div>
                     <span class="rule-name">${meta.icon} ${meta.name}</span>
                     <span style="font-size:0.75rem;color:var(--gray-400);margin-left:8px;">${note}</span>
+                    ${epInfo}
                 </div>
-                <span class="rule-score ${cls}">${icon} ${score} / ${meta.max}</span>
+                <span class="rule-score ${cls}">${icon} ${score} / ${maxPts}</span>
             </div>`;
     }
 
@@ -1824,10 +1840,12 @@ function renderSuggestions(report) {
     const listDiv = document.getElementById('suggestions-list');
     let html = '';
 
-    // Sort rules: failed first, then by max_pts descending
+    // Sort rules: failed first, then partial, then fully passed — by gap descending
     rulesWithSuggestions.sort((a, b) => {
-        if (a.validated !== b.validated) return a.validated ? 1 : -1;
-        return b.max_pts - a.max_pts;
+        const rankA = !a.validated ? 0 : (a.matched_count < a.candidate_count ? 1 : 2);
+        const rankB = !b.validated ? 0 : (b.matched_count < b.candidate_count ? 1 : 2);
+        if (rankA !== rankB) return rankA - rankB;
+        return (b.max_pts - b.score) - (a.max_pts - a.score);
     });
 
     for (const rule of rulesWithSuggestions) {
@@ -1837,8 +1855,9 @@ function renderSuggestions(report) {
         if (filteredSuggs.length === 0) continue;
 
         const ruleId = 'sugg-rule-' + rule.key;
-        const statusCls = rule.validated ? 'passed' : 'failed';
-        const statusLabel = rule.validated ? '✅ Validé' : '❌ Non validé';
+        const isPartial = rule.validated && rule.matched_count < rule.candidate_count;
+        const statusCls = !rule.validated ? 'failed' : isPartial ? 'partial' : 'passed';
+        const statusLabel = !rule.validated ? '❌ Non validé' : isPartial ? `⚠️ Partiel (${rule.matched_count}/${rule.candidate_count})` : '✅ Validé';
         const gapPts = Math.max(0, rule.max_pts - rule.score);
 
         html += `

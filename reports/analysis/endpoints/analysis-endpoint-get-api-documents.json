@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-04T21:07:20Z",
+  "timestamp": "2026-04-04T21:34:30Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "get",
@@ -7,10 +7,10 @@
     "url": "http://localhost:8080/api/documents",
     "http_code": 200,
     "size_download": 356,
-    "time_total": 0.006267,
-    "speed_download": 56804,
+    "time_total": 0.008126,
+    "speed_download": 43810,
     "energy_network_wh": 1.989305019378662e-05,
-    "energy_server_wh": 4.352083333333333e-05,
-    "energy_total_wh": 6.341388352711995e-05
+    "energy_server_wh": 5.643055555555555e-05,
+    "energy_total_wh": 7.632360574934217e-05
   }
 }

@@ -1,11 +1,11 @@
 {
   "appname": "esignpaym-api",
-  "timestamp": "2026-04-04T21:07:20Z",
+  "timestamp": "2026-04-04T21:34:30Z",
   "service_base_url": "http://localhost:8080",
   "green_score_summary": {
-    "total": 100,
+    "total": 65,
     "max": 100,
-    "grade": "A+"
+    "grade": "B"
   },
   "rule_resource_mapping": {
     "DE11_pagination": {
@@ -70,10 +70,39 @@
         }
       ],
       "validated": true,
-      "score": 15,
+      "score": 5,
       "matched_count": 3,
       "candidate_count": 9,
-      "suggestions": []
+      "suggestions": [
+        {
+          "target": "GET /api/payments/changes",
+          "action": "Add pagination parameters (page & size)",
+          "priority": "high",
+          "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+          "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+        },
+        {
+          "target": "GET /api/documents/changes",
+          "action": "Add pagination parameters (page & size)",
+          "priority": "high",
+          "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+          "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+        },
+        {
+          "target": "GET /api/account-types",
+          "action": "Add pagination parameters (page & size)",
+          "priority": "high",
+          "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+          "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+        },
+        {
+          "target": "GET /api/account-applications/changes",
+          "action": "Add pagination parameters (page & size)",
+          "priority": "high",
+          "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+          "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+        }
+      ]
     },
     "DE08_fields": {
       "id": "DE08",
@@ -167,7 +196,7 @@
         }
       ],
       "validated": true,
-      "score": 15,
+      "score": 13,
       "matched_count": 12,
       "candidate_count": 14,
       "suggestions": []
@@ -524,10 +553,32 @@
         }
       ],
       "validated": true,
-      "score": 10,
+      "score": 2,
       "matched_count": 3,
       "candidate_count": 14,
-      "suggestions": []
+      "suggestions": [
+        {
+          "target": "GET /api/payments/changes  (new endpoint)",
+          "action": "Add a delta/changes endpoint with a 'since' parameter",
+          "priority": "medium",
+          "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+          "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."
+        },
+        {
+          "target": "GET /api/documents/changes  (new endpoint)",
+          "action": "Add a delta/changes endpoint with a 'since' parameter",
+          "priority": "medium",
+          "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+          "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."
+        },
+        {
+          "target": "GET /api/account-applications/changes  (new endpoint)",
+          "action": "Add a delta/changes endpoint with a 'since' parameter",
+          "priority": "medium",
+          "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+          "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."
+        }
+      ]
     },
     "range_206": {
       "id": "206",
@@ -838,10 +889,25 @@
         }
       ],
       "validated": true,
-      "score": 10,
+      "score": 0,
       "matched_count": 1,
       "candidate_count": 34,
-      "suggestions": []
+      "suggestions": [
+        {
+          "target": "GET /api/payments  (add CBOR variant)",
+          "action": "Add a binary format alternative (CBOR or Protobuf)",
+          "priority": "low",
+          "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+          "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+        },
+        {
+          "target": "GET /api/documents  (add CBOR variant)",
+          "action": "Add a binary format alternative (CBOR or Protobuf)",
+          "priority": "low",
+          "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+          "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+        }
+      ]
     },
     "LO01_observability": {
       "id": "LO01",
@@ -881,10 +947,18 @@
         }
       ],
       "validated": true,
-      "score": 5,
+      "score": 4,
       "matched_count": 4,
       "candidate_count": 5,
-      "suggestions": []
+      "suggestions": [
+        {
+          "target": "/actuator/health, /actuator/metrics",
+          "action": "Expose Spring Boot Actuator endpoints",
+          "priority": "high",
+          "impact": "+5 pts \u2014 essential for production monitoring",
+          "how": "Spring Boot application.yml:\n  management:\n    endpoints:\n      web:\n        exposure:\n          include: health,info,metrics\n    endpoint:\n      health:\n        show-details: when-authorized\n\nAdd dependency: spring-boot-starter-actuator (likely already present)."
+        }
+      ]
     },
     "US07_rate_limit": {
       "id": "US07",
@@ -919,20 +993,20 @@
         {
           "method": "POST",
           "path": "/api/sign/{token}",
-          "matched": true,
-          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+          "matched": false,
+          "reason": "No rate-limit headers in response"
         },
         {
           "method": "POST",
           "path": "/api/sign/{token}/verify-otp",
-          "matched": true,
-          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+          "matched": false,
+          "reason": "No rate-limit headers in response"
         },
         {
           "method": "POST",
           "path": "/api/sign/{token}/send-otp",
-          "matched": true,
-          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+          "matched": false,
+          "reason": "No rate-limit headers in response"
         },
         {
           "method": "GET",
@@ -1098,10 +1172,18 @@
         }
       ],
       "validated": true,
-      "score": 5,
-      "matched_count": 9,
+      "score": 1,
+      "matched_count": 6,
       "candidate_count": 34,
-      "suggestions": []
+      "suggestions": [
+        {
+          "target": "ALL endpoints (server-level)",
+          "action": "Add rate-limit response headers",
+          "priority": "medium",
+          "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients",
+          "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"
+        }
+      ]
     }
   },
   "endpoint_rules": {

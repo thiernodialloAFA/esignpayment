@@ -1,21 +1,21 @@
 {
   "appname": "esignpaym-api",
-  "timestamp": "2026-04-04T21:07:20Z",
+  "timestamp": "2026-04-04T21:34:30Z",
   "service_base_url": "http://localhost:8080",
   "green_score": {
-    "total": 100,
+    "total": 65,
     "max": 100,
-    "grade": "A+",
+    "grade": "B",
     "breakdown": {
-      "DE11_pagination": 15,
-      "DE08_fields": 15,
+      "DE11_pagination": 5,
+      "DE08_fields": 13,
       "DE01_compression": 15,
       "DE02_DE03_cache": 15,
-      "DE06_delta": 10,
+      "DE06_delta": 2,
       "range_206": 10,
-      "AR02_format_cbor": 10,
-      "LO01_observability": 5,
-      "US07_rate_limit": 5
+      "AR02_format_cbor": 0,
+      "LO01_observability": 4,
+      "US07_rate_limit": 1
     },
     "details": {
       "DE11_pagination": {
@@ -111,10 +111,39 @@
           }
         ],
         "validated": true,
-        "score": 15,
+        "score": 5,
         "matched_count": 3,
         "candidate_count": 9,
-        "suggestions": []
+        "suggestions": [
+          {
+            "target": "GET /api/payments/changes",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/documents/changes",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/account-types",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/account-applications/changes",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          }
+        ]
       },
       "DE08_fields": {
         "id": "DE08",
@@ -208,7 +237,7 @@
           }
         ],
         "validated": true,
-        "score": 15,
+        "score": 13,
         "matched_count": 12,
         "candidate_count": 14,
         "suggestions": []
@@ -565,10 +594,32 @@
           }
         ],
         "validated": true,
-        "score": 10,
+        "score": 2,
         "matched_count": 3,
         "candidate_count": 14,
-        "suggestions": []
+        "suggestions": [
+          {
+            "target": "GET /api/payments/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."
+          },
+          {
+            "target": "GET /api/documents/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."
+          },
+          {
+            "target": "GET /api/account-applications/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."
+          }
+        ]
       },
       "range_206": {
         "id": "206",
@@ -879,10 +930,25 @@
           }
         ],
         "validated": true,
-        "score": 10,
+        "score": 0,
         "matched_count": 1,
         "candidate_count": 34,
-        "suggestions": []
+        "suggestions": [
+          {
+            "target": "GET /api/payments  (add CBOR variant)",
+            "action": "Add a binary format alternative (CBOR or Protobuf)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+            "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+          },
+          {
+            "target": "GET /api/documents  (add CBOR variant)",
+            "action": "Add a binary format alternative (CBOR or Protobuf)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+            "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+          }
+        ]
       },
       "LO01_observability": {
         "id": "LO01",
@@ -922,10 +988,18 @@
           }
         ],
         "validated": true,
-        "score": 5,
+        "score": 4,
         "matched_count": 4,
         "candidate_count": 5,
-        "suggestions": []
+        "suggestions": [
+          {
+            "target": "/actuator/health, /actuator/metrics",
+            "action": "Expose Spring Boot Actuator endpoints",
+            "priority": "high",
+            "impact": "+5 pts \u2014 essential for production monitoring",
+            "how": "Spring Boot application.yml:\n  management:\n    endpoints:\n      web:\n        exposure:\n          include: health,info,metrics\n    endpoint:\n      health:\n        show-details: when-authorized\n\nAdd dependency: spring-boot-starter-actuator (likely already present)."
+          }
+        ]
       },
       "US07_rate_limit": {
         "id": "US07",
@@ -960,20 +1034,20 @@
           {
             "method": "POST",
             "path": "/api/sign/{token}",
-            "matched": true,
-            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+            "matched": false,
+            "reason": "No rate-limit headers in response"
           },
           {
             "method": "POST",
             "path": "/api/sign/{token}/verify-otp",
-            "matched": true,
-            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+            "matched": false,
+            "reason": "No rate-limit headers in response"
           },
           {
             "method": "POST",
             "path": "/api/sign/{token}/send-otp",
-            "matched": true,
-            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+            "matched": false,
+            "reason": "No rate-limit headers in response"
           },
           {
             "method": "GET",
@@ -1139,10 +1213,18 @@
           }
         ],
         "validated": true,
-        "score": 5,
-        "matched_count": 9,
+        "score": 1,
+        "matched_count": 6,
         "candidate_count": 34,
-        "suggestions": []
+        "suggestions": [
+          {
+            "target": "ALL endpoints (server-level)",
+            "action": "Add rate-limit response headers",
+            "priority": "medium",
+            "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients",
+            "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"
+          }
+        ]
       }
     },
     "endpoint_rules": {
@@ -1392,307 +1474,307 @@
   "totals": {
     "endpoints_discovered": 34,
     "endpoints_measured": 33,
-    "total_bytes": 5645,
-    "total_time_s": 0.629716,
-    "energy_total_wh": 0.004688466733800039
+    "total_bytes": 4269,
+    "total_time_s": 0.47656099999999996,
+    "energy_total_wh": 0.003548000353150897
   },
   "endpoints": [
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.00955,
-      "speed_download": 10366,
+      "time_total": 0.061476,
+      "speed_download": 1610,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 6.631944444444444e-05,
-      "energy_total_wh": 7.185150053766038e-05
+      "energy_server_wh": 0.00042691666666666664,
+      "energy_total_wh": 0.0004324487227598826
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.024236,
-      "speed_download": 4084,
+      "time_total": 0.026967,
+      "speed_download": 3671,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 0.00016830555555555555,
-      "energy_total_wh": 0.0001738376116487715
+      "energy_server_wh": 0.00018727083333333334,
+      "energy_total_wh": 0.00019280288942654929
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.004956,
-      "speed_download": 19975,
+      "time_total": 0.011743,
+      "speed_download": 8430,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 3.4416666666666665e-05,
-      "energy_total_wh": 3.994872275988261e-05
+      "energy_server_wh": 8.154861111111111e-05,
+      "energy_total_wh": 8.708066720432705e-05
     },
     {
-      "http_code": 200,
-      "size_download": 1344,
-      "time_total": 0.033006,
-      "speed_download": 40719,
-      "energy_network_wh": 7.510185241699219e-05,
-      "energy_server_wh": 0.00022920833333333333,
-      "energy_total_wh": 0.0003043101857503255
-    },
-    {
-      "http_code": 200,
-      "size_download": 117,
-      "time_total": 0.007876,
-      "speed_download": 14854,
-      "energy_network_wh": 6.537884473800659e-06,
-      "energy_server_wh": 5.469444444444444e-05,
-      "energy_total_wh": 6.12323289182451e-05
-    },
-    {
-      "http_code": 200,
-      "size_download": 135,
-      "time_total": 0.007249,
-      "speed_download": 18624,
-      "energy_network_wh": 7.543712854385376e-06,
-      "energy_server_wh": 5.034027777777778e-05,
-      "energy_total_wh": 5.7883990632163155e-05
-    },
-    {
-      "http_code": 200,
-      "size_download": 356,
-      "time_total": 0.009217,
-      "speed_download": 38622,
-      "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 6.400694444444444e-05,
-      "energy_total_wh": 8.389999463823106e-05
+      "http_code": 409,
+      "size_download": 80,
+      "time_total": 0.016234,
+      "speed_download": 4927,
+      "energy_network_wh": 4.470348358154297e-06,
+      "energy_server_wh": 0.00011273611111111109,
+      "energy_total_wh": 0.00011720645946926539
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.058916,
-      "speed_download": 1188,
+      "time_total": 0.051485,
+      "speed_download": 1359,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.0004091388888888889,
-      "energy_total_wh": 0.0004130504437022739
+      "energy_server_wh": 0.00035753472222222225,
+      "energy_total_wh": 0.00036144627703560726
+    },
+    {
+      "http_code": 500,
+      "size_download": 70,
+      "time_total": 0.017789,
+      "speed_download": 3934,
+      "energy_network_wh": 3.91155481338501e-06,
+      "energy_server_wh": 0.0001235347222222222,
+      "energy_total_wh": 0.0001274462770356072
+    },
+    {
+      "http_code": 200,
+      "size_download": 356,
+      "time_total": 0.006844,
+      "speed_download": 52017,
+      "energy_network_wh": 1.989305019378662e-05,
+      "energy_server_wh": 4.752777777777778e-05,
+      "energy_total_wh": 6.74208279715644e-05
+    },
+    {
+      "http_code": 500,
+      "size_download": 70,
+      "time_total": 0.020344,
+      "speed_download": 3440,
+      "energy_network_wh": 3.91155481338501e-06,
+      "energy_server_wh": 0.00014127777777777777,
+      "energy_total_wh": 0.00014518933259116278
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.006068,
-      "speed_download": 15656,
+      "time_total": 0.005647,
+      "speed_download": 16824,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 4.213888888888888e-05,
-      "energy_total_wh": 4.744742756419711e-05
+      "energy_server_wh": 3.921527777777778e-05,
+      "energy_total_wh": 4.452381645308601e-05
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.012399,
-      "speed_download": 7661,
+      "time_total": 0.009705,
+      "speed_download": 9789,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 8.610416666666666e-05,
-      "energy_total_wh": 9.141270534197489e-05
+      "energy_server_wh": 6.739583333333333e-05,
+      "energy_total_wh": 7.270437200864156e-05
     },
     {
       "http_code": 200,
       "size_download": 356,
-      "time_total": 0.006267,
-      "speed_download": 56804,
+      "time_total": 0.008126,
+      "speed_download": 43810,
       "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 4.352083333333333e-05,
-      "energy_total_wh": 6.341388352711995e-05
+      "energy_server_wh": 5.643055555555555e-05,
+      "energy_total_wh": 7.632360574934217e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.01206,
-      "speed_download": 5804,
+      "time_total": 0.026456,
+      "speed_download": 2645,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 8.374999999999999e-05,
-      "energy_total_wh": 8.7661554813385e-05
+      "energy_server_wh": 0.00018372222222222222,
+      "energy_total_wh": 0.00018763377703560723
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.005517,
-      "speed_download": 17400,
+      "time_total": 0.009944,
+      "speed_download": 9654,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 3.8312499999999996e-05,
-      "energy_total_wh": 4.367691802978515e-05
+      "energy_server_wh": 6.905555555555555e-05,
+      "energy_total_wh": 7.44199735853407e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.005148,
-      "speed_download": 18648,
+      "time_total": 0.009064,
+      "speed_download": 10591,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 3.5749999999999995e-05,
-      "energy_total_wh": 4.111441802978515e-05
+      "energy_server_wh": 6.294444444444444e-05,
+      "energy_total_wh": 6.830886247422959e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.005027,
-      "speed_download": 19096,
+      "time_total": 0.006997,
+      "speed_download": 13719,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 3.490972222222222e-05,
-      "energy_total_wh": 4.0274140252007376e-05
+      "energy_server_wh": 4.859027777777777e-05,
+      "energy_total_wh": 5.3954695807562926e-05
     },
     {
       "http_code": 200,
       "size_download": 356,
-      "time_total": 0.004796,
-      "speed_download": 74228,
+      "time_total": 0.007171,
+      "speed_download": 49647,
       "energy_network_wh": 1.989305019378662e-05,
-      "energy_server_wh": 3.330555555555555e-05,
-      "energy_total_wh": 5.3198605749342174e-05
+      "energy_server_wh": 4.979861111111111e-05,
+      "energy_total_wh": 6.969166130489773e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.011344,
-      "speed_download": 6170,
+      "time_total": 0.023808,
+      "speed_download": 2940,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 7.877777777777778e-05,
-      "energy_total_wh": 8.268933259116279e-05
+      "energy_server_wh": 0.00016533333333333333,
+      "energy_total_wh": 0.00016924488814671834
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.008641,
-      "speed_download": 11457,
+      "time_total": 0.008549,
+      "speed_download": 11580,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 6.000694444444444e-05,
-      "energy_total_wh": 6.553900053766038e-05
+      "energy_server_wh": 5.936805555555555e-05,
+      "energy_total_wh": 6.490011164877149e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.005565,
-      "speed_download": 17790,
+      "time_total": 0.009779,
+      "speed_download": 10123,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 3.864583333333333e-05,
-      "energy_total_wh": 4.417788942654927e-05
+      "energy_server_wh": 6.790972222222222e-05,
+      "energy_total_wh": 7.344177831543816e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.006193,
-      "speed_download": 15984,
+      "time_total": 0.00842,
+      "speed_download": 11757,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 4.300694444444444e-05,
-      "energy_total_wh": 4.853900053766038e-05
+      "energy_server_wh": 5.8472222222222223e-05,
+      "energy_total_wh": 6.400427831543817e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.320612,
-      "speed_download": 218,
+      "time_total": 0.045578,
+      "speed_download": 1535,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.002226472222222222,
-      "energy_total_wh": 0.002230383777035607
+      "energy_server_wh": 0.00031651388888888886,
+      "energy_total_wh": 0.00032042544370227387
     },
     {
       "http_code": 200,
       "size_download": 229,
-      "time_total": 0.003626,
-      "speed_download": 63154,
+      "time_total": 0.006259,
+      "speed_download": 36588,
       "energy_network_wh": 1.2796372175216675e-05,
-      "energy_server_wh": 2.5180555555555552e-05,
-      "energy_total_wh": 3.7976927730772227e-05
+      "energy_server_wh": 4.3465277777777774e-05,
+      "energy_total_wh": 5.626164995299445e-05
     },
     {
       "http_code": 403,
       "size_download": 95,
-      "time_total": 0.006696,
-      "speed_download": 14186,
+      "time_total": 0.007057,
+      "speed_download": 13462,
       "energy_network_wh": 5.3085386753082275e-06,
-      "energy_server_wh": 4.65e-05,
-      "energy_total_wh": 5.1808538675308226e-05
+      "energy_server_wh": 4.900694444444444e-05,
+      "energy_total_wh": 5.431548311975267e-05
     },
     {
       "http_code": 200,
       "size_download": 79,
-      "time_total": 0.002791,
-      "speed_download": 28303,
+      "time_total": 0.002849,
+      "speed_download": 27728,
       "energy_network_wh": 4.414469003677368e-06,
-      "energy_server_wh": 1.9381944444444444e-05,
-      "energy_total_wh": 2.3796413448121812e-05
+      "energy_server_wh": 1.978472222222222e-05,
+      "energy_total_wh": 2.419919122589959e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.003615,
-      "speed_download": 19361,
+      "time_total": 0.008521,
+      "speed_download": 8215,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 2.5104166666666666e-05,
-      "energy_total_wh": 2.9015721480051676e-05
+      "energy_server_wh": 5.9173611111111114e-05,
+      "energy_total_wh": 6.308516592449612e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.004524,
-      "speed_download": 21220,
+      "time_total": 0.007415,
+      "speed_download": 12947,
       "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 3.141666666666667e-05,
-      "energy_total_wh": 3.678108469645182e-05
+      "energy_server_wh": 5.149305555555555e-05,
+      "energy_total_wh": 5.6857473585340704e-05
     },
     {
       "http_code": 403,
       "size_download": 96,
-      "time_total": 0.0079,
-      "speed_download": 12152,
-      "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 5.486111111111111e-05,
-      "energy_total_wh": 6.022552914089627e-05
-    },
-    {
-      "http_code": 403,
-      "size_download": 96,
-      "time_total": 0.006095,
-      "speed_download": 15751,
-      "energy_network_wh": 5.364418029785156e-06,
-      "energy_server_wh": 4.2326388888888886e-05,
-      "energy_total_wh": 4.769080691867404e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.003487,
+      "time_total": 0.004783,
       "speed_download": 20071,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 2.4215277777777777e-05,
-      "energy_total_wh": 2.8126832591162787e-05
+      "energy_network_wh": 5.364418029785156e-06,
+      "energy_server_wh": 3.3215277777777776e-05,
+      "energy_total_wh": 3.857969580756293e-05
+    },
+    {
+      "http_code": 403,
+      "size_download": 96,
+      "time_total": 0.005554,
+      "speed_download": 17285,
+      "energy_network_wh": 5.364418029785156e-06,
+      "energy_server_wh": 3.856944444444444e-05,
+      "energy_total_wh": 4.3933862474229596e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.006594,
-      "speed_download": 10615,
+      "time_total": 0.008071,
+      "speed_download": 8673,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 4.5791666666666664e-05,
-      "energy_total_wh": 4.9703221480051674e-05
+      "energy_server_wh": 5.6048611111111106e-05,
+      "energy_total_wh": 5.9960165924496116e-05
+    },
+    {
+      "http_code": 500,
+      "size_download": 70,
+      "time_total": 0.014924,
+      "speed_download": 4690,
+      "energy_network_wh": 3.91155481338501e-06,
+      "energy_server_wh": 0.00010363888888888889,
+      "energy_total_wh": 0.0001075504437022739
     },
     {
       "http_code": 200,
       "size_download": 559,
-      "time_total": 0.007691,
-      "speed_download": 72681,
+      "time_total": 0.005134,
+      "speed_download": 108889,
       "energy_network_wh": 3.123655915260315e-05,
-      "energy_server_wh": 5.3409722222222216e-05,
-      "energy_total_wh": 8.464628137482537e-05
+      "energy_server_wh": 3.5652777777777774e-05,
+      "energy_total_wh": 6.688933693038092e-05
     },
     {
       "http_code": 500,
       "size_download": 70,
-      "time_total": 0.005116,
-      "speed_download": 13681,
+      "time_total": 0.007323,
+      "speed_download": 9558,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 3.552777777777778e-05,
-      "energy_total_wh": 3.943933259116279e-05
+      "energy_server_wh": 5.085416666666666e-05,
+      "energy_total_wh": 5.476572148005167e-05
     },
     {
       "http_code": 403,
       "size_download": 99,
-      "time_total": 0.006938,
-      "speed_download": 14269,
+      "time_total": 0.006545,
+      "speed_download": 15126,
       "energy_network_wh": 5.5320560932159415e-06,
-      "energy_server_wh": 4.818055555555555e-05,
-      "energy_total_wh": 5.371261164877149e-05
+      "energy_server_wh": 4.545138888888888e-05,
+      "energy_total_wh": 5.098344498210482e-05
     }
   ]
 }

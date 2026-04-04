@@ -85,17 +85,22 @@ def generate_markdown(report: dict, *, appname: str = "") -> str:
     # ── Breakdown table ──
     a("### 📋 Détail par règle")
     a("")
-    a("| Statut | Règle | Score | Max | Détail |")
-    a("|:------:|-------|------:|----:|--------|")
+    a("| Statut | Règle | Score | Max | Endpoints | Détail |")
+    a("|:------:|-------|------:|----:|:---------:|--------|")
+    rrm_top = gs.get("rule_resource_mapping", {})
     for key, label in LABELS.items():
         score = breakdown.get(key, 0)
         mx = MAX_SCORES.get(key, 0)
-        icon = "✅" if mx > 0 and score >= mx * 0.75 else "⚠️" if mx > 0 and score >= mx * 0.4 else "❌"
+        rrmEntry = rrm_top.get(key, {})
+        matched = rrmEntry.get("matched_count")
+        candidates = rrmEntry.get("candidate_count")
+        ep_str = f"{matched}/{candidates}" if matched is not None and candidates is not None else "—"
+        icon = "✅" if mx > 0 and score >= mx else "⚠️" if mx > 0 and score > 0 else "❌"
         detail_dict = details.get(key, {})
         note = detail_dict.get("note", "")
         pct = detail_dict.get("reduction_pct")
         detail_str = f"-{pct}%" if pct is not None else note
-        a(f"| {icon} | {label} | {score} | {mx} | {detail_str} |")
+        a(f"| {icon} | {label} | {score} | {mx} | {ep_str} | {detail_str} |")
     a("")
 
     # ── Measurements comparison ──
@@ -233,14 +238,16 @@ def generate_markdown(report: dict, *, appname: str = "") -> str:
           f"**Total : {len(all_suggestions)} suggestions**")
         a("")
 
-        # Sort: failed first, then by max_pts desc
-        rules_with_suggestions.sort(
-            key=lambda r: (r["validated"], -r["max_pts"])
-        )
+        # Sort: failed first, then partial, then fully passed — by gap descending
+        def _sort_key(r):
+            rank = 0 if not r["validated"] else (1 if r["matched_count"] < r["candidate_count"] else 2)
+            return (rank, -(r["max_pts"] - r["score"]))
+        rules_with_suggestions.sort(key=_sort_key)
 
         for rule in rules_with_suggestions:
             gap = max(0, rule["max_pts"] - rule["score"])
-            status = "✅ Validé" if rule["validated"] else "❌ Non validé"
+            is_partial = rule["validated"] and rule["matched_count"] < rule["candidate_count"]
+            status = "❌ Non validé" if not rule["validated"] else (f"⚠️ Partiel ({rule['matched_count']}/{rule['candidate_count']})" if is_partial else "✅ Validé")
             a(f"#### {rule['icon']} {rule['name']} ({status}"
               f"{f' — +{gap} pts possibles' if gap > 0 else ''})")
             a("")
