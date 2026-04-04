@@ -271,6 +271,18 @@ def generate_markdown(report: dict, *, appname: str = "") -> str:
                 a("```")
                 a("</details>")
                 a("")
+    else:
+        # No suggestions — show congratulations section
+        a("### 💡 Suggestions d'amélioration")
+        a("")
+        max_score = gs.get("max", 100)
+        if total >= max_score:
+            a("> 🏆 **Score parfait !** Toutes les règles Green API sont validées — bravo !")
+        else:
+            a(f"> ✅ **Aucune suggestion d'amélioration** — "
+              f"Score actuel : **{total}/{max_score}** — "
+              f"toutes les règles analysées sont conformes.")
+        a("")
 
     # ── Footer ──
     a("---")

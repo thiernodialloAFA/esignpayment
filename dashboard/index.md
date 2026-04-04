@@ -73,6 +73,10 @@
 | GET | `/api/documents/changes` | 500 | 70 B | 0.003s |
 | GET | `/api/auth/me` | 500 | 70 B | 0.007s |
 
+### 💡 Suggestions d'amélioration
+
+> 🏆 **Score parfait !** Toutes les règles Green API sont validées — bravo !
+
 ---
 
 🌿 *API Green Score — [Framework](https://github.com/API-Green-Score/APIGreenScore) | [Training](https://github.com/API-Green-Score/training-student) | Devoxx France 2026*
