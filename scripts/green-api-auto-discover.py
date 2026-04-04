@@ -587,6 +587,50 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
     # ═══════════════════════════════════════════════════════════════════
     _init_rule("DE02_DE03_cache")
     etag_ok = False
+    etag_reason_spec = None
+
+    # 0) Spec-level detection — check OpenAPI spec for ETag declarations
+    #    a) servers[*].x-server-etag-support.enabled
+    for srv in (spec.get("servers") or []):
+        xetag = (srv.get("x-server-etag-support") or
+                 srv.get("extensions", {}).get("x-server-etag-support") or {})
+        if isinstance(xetag, dict) and xetag.get("enabled") is True:
+            etag_ok = True
+            etag_reason_spec = "OpenAPI servers.x-server-etag-support.enabled=true"
+
+    #    b) response headers in spec contain ETag header
+    if not etag_ok:
+        for _path, ops in (spec.get("paths") or {}).items():
+            if etag_ok:
+                break
+            for _method in ("get",):
+                op = ops.get(_method) if isinstance(ops, dict) else None
+                if not op or not isinstance(op, dict):
+                    continue
+                for _code, resp in (op.get("responses") or {}).items():
+                    if not isinstance(resp, dict):
+                        continue
+                    resp_hdrs = resp.get("headers") or {}
+                    if any(k.lower() == "etag" for k in resp_hdrs):
+                        etag_ok = True
+                        etag_reason_spec = "OpenAPI response header ETag declared"
+                        break
+                if etag_ok:
+                    break
+
+    #    c) 304 response code in spec
+    if not etag_ok:
+        for _path, ops in (spec.get("paths") or {}).items():
+            if etag_ok:
+                break
+            for _method in ("get",):
+                op = ops.get(_method) if isinstance(ops, dict) else None
+                if not op or not isinstance(op, dict):
+                    continue
+                if "304" in (op.get("responses") or {}):
+                    etag_ok = True
+                    etag_reason_spec = "OpenAPI spec declares 304 Not Modified response"
+                    break
 
     if base_url:
         tested_paths = set()
@@ -596,6 +640,10 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
             url = build_url(base_url, test_ep["path"], {})
             _, head_hdrs = http_head(url, headers=auth_headers, timeout=10)
             etag_val = head_hdrs.get("etag", "")
+            # Fallback: if HEAD didn't return ETag, try GET
+            if not etag_val:
+                m_get = measure_endpoint(url, headers=auth_headers, repeat=1, timeout=10)
+                etag_val = m_get.get("response_headers", {}).get("etag", "")
             if etag_val:
                 m304 = measure_endpoint(
                     url,
@@ -611,26 +659,41 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
                     register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
                              False,
                              f"ETag present but If-None-Match → {m304['http_code']}")
+            elif etag_ok:
+                register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
+                         True,
+                         etag_reason_spec or "ETag support declared in spec")
             else:
                 register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
-                         False, "No ETag header in HEAD response")
+                         False, "No ETag header in HEAD/GET response")
 
         # Register remaining single-resource endpoints as not individually tested
         for e in single_eps:
             if e["path"] not in tested_paths:
-                register(
-                    "DE02_DE03_cache", e["method"], e["path"], False,
-                    "Not individually tested"
-                    + (" (ETag supported on other endpoints)" if etag_ok else ""),
-                )
+                if etag_ok:
+                    register(
+                        "DE02_DE03_cache", e["method"], e["path"], True,
+                        etag_reason_spec or "ETag supported on other endpoints",
+                    )
+                else:
+                    register(
+                        "DE02_DE03_cache", e["method"], e["path"], False,
+                        "Not individually tested",
+                    )
     else:
         for e in single_eps:
-            register("DE02_DE03_cache", e["method"], e["path"], False,
-                     "No base_url — cannot test")
+            if etag_ok:
+                register("DE02_DE03_cache", e["method"], e["path"], True,
+                         etag_reason_spec or "ETag support declared in spec")
+            else:
+                register("DE02_DE03_cache", e["method"], e["path"], False,
+                         "No base_url — cannot test")
 
     scores["DE02_DE03_cache"] = 15 if etag_ok else 0
     details["DE02_DE03_cache"] = (
-        {"http_code": 304, "note": "ETag + 304 supported"} if etag_ok
+        {"http_code": 304, "note": "ETag + 304 supported"
+         + (f" ({etag_reason_spec})" if etag_reason_spec else "")}
+        if etag_ok
         else {"note": "ETag/304 not detected"}
     )
 
@@ -1177,12 +1240,17 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
 # ─── Step 5: Build Dashboard-Compatible Report ────────────────────────────
 
 def load_previous_report(output_dir):
-    """Load the latest-report.json if it exists (for before/after comparison)."""
+    """Load the latest-report.json if it exists (for before/after comparison).
+    Handles both old flat format and new {appname, report} envelope."""
     latest = output_dir / "latest-report.json"
     if latest.is_file():
         try:
             with open(latest, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            # Unwrap envelope if present
+            if "report" in data and "appname" in data:
+                return data["report"]
+            return data
         except Exception:
             pass
     return None
@@ -1306,6 +1374,7 @@ Examples:
   python green-api-auto-discover.py --target http://localhost:8081 --bearer MY_TOKEN
         """,
     )
+    parser.add_argument("--appname", default="", help="Application name for reports (default: root folder name)")
     parser.add_argument("--target", default="", help="Base URL of the running API (e.g. http://localhost:8081)")
     parser.add_argument("--swagger", default="", help="Path or URL to OpenAPI spec (auto-discovered if omitted)")
     parser.add_argument("--bearer", default="", help="Bearer token for authenticated APIs")
@@ -1327,6 +1396,9 @@ Examples:
     output_dir = Path(args.output_dir) if args.output_dir else root_dir / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Resolve appname: CLI > root folder name
+    appname = args.appname.strip() if args.appname else root_dir.name
+
     timestamp_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     timestamp_file = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
@@ -1347,6 +1419,7 @@ Examples:
     # ── Banner ──
     log("=" * 60)
     log("  Green API Auto-Discover & Analyzer")
+    log(f"  App: {appname}")
     log("  Devoxx France 2026 — Green Architecture")
     log("=" * 60)
 
@@ -1573,6 +1646,7 @@ Examples:
 
     # Save rule-resource mapping as a separate report file
     mapping_report = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score_summary": {
@@ -1618,14 +1692,20 @@ Examples:
             "issues": spectral_issues[:100],
         }
 
+    # Wrap report with appname envelope
+    wrapped_report = {
+        "appname": appname,
+        "report": dashboard_report,
+    }
+
     # Save reports
     report_file = output_dir / f"green-score-report-{timestamp_file}.json"
     latest_file = output_dir / "latest-report.json"
 
     with open(report_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
     with open(latest_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
 
     log(f"Report: {report_file}", "OK")
     log(f"Latest: {latest_file}", "OK")
@@ -1643,6 +1723,7 @@ Examples:
 
     # Analysis summary
     summary = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score": green_score,
@@ -1684,6 +1765,7 @@ Examples:
     # ── Final Summary ──
     print()
     print("=" * 60)
+    print(f"  APP: {appname}")
     print(f"  GREEN SCORE: {green_score['total']}/{green_score['max']}   Grade: {green_score['grade']}")
     print(f"  Endpoints discovered: {len(endpoints)}")
     print(f"  Endpoints measured:   {len(measurements)}")

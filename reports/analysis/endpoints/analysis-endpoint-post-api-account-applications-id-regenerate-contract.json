@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T09:00:01Z",
+  "timestamp": "2026-04-04T15:07:58Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/account-applications/{id}/regenerate-contract",
-    "url": "http://localhost:8080/api/account-applications/23876279-ef18-43ad-9b7e-fc895e683444/regenerate-contract",
+    "url": "http://localhost:8080/api/account-applications/4b4313f3-75f8-4e20-8848-044280511992/regenerate-contract",
     "http_code": 403,
     "size_download": 99,
-    "time_total": 0.003887,
-    "speed_download": 25468,
+    "time_total": 0.010379,
+    "speed_download": 9538,
     "energy_network_wh": 5.5320560932159415e-06,
-    "energy_server_wh": 2.6993055555555552e-05,
-    "energy_total_wh": 3.252511164877149e-05
+    "energy_server_wh": 7.207638888888888e-05,
+    "energy_total_wh": 7.760844498210483e-05
   }
 }

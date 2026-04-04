@@ -46,7 +46,7 @@ def _fmt_bytes(n: int) -> str:
     return f"{n} B"
 
 
-def generate_markdown(report: dict) -> str:
+def generate_markdown(report: dict, *, appname: str = "") -> str:
     """Return a Markdown string representing the Green Score report."""
     gs = report.get("green_score", {})
     total = gs.get("total", 0)
@@ -68,6 +68,9 @@ def generate_markdown(report: dict) -> str:
 
     a("# 🌿 Green API Score Dashboard")
     a("")
+    if appname:
+        a(f"> 📦 **Application : {appname}**")
+        a(">")
     a("> **Devoxx France 2026 — Green Architecture : moins de gras, plus d'impact !**")
     a("")
     a(f"📅 *Dernière analyse : {ts}*")
@@ -303,15 +306,23 @@ def main() -> int:
         print(f"Template not found: {template_path}", file=sys.stderr)
         return 1
 
-    report = json.loads(report_text)
+    raw_data = json.loads(report_text)
     template = template_path.read_text(encoding="utf-8")
 
     if PLACEHOLDER not in template:
         print(f"Placeholder {PLACEHOLDER} not found in template", file=sys.stderr)
         return 1
 
-    # ── Generate HTML ──
-    embedded = json.dumps(report, ensure_ascii=True)
+    # ── Unwrap {appname, report} envelope if present ──
+    if "report" in raw_data and "appname" in raw_data:
+        appname = raw_data["appname"]
+        report = raw_data["report"]
+    else:
+        appname = ""
+        report = raw_data
+
+    # ── Generate HTML — embed the full envelope (or flat report) ──
+    embedded = json.dumps(raw_data, ensure_ascii=True)
     output = template.replace(PLACEHOLDER, embedded)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -320,7 +331,7 @@ def main() -> int:
 
     # ── Generate Markdown (same directory as HTML, named index.md) ──
     md_path = output_path.parent / "index.md"
-    md_content = generate_markdown(report)
+    md_content = generate_markdown(report, appname=appname)
     md_path.write_text(md_content, encoding="utf-8")
     print(f"Markdown dashboard written to {md_path}")
 

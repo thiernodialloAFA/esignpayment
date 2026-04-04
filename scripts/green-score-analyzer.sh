@@ -18,6 +18,7 @@ BASELINE_PORT=${BASELINE_PORT:-8080}
 OPTIMIZED_PORT=${OPTIMIZED_PORT:-8081}
 BASELINE="http://localhost:${BASELINE_PORT}"
 OPTIMIZED="http://localhost:${OPTIMIZED_PORT}"
+APPNAME=${APPNAME:-$(basename "$(cd "$(dirname "$0")/.." && pwd)")}
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%SZ)
 OUTPUT_DIR="$(cd "$(dirname "$0")/.." && pwd)/reports"
 mkdir -p "$OUTPUT_DIR"
@@ -256,6 +257,7 @@ ENV_B_ONE="$B_ONE" \
 ENV_B_ONE2="$B_ONE2" \
 ENV_O_ETAG_FIRST="$O_ETAG_FIRST" \
 ENV_TIMESTAMP="$TIMESTAMP" \
+ENV_APPNAME="$APPNAME" \
 python3 -c "
 import json, sys, os
 
@@ -272,6 +274,7 @@ b_one = json.loads(os.environ['ENV_B_ONE'])
 b_one2 = json.loads(os.environ['ENV_B_ONE2'])
 o_etag_first = json.loads(os.environ['ENV_O_ETAG_FIRST'])
 timestamp = os.environ['ENV_TIMESTAMP']
+appname = os.environ.get('ENV_APPNAME', 'unknown')
 
 scores = {}
 details = {}
@@ -424,7 +427,12 @@ report = {
     }
 }
 
-print(json.dumps(report, indent=2))
+wrapped = {
+    'appname': appname,
+    'report': report
+}
+
+print(json.dumps(wrapped, indent=2))
 " > "$REPORT_FILE"
 
 if [ "$DEBUG_MODE" = true ]; then
@@ -459,8 +467,8 @@ echo -e "${GREEN}📄 Latest report:   ${LATEST_LINK}${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 # Quick summary
-TOTAL=$(python3 -c "import sys,json;r=json.load(sys.stdin);print(r['green_score']['total'])" < "$REPORT_FILE")
-GRADE=$(python3 -c "import sys,json;r=json.load(sys.stdin);print(r['green_score']['grade'])" < "$REPORT_FILE")
+TOTAL=$(python3 -c "import sys,json;d=json.load(sys.stdin);r=d.get('report',d);print(r['green_score']['total'])" < "$REPORT_FILE")
+GRADE=$(python3 -c "import sys,json;d=json.load(sys.stdin);r=d.get('report',d);print(r['green_score']['grade'])" < "$REPORT_FILE")
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════╗${NC}"

@@ -632,6 +632,12 @@
         <h1>🌿 Green API Score Dashboard</h1>
         <div class="subtitle">Green Architecture : moins de gras, plus d'impact, plus d'efficacité !</div>
         <div class="badge">Devoxx France 2026 — Tools in Action</div>
+        <div id="app-selector-bar" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+            <span style="color:var(--gray-400);font-size:0.85rem;">📦 API :</span>
+            <span id="appname-display" style="font-weight:700;font-size:1.05rem;color:var(--green-400);"></span>
+            <select id="app-selector" style="background:var(--gray-800);border:1px solid var(--gray-600);color:var(--green-200);border-radius:8px;padding:4px 12px;font-size:0.85rem;font-weight:600;cursor:pointer;" onchange="switchApp(this.value)"></select>
+            <button onclick="deleteCurrentApp()" style="background:none;border:1px solid var(--red-500);color:var(--red-400);border-radius:6px;padding:3px 10px;font-size:0.75rem;cursor:pointer;" title="Supprimer cet app de l'historique">🗑️</button>
+        </div>
     </div>
 
     <div class="dashboard-layout">
@@ -876,19 +882,133 @@
     </div>
 
 <script>
-const STORAGE_KEY = 'green-api-score-history';
-const EMBEDDED_REPORT = __REPORT_JSON__;
+const STORAGE_KEY_PREFIX = 'green-api-score-history';
+const APP_LIST_KEY = 'green-api-score-apps';
+const RAW_EMBEDDED = __REPORT_JSON__;
+
+// ─── Unwrap envelope {appname, report} ─────────────────────────
+function unwrapEnvelope(data) {
+    if (data && typeof data === 'object' && 'appname' in data && 'report' in data) {
+        return { appname: data.appname, report: data.report };
+    }
+    return { appname: '', report: data };
+}
+
+function storageKeyFor(appname) {
+    if (!appname) return STORAGE_KEY_PREFIX;
+    return STORAGE_KEY_PREFIX + '-' + appname;
+}
+
+function getAppList() {
+    try { return JSON.parse(localStorage.getItem(APP_LIST_KEY) || '[]'); }
+    catch { return []; }
+}
+function saveAppList(apps) {
+    localStorage.setItem(APP_LIST_KEY, JSON.stringify([...new Set(apps)]));
+}
+function registerApp(appname) {
+    if (!appname) return;
+    const apps = getAppList();
+    if (!apps.includes(appname)) {
+        apps.push(appname);
+        apps.sort();
+        saveAppList(apps);
+    }
+}
 
 // ─── State ─────────────────────────────────────────────────────
+let currentAppname = '';
 let currentReport = null;
-let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let history = [];
+
+function loadHistoryForApp(appname) {
+    const key = storageKeyFor(appname);
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { history = []; }
+}
+
+function refreshAppSelector() {
+    const sel = document.getElementById('app-selector');
+    const apps = getAppList();
+    // Always include currentAppname even if not in list yet
+    const allApps = [...new Set([...(currentAppname ? [currentAppname] : []), ...apps])].sort();
+    sel.innerHTML = '';
+    if (allApps.length === 0) {
+        sel.innerHTML = '<option value="">(aucune app)</option>';
+        sel.style.display = 'none';
+        document.querySelector('[onclick="deleteCurrentApp()"]').style.display = 'none';
+    } else {
+        for (const a of allApps) {
+            const opt = document.createElement('option');
+            opt.value = a;
+            opt.textContent = a;
+            if (a === currentAppname) opt.selected = true;
+            sel.appendChild(opt);
+        }
+        sel.style.display = allApps.length > 1 ? '' : 'none';
+        document.querySelector('[onclick="deleteCurrentApp()"]').style.display = allApps.length > 1 ? '' : 'none';
+    }
+    document.getElementById('appname-display').textContent = currentAppname || '—';
+}
+
+function switchApp(appname) {
+    currentAppname = appname;
+    loadHistoryForApp(appname);
+    document.getElementById('appname-display').textContent = appname || '—';
+    // Re-render last report from history
+    if (history.length > 0) {
+        // Try to reconstruct a minimal report from last history entry
+        const last = history[history.length - 1];
+        if (last._fullReport) {
+            renderReport(last._fullReport);
+        } else {
+            // No full report cached, show history only
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('score-display').style.display = 'block';
+            document.getElementById('score-number').textContent = last.total;
+            document.getElementById('score-max').textContent = '/ ' + (last.max || 100);
+            document.getElementById('score-grade').textContent = last.grade || '?';
+            document.getElementById('score-timestamp').textContent = '📅 ' + (last.timestamp || '');
+            renderHistory();
+            renderEnergyHistory();
+            renderCO2History();
+        }
+    } else {
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('score-display').style.display = 'none';
+    }
+    refreshAppSelector();
+}
+
+function deleteCurrentApp() {
+    if (!currentAppname) return;
+    if (!confirm(`Supprimer tout l'historique de l'app "${currentAppname}" ?`)) return;
+    localStorage.removeItem(storageKeyFor(currentAppname));
+    const apps = getAppList().filter(a => a !== currentAppname);
+    saveAppList(apps);
+    if (apps.length > 0) {
+        switchApp(apps[0]);
+    } else {
+        currentAppname = '';
+        history = [];
+        refreshAppSelector();
+        location.reload();
+    }
+}
 
 // ─── File Input ────────────────────────────────────────────────
 document.getElementById('file-input').addEventListener('change', async (e) => {
     for (const file of e.target.files) {
         const text = await file.text();
         try {
-            const report = JSON.parse(text);
+            const raw = JSON.parse(text);
+            const { appname, report } = unwrapEnvelope(raw);
+            if (appname && appname !== currentAppname) {
+                currentAppname = appname;
+                registerApp(appname);
+                loadHistoryForApp(appname);
+                refreshAppSelector();
+            }
             addToHistory(report);
             renderReport(report);
         } catch (err) {
@@ -902,7 +1022,17 @@ function loadFromUrl() {
     if (!url) return;
     fetch(url)
         .then(r => r.json())
-        .then(report => { addToHistory(report); renderReport(report); })
+        .then(raw => {
+            const { appname, report } = unwrapEnvelope(raw);
+            if (appname && appname !== currentAppname) {
+                currentAppname = appname;
+                registerApp(appname);
+                loadHistoryForApp(appname);
+                refreshAppSelector();
+            }
+            addToHistory(report);
+            renderReport(report);
+        })
         .catch(err => alert('Erreur: ' + err.message));
 }
 
@@ -941,14 +1071,21 @@ function addToHistory(report) {
         history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
         // Keep last 50
         if (history.length > 50) history = history.slice(-50);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        localStorage.setItem(storageKeyFor(currentAppname), JSON.stringify(history));
     }
 }
 
 function clearHistory() {
-    if (confirm('Supprimer tout l\'historique ?')) {
+    if (confirm('Supprimer tout l\'historique (toutes les apps) ?')) {
+        // Remove all per-app history keys
+        const apps = getAppList();
+        for (const a of apps) {
+            localStorage.removeItem(storageKeyFor(a));
+        }
+        // Also remove default (no appname) key
+        localStorage.removeItem(STORAGE_KEY_PREFIX);
+        localStorage.removeItem(APP_LIST_KEY);
         history = [];
-        localStorage.removeItem(STORAGE_KEY);
         location.reload();
     }
 }
@@ -2008,7 +2145,7 @@ function loadSampleData() {
         if (!history.find(x => x.timestamp === h.timestamp)) history.push(h);
     });
     history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    localStorage.setItem(storageKeyFor(currentAppname), JSON.stringify(history));
 
     renderReport(sample);
 }
@@ -2016,13 +2153,33 @@ function loadSampleData() {
 // ─── Auto-load latest if served from same origin ───────────────
 window.addEventListener('DOMContentLoaded', () => {
     initEnergyPanel();
-    if (EMBEDDED_REPORT) {
-        addToHistory(EMBEDDED_REPORT);
-        renderReport(EMBEDDED_REPORT);
+
+    // Unwrap embedded data
+    const { appname: embeddedAppname, report: embeddedReport } = unwrapEnvelope(RAW_EMBEDDED);
+    if (embeddedAppname) {
+        currentAppname = embeddedAppname;
+        registerApp(currentAppname);
+    }
+    loadHistoryForApp(currentAppname);
+    refreshAppSelector();
+
+    if (embeddedReport) {
+        addToHistory(embeddedReport);
+        renderReport(embeddedReport);
     } else {
         fetch('../reports/latest-report.json')
             .then(r => { if (!r.ok) throw new Error('no report'); return r.json(); })
-            .then(report => { addToHistory(report); renderReport(report); })
+            .then(raw => {
+                const { appname, report } = unwrapEnvelope(raw);
+                if (appname && !currentAppname) {
+                    currentAppname = appname;
+                    registerApp(currentAppname);
+                    loadHistoryForApp(currentAppname);
+                    refreshAppSelector();
+                }
+                addToHistory(report);
+                renderReport(report);
+            })
             .catch(() => { /* no latest report, show empty state */ });
     }
     renderHistory();

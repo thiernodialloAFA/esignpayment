@@ -13,9 +13,6 @@
       "url": "/",
       "description": "ESignPay API Server \u2014 gzip compression enabled on all endpoints",
       "x-server-compression": {
-        "algorithms": [
-          "gzip"
-        ],
         "mime-types": [
           "application/json",
           "application/xml",
@@ -25,14 +22,17 @@
           "application/cbor"
         ],
         "enabled": true,
-        "min-response-size": "256 bytes"
+        "min-response-size": "256 bytes",
+        "algorithms": [
+          "gzip"
+        ]
       },
       "x-server-range-support": {
-        "enabled": true,
-        "unit": "bytes",
         "endpoints": [
           "/api/documents/{id}/download"
-        ]
+        ],
+        "enabled": true,
+        "unit": "bytes"
       }
     }
   ],
@@ -2817,18 +2817,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -2951,18 +2951,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -3059,18 +3059,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",

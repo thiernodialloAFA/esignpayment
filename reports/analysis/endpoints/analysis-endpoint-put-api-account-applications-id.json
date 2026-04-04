@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T09:00:01Z",
+  "timestamp": "2026-04-04T15:07:58Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "put",
     "path": "/api/account-applications/{id}",
-    "url": "http://localhost:8080/api/account-applications/4e16e0e4-a2ac-4022-81a9-e0a48a48e2f7",
+    "url": "http://localhost:8080/api/account-applications/81c787cd-2a8b-4683-a8be-a86ac4ac1164",
     "http_code": 403,
     "size_download": 99,
-    "time_total": 0.027821,
-    "speed_download": 3558,
+    "time_total": 0.027094,
+    "speed_download": 3653,
     "energy_network_wh": 5.5320560932159415e-06,
-    "energy_server_wh": 0.00019320138888888886,
-    "energy_total_wh": 0.0001987334449821048
+    "energy_server_wh": 0.00018815277777777778,
+    "energy_total_wh": 0.00019368483387099372
   }
 }

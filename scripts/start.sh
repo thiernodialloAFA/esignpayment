@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 ###############################################################################
 #  Start baseline + optimized (local dev)
-#  Usage: bash scripts/start.sh [--analyze] [--debug]
+#  Usage: bash scripts/start.sh [--analyze] [--debug] [--appname <name>]
 ###############################################################################
 set -uo pipefail   # pas de -e : on gère les erreurs manuellement
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Parse options
 DEBUG_FLAG=""
-for arg in "$@"; do
-  case "$arg" in
+APPNAME="${APPNAME:-}"
+args=("$@")
+i=0
+while [ $i -lt ${#args[@]} ]; do
+  case "${args[$i]}" in
     --debug) DEBUG_FLAG="--debug" ;;
+    --appname)
+      i=$((i + 1))
+      APPNAME="${args[$i]:-}"
+      ;;
   esac
+  i=$((i + 1))
 done
+
+# Default APPNAME = root folder basename
+APPNAME="${APPNAME:-$(basename "$ROOT")}"
+export APPNAME
 
 # Détection automatique : docker ou podman ?
 source "$ROOT/scripts/_container-runtime.sh"

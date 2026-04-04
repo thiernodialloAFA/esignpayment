@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T09:00:01Z",
+  "timestamp": "2026-04-04T15:07:58Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/documents/{id}/live-sign/{signerId}",
-    "url": "http://localhost:8080/api/documents/d8effc72-9619-4c8b-817f-70f8605bfeff/live-sign/7a535a2c-3df5-4056-99cd-220d16460135",
+    "url": "http://localhost:8080/api/documents/ecd36ca5-a310-4622-962f-21e881f19ec9/live-sign/4e4972a4-a79b-4d11-9bc5-c7266226e124",
     "http_code": 403,
     "size_download": 96,
-    "time_total": 0.005572,
-    "speed_download": 17229,
+    "time_total": 0.011037,
+    "speed_download": 8698,
     "energy_network_wh": 5.364418029785156e-06,
-    "energy_server_wh": 3.869444444444444e-05,
-    "energy_total_wh": 4.40588624742296e-05
+    "energy_server_wh": 7.664583333333332e-05,
+    "energy_total_wh": 8.201025136311848e-05
   }
 }

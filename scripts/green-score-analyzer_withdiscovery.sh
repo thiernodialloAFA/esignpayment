@@ -33,6 +33,7 @@ SWAGGER_URL=${SWAGGER_URL:-""}
 BEARER_TOKEN=${BEARER_TOKEN:-""}
 REPEAT=${REPEAT:-3}
 SKIP_SPECTRAL=${SKIP_SPECTRAL:-true}
+APPNAME=${APPNAME:-$(basename "$(cd "$(dirname "$0")/.." && pwd)")}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -103,6 +104,7 @@ echo ""
 CMD=(python3 "$AUTODISCOVER_PY"
   --target "$TARGET_URL"
   --repeat "$REPEAT"
+  --appname "$APPNAME"
 )
 
 if [ -n "$SWAGGER_URL" ]; then
@@ -158,10 +160,11 @@ fi
 
 # ── Display summary ──
 echo ""
-TOTAL=$(python3 -c "import json;r=json.load(open('$LATEST_REPORT'));print(r['green_score']['total'])" 2>/dev/null || echo "?")
-GRADE=$(python3 -c "import json;r=json.load(open('$LATEST_REPORT'));print(r['green_score']['grade'])" 2>/dev/null || echo "?")
-EP_DISC=$(python3 -c "import json;r=json.load(open('$LATEST_REPORT'));print(r.get('auto_discovery',{}).get('endpoints_discovered',0))" 2>/dev/null || echo "0")
-EP_MEAS=$(python3 -c "import json;r=json.load(open('$LATEST_REPORT'));print(r.get('auto_discovery',{}).get('endpoints_measured',0))" 2>/dev/null || echo "0")
+TOTAL=$(python3 -c "import json;d=json.load(open('$LATEST_REPORT'));r=d.get('report',d);print(r['green_score']['total'])" 2>/dev/null || echo "?")
+GRADE=$(python3 -c "import json;d=json.load(open('$LATEST_REPORT'));r=d.get('report',d);print(r['green_score']['grade'])" 2>/dev/null || echo "?")
+EP_DISC=$(python3 -c "import json;d=json.load(open('$LATEST_REPORT'));r=d.get('report',d);print(r.get('auto_discovery',{}).get('endpoints_discovered',0))" 2>/dev/null || echo "0")
+EP_MEAS=$(python3 -c "import json;d=json.load(open('$LATEST_REPORT'));r=d.get('report',d);print(r.get('auto_discovery',{}).get('endpoints_measured',0))" 2>/dev/null || echo "0")
+APP_DISPLAY=$(python3 -c "import json;d=json.load(open('$LATEST_REPORT'));print(d.get('appname','$APPNAME'))" 2>/dev/null || echo "$APPNAME")
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}📄 Report: ${LATEST_REPORT}${NC}"
@@ -169,6 +172,7 @@ echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━�
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║  📦 APP: ${GREEN}${APP_DISPLAY}${CYAN}                                        ║${NC}"
 echo -e "${CYAN}║  🌿 GREEN SCORE:  ${GREEN}${TOTAL}/100${CYAN}   Grade: ${GREEN}${GRADE}${CYAN}                    ║${NC}"
 echo -e "${CYAN}║  🔍 Endpoints discovered: ${GREEN}${EP_DISC}${CYAN}  measured: ${GREEN}${EP_MEAS}${CYAN}              ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
@@ -178,8 +182,10 @@ if [ "$DEBUG_MODE" = true ]; then
   echo -e "${YELLOW}━━━ 🐛 DEBUG: Score breakdown ━━━${NC}"
   python3 -c "
 import json
-r = json.load(open('$LATEST_REPORT'))
+d = json.load(open('$LATEST_REPORT'))
+r = d.get('report', d)
 gs = r['green_score']
+print(f'  App:   {d.get(\"appname\", \"unknown\")}')
 print(f'  Total: {gs[\"total\"]}/{gs[\"max\"]}  Grade: {gs[\"grade\"]}')
 print()
 for rule, score in gs.get('breakdown', {}).items():

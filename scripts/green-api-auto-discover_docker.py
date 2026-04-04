@@ -1119,12 +1119,17 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
 # ─── Step 5: Build Dashboard-Compatible Report ────────────────────────────
 
 def load_previous_report(output_dir):
-    """Load the latest-report.json if it exists (for before/after comparison)."""
+    """Load the latest-report.json if it exists (for before/after comparison).
+    Handles both old flat format and new {appname, report} envelope."""
     latest = output_dir / "latest-report.json"
     if latest.is_file():
         try:
             with open(latest, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            # Unwrap envelope if present
+            if "report" in data and "appname" in data:
+                return data["report"]
+            return data
         except Exception:
             pass
     return None
@@ -1248,6 +1253,7 @@ Examples:
   python green-api-auto-discover.py --target http://localhost:8081 --bearer MY_TOKEN
         """,
     )
+    parser.add_argument("--appname", default="", help="Application name for reports (default: root folder name)")
     parser.add_argument("--target", default="", help="Base URL of the running API (e.g. http://localhost:8081)")
     parser.add_argument("--swagger", default="", help="Path or URL to OpenAPI spec (auto-discovered if omitted)")
     parser.add_argument("--bearer", default="", help="Bearer token for authenticated APIs")
@@ -1269,6 +1275,9 @@ Examples:
     output_dir = Path(args.output_dir) if args.output_dir else root_dir / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Resolve appname: CLI > root folder name
+    appname = args.appname.strip() if args.appname else root_dir.name
+
     timestamp_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     timestamp_file = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
@@ -1289,6 +1298,7 @@ Examples:
     # ── Banner ──
     log("=" * 60)
     log("  Green API Auto-Discover & Analyzer")
+    log(f"  App: {appname}")
     log("  Devoxx France 2026 — Green Architecture")
     log("=" * 60)
 
@@ -1470,6 +1480,7 @@ Examples:
 
     # Save rule-resource mapping as a separate report file
     mapping_report = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score_summary": {
@@ -1515,14 +1526,20 @@ Examples:
             "issues": spectral_issues[:100],
         }
 
+    # Wrap report with appname envelope
+    wrapped_report = {
+        "appname": appname,
+        "report": dashboard_report,
+    }
+
     # Save reports
     report_file = output_dir / f"green-score-report-{timestamp_file}.json"
     latest_file = output_dir / "latest-report.json"
 
     with open(report_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
     with open(latest_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
 
     log(f"Report: {report_file}", "OK")
     log(f"Latest: {latest_file}", "OK")
@@ -1540,6 +1557,7 @@ Examples:
 
     # Analysis summary
     summary = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score": green_score,
@@ -1581,6 +1599,7 @@ Examples:
     # ── Final Summary ──
     print()
     print("=" * 60)
+    print(f"  APP: {appname}")
     print(f"  GREEN SCORE: {green_score['total']}/{green_score['max']}   Grade: {green_score['grade']}")
     print(f"  Endpoints discovered: {len(endpoints)}")
     print(f"  Endpoints measured:   {len(measurements)}")
