@@ -143,15 +143,16 @@ jobs:
           python3 -c "
           import json
           r = json.load(open('$REPORT'))
-          print(json.dumps(r.get('green_score', {}), indent=2))
-          disc = r.get('auto_discovery', {})
+          rpt = r.get('report', r)
+          print(json.dumps(rpt.get('green_score', {}), indent=2))
+          disc = rpt.get('auto_discovery', {})
           print(f'Endpoints discovered: {disc.get(\"endpoints_discovered\", 0)}')
           print(f'Endpoints measured: {disc.get(\"endpoints_measured\", 0)}')
           "
 
-          TOTAL=$(python3 -c "import json;print(json.load(open('$REPORT'))['green_score']['total'])")
-          GRADE=$(python3 -c "import json;print(json.load(open('$REPORT'))['green_score']['grade'])")
-          EP_COUNT=$(python3 -c "import json;r=json.load(open('$REPORT'));print(r.get('auto_discovery',{}).get('endpoints_discovered',0))")
+          TOTAL=$(python3 -c "import json;r=json.load(open('$REPORT'));rpt=r.get('report',r);print(rpt['green_score']['total'])")
+          GRADE=$(python3 -c "import json;r=json.load(open('$REPORT'));rpt=r.get('report',r);print(rpt['green_score']['grade'])")
+          EP_COUNT=$(python3 -c "import json;r=json.load(open('$REPORT'));rpt=r.get('report',r);print(rpt.get('auto_discovery',{}).get('endpoints_discovered',0))")
 
           echo "## 🌿 Green Score: ${TOTAL}/100 (Grade: ${GRADE})" >> $GITHUB_STEP_SUMMARY
           echo "Endpoints discovered: ${EP_COUNT}" >> $GITHUB_STEP_SUMMARY
@@ -160,7 +161,8 @@ jobs:
           python3 -c "
           import json
           r = json.load(open('$REPORT'))
-          ep = r.get('auto_discovery', {}).get('endpoints_discovered', 0)
+          rpt = r.get('report', r)
+          ep = rpt.get('auto_discovery', {}).get('endpoints_discovered', 0)
           assert ep > 0, f'FAIL: no endpoints discovered (got {ep})'
           print(f'✅ Discovered {ep} endpoints from Swagger')
           "
@@ -208,7 +210,8 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const report = JSON.parse(fs.readFileSync('reports/latest-report.json', 'utf8'));
+            const raw = JSON.parse(fs.readFileSync('reports/latest-report.json', 'utf8'));
+            const report = raw.report || raw;
             const gs = report.green_score;
             const disc = report.auto_discovery || {};
             const emoji = gs.total >= 80 ? '🟢' : gs.total >= 50 ? '🟡' : '🔴';
@@ -250,7 +253,7 @@ jobs:
               body += `\n</details>\n`;
             }
 
-            body += `\n📅 *${report.timestamp}*`;
+            body += `\n📅 *${report.timestamp || raw.timestamp || 'N/A'}*`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
