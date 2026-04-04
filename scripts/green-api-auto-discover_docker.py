@@ -238,24 +238,66 @@ def extract_endpoints(spec):
 
 # ─── Step 2: Spectral Linting ──────────────────────────────────────────────
 
-def run_spectral(spec_source, spectral_config, output_file):
-    """Run Spectral CLI if available. Returns list of issues or None."""
+def _ensure_spectral_installed():
+    """Return the command prefix to invoke Spectral, installing it if needed."""
     spectral_bin = shutil.which("spectral")
+    if spectral_bin:
+        return [spectral_bin]
+
     npx_bin = shutil.which("npx")
-    if not spectral_bin and not npx_bin:
-        log("Spectral CLI not found (install: npm i -g @stoplight/spectral-cli). Skipping lint.", "WARN")
+    if npx_bin:
+        # Check whether the package is already available via npx
+        try:
+            probe = subprocess.run(
+                [npx_bin, "--yes", "@stoplight/spectral-cli", "--version"],
+                capture_output=True, text=True, timeout=120,
+            )
+            if probe.returncode == 0:
+                return [npx_bin, "--yes", "@stoplight/spectral-cli"]
+        except Exception:
+            pass
+
+    npm_bin = shutil.which("npm")
+    if npm_bin:
+        log("Spectral CLI not found — installing globally via npm…", "WARN")
+        try:
+            subprocess.run(
+                [npm_bin, "install", "-g", "@stoplight/spectral-cli"],
+                capture_output=True, text=True, timeout=120, check=True,
+            )
+            spectral_bin = shutil.which("spectral")
+            if spectral_bin:
+                log("Spectral installed successfully", "OK")
+                return [spectral_bin]
+        except Exception as e:
+            log(f"npm global install failed ({e}), trying npx…", "WARN")
+
+    if npx_bin:
+        return [npx_bin, "--yes", "@stoplight/spectral-cli"]
+
+    return None
+
+
+def run_spectral(spec_source, spectral_config, output_file):
+    """Run Spectral CLI. Returns list of issues or None.
+
+    If *spectral_config* is None/empty the built-in ``spectral:oas``
+    ruleset is used so that linting always executes.
+    """
+    cmd_prefix = _ensure_spectral_installed()
+    if not cmd_prefix:
+        log("Spectral CLI not found and could not be installed "
+            "(install: npm i -g @stoplight/spectral-cli). Skipping lint.", "ERR")
         return None
 
-    cmd_prefix = [spectral_bin] if spectral_bin else [npx_bin, "@stoplight/spectral-cli"]
-    cmd = cmd_prefix + [
-        "lint", spec_source,
-        "--ruleset", spectral_config,
-        "--format", "json",
-        "--output", output_file,
-    ]
+    cmd = cmd_prefix + ["lint", spec_source, "--format", "json", "--output", output_file]
+    if spectral_config:
+        cmd += ["--ruleset", spectral_config]
+    # else: Spectral uses its built-in spectral:oas ruleset
+
     log(f"Running Spectral: {' '.join(cmd)}")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         if os.path.isfile(output_file):
             with open(output_file, "r", encoding="utf-8") as f:
                 issues = json.load(f)
@@ -267,6 +309,11 @@ def run_spectral(spec_source, spectral_config, output_file):
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(issues, f, indent=2)
             return issues
+        # If output file is missing and no JSON on stdout, log stderr
+        if result.stderr.strip():
+            log(f"Spectral stderr: {result.stderr[:500]}", "WARN")
+    except subprocess.TimeoutExpired:
+        log("Spectral timed out after 120 s", "ERR")
     except Exception as e:
         log(f"Spectral error: {e}", "ERR")
     return None
@@ -323,160 +370,506 @@ def build_url(base, path, user_params):
 # ─── Step 4: Green Score Analysis (static + runtime) ──────────────────────
 
 def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
-    """Analyze Green API rules against the spec and live measurements."""
+    """Analyze Green API rules against the spec and live measurements.
+
+    Produces a **bidirectional mapping** between rules and API resources:
+      - ``rule_resource_mapping``: for each rule → list of candidate endpoints
+        with ``matched`` status and ``reason``.
+      - ``endpoint_rules``: reverse index — for each endpoint → list of rules
+        that reference it.
+
+    A rule is *validated* when **at least one** of its candidate endpoints
+    matches the check.  One endpoint can appear in several rules.
+    """
     scores = {}
     details = {}
+    mapping = {}  # rule_key -> { ...rule meta, candidates: [...] }
 
-    # Helper: find collection endpoints (GET returning arrays, path has no {id})
-    collection_eps = [e for e in endpoints if e["method"] == "get" and "{" not in e["path"]
-                      and not e["path"].endswith("/health")]
+    # ── helpers ──────────────────────────────────────────────────────────
 
-    # Helper: find single-resource endpoints (GET with {id} in path)
-    single_eps = [e for e in endpoints if e["method"] == "get" and "{" in e["path"]]
+    def _init_rule(rule_key):
+        if rule_key not in mapping:
+            r = GREEN_RULES[rule_key]
+            mapping[rule_key] = {
+                "id": r["id"],
+                "label": r["label"],
+                "description": r["description"],
+                "max_pts": r["max_pts"],
+                "candidates": [],
+            }
 
-    # Full payload measurement (largest collection)
-    full_payload_key = None
-    full_payload_size = 0
+    def register(rule_key, method, path, matched, reason):
+        _init_rule(rule_key)
+        mapping[rule_key]["candidates"].append({
+            "method": method.upper(),
+            "path": path,
+            "matched": matched,
+            "reason": reason,
+        })
+
+    def _matched_count(rule_key):
+        return sum(1 for c in mapping.get(rule_key, {}).get("candidates", [])
+                   if c["matched"])
+
+    # ── categorise endpoints ─────────────────────────────────────────────
+
+    collection_eps = [
+        e for e in endpoints
+        if e["method"] == "get" and "{" not in e["path"]
+        and not e["path"].endswith("/health")
+    ]
+    single_eps = [
+        e for e in endpoints
+        if e["method"] == "get" and "{" in e["path"]
+    ]
+    all_get_eps = [e for e in endpoints if e["method"] == "get"]
+
+    # ═══════════════════════════════════════════════════════════════════
+    # DE11 — Pagination
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("DE11_pagination")
     for e in collection_eps:
-        key = f"get:{e['path']}"
-        m = measurements.get(key, {})
-        if m.get("size_download", 0) > full_payload_size:
-            full_payload_size = m.get("size_download", 0)
-            full_payload_key = key
+        pnames = {p.get("name", "").lower() for p in e.get("parameters", [])}
+        pag = pnames & {"page", "size", "limit", "offset", "cursor"}
+        register(
+            "DE11_pagination", e["method"], e["path"], bool(pag),
+            f"Pagination params: {', '.join(sorted(pag))}" if pag
+            else "No pagination params (page/size/limit/offset/cursor)",
+        )
+    n = _matched_count("DE11_pagination")
+    scores["DE11_pagination"] = 15 if n else 0
+    details["DE11_pagination"] = {
+        "note": f"Pagination on {n}/{len(collection_eps)} collection endpoint(s)" if n
+        else "No pagination on collection endpoints",
+    }
 
-    # ── DE11 Pagination ──
-    has_pagination = False
-    for e in collection_eps:
-        param_names = {p.get("name", "").lower() for p in e.get("parameters", [])}
-        if param_names & {"page", "size", "limit", "offset", "cursor"}:
-            has_pagination = True
-            break
-    if has_pagination:
-        scores["DE11_pagination"] = 15
-        details["DE11_pagination"] = {"note": "Pagination params detected in spec"}
-    else:
-        scores["DE11_pagination"] = 0
-        details["DE11_pagination"] = {"note": "No pagination params found on collection endpoints"}
+    # ═══════════════════════════════════════════════════════════════════
+    # DE08 — Field filtering
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("DE08_fields")
+    for e in all_get_eps:
+        pnames = {p.get("name", "").lower() for p in e.get("parameters", [])}
+        fp = pnames & {"fields", "select"}
+        has_select_path = "/select" in e["path"]
+        matched = bool(fp) or has_select_path
+        reason = (
+            f"Field filter params: {', '.join(sorted(fp))}" if fp
+            else "Path contains /select" if has_select_path
+            else "No field filter param (fields/select)"
+        )
+        register("DE08_fields", e["method"], e["path"], matched, reason)
+    n = _matched_count("DE08_fields")
+    scores["DE08_fields"] = 15 if n else 0
+    details["DE08_fields"] = {
+        "note": f"Field filtering on {n} endpoint(s)" if n
+        else "No field filter found",
+    }
 
-    # ── DE08 Fields filter ──
-    has_fields = False
-    for e in endpoints:
-        param_names = {p.get("name", "").lower() for p in e.get("parameters", [])}
-        if "fields" in param_names or "select" in param_names:
-            has_fields = True
-            break
-    # Also check if a /select endpoint exists
-    if not has_fields:
-        for e in endpoints:
-            if "/select" in e["path"]:
-                has_fields = True
-                break
-    if has_fields:
-        scores["DE08_fields"] = 15
-        details["DE08_fields"] = {"note": "Fields filter detected"}
-    else:
-        scores["DE08_fields"] = 0
-        details["DE08_fields"] = {"note": "No fields filter found"}
-
-    # ── DE01 Compression ──
+    # ═══════════════════════════════════════════════════════════════════
+    # DE01 — Compression (gzip)
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("DE01_compression")
     gzip_ok = False
-    if collection_eps and base_url:
-        test_ep = collection_eps[0]
-        url = build_url(base_url, test_ep["path"], {})
-        m = measure_endpoint(url, headers={**auth_headers, "Accept-Encoding": "gzip"}, repeat=1, timeout=15)
+    gzip_reason_spec = None
+
+    # 0) Spec-level detection — check OpenAPI spec for gzip declarations
+    #    a) servers[*].x-server-compression.enabled
+    for srv in (spec.get("servers") or []):
+        xcomp = (srv.get("x-server-compression") or
+                 srv.get("extensions", {}).get("x-server-compression") or {})
+        if isinstance(xcomp, dict) and xcomp.get("enabled") is True:
+            algos = xcomp.get("algorithms", [])
+            if not algos or "gzip" in [a.lower() for a in algos]:
+                gzip_ok = True
+                gzip_reason_spec = "OpenAPI servers.x-server-compression.enabled=true"
+
+    #    b) info.description mentions gzip
+    if not gzip_ok:
+        info_desc = (spec.get("info") or {}).get("description") or ""
+        if "gzip" in info_desc.lower():
+            gzip_ok = True
+            gzip_reason_spec = "OpenAPI info.description mentions gzip compression"
+
+    #    c) response headers in spec contain Content-Encoding with gzip
+    if not gzip_ok:
+        for _path, ops in (spec.get("paths") or {}).items():
+            if gzip_ok:
+                break
+            for _method in ("get", "post", "put", "patch", "delete", "head"):
+                op = ops.get(_method) if isinstance(ops, dict) else None
+                if not op or not isinstance(op, dict):
+                    continue
+                for _code, resp in (op.get("responses") or {}).items():
+                    if not isinstance(resp, dict):
+                        continue
+                    ce_hdr = (resp.get("headers") or {}).get("Content-Encoding")
+                    if not ce_hdr:
+                        continue
+                    schema = ce_hdr.get("schema") or {}
+                    enum_vals = schema.get("enum") or []
+                    desc = (ce_hdr.get("description") or "").lower()
+                    if "gzip" in desc or "gzip" in [str(v).lower() for v in enum_vals]:
+                        gzip_ok = True
+                        gzip_reason_spec = "OpenAPI response header Content-Encoding declares gzip"
+                        break
+                if gzip_ok:
+                    break
+
+    # 1) Check existing measurement headers for passive gzip
+    for e in endpoints:
+        key = f"{e['method']}:{e['path']}"
+        m = measurements.get(key, {})
         ce = m.get("response_headers", {}).get("content-encoding", "")
         if "gzip" in ce.lower():
             gzip_ok = True
-        # Also check if compressed size < uncompressed
-        key = f"get:{test_ep['path']}"
-        raw_size = measurements.get(key, {}).get("size_download", 0)
-        if m["size_download"] > 0 and raw_size > 0 and m["size_download"] < raw_size * 0.9:
+
+    if not gzip_ok and collection_eps and base_url:
+        gzip_probe_ep = collection_eps[0]
+        url = build_url(base_url, gzip_probe_ep["path"], {})
+        m_gz = measure_endpoint(
+            url, headers={**auth_headers, "Accept-Encoding": "gzip"},
+            repeat=1, timeout=15,
+        )
+        ce = m_gz.get("response_headers", {}).get("content-encoding", "")
+        raw_key = f"get:{gzip_probe_ep['path']}"
+        raw_size = measurements.get(raw_key, {}).get("size_download", 0)
+        if "gzip" in ce.lower():
             gzip_ok = True
-    if gzip_ok:
-        scores["DE01_compression"] = 15
-        details["DE01_compression"] = {"note": "Gzip compression active"}
-    else:
-        scores["DE01_compression"] = 0
-        details["DE01_compression"] = {"note": "Gzip not detected"}
+        elif (m_gz["size_download"] > 0 and raw_size > 0
+              and m_gz["size_download"] < raw_size * 0.9):
+            gzip_ok = True
 
-    # ── DE02/DE03 Cache ETag ──
+    for e in endpoints:
+        key = f"{e['method']}:{e['path']}"
+        m = measurements.get(key, {})
+        ce = m.get("response_headers", {}).get("content-encoding", "")
+        ep_has_gzip = "gzip" in ce.lower()
+        if ep_has_gzip:
+            register("DE01_compression", e["method"], e["path"], True,
+                     "Content-Encoding: gzip in response")
+        elif gzip_ok:
+            reason = gzip_reason_spec or "Server supports gzip (confirmed on another endpoint)"
+            register("DE01_compression", e["method"], e["path"], True, reason)
+        else:
+            register("DE01_compression", e["method"], e["path"], False,
+                     "No gzip compression detected")
+
+    scores["DE01_compression"] = 15 if gzip_ok else 0
+    details["DE01_compression"] = {
+        "note": ("Gzip compression active"
+                 + (f" ({gzip_reason_spec})" if gzip_reason_spec else ""))
+        if gzip_ok else "Gzip not detected",
+    }
+
+    # ═══════════════════════════════════════════════════════════════════
+    # DE02 / DE03 — Cache ETag + 304
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("DE02_DE03_cache")
     etag_ok = False
-    if single_eps and base_url:
-        test_ep = single_eps[0]
-        url = build_url(base_url, test_ep["path"], {})
-        _, head_hdrs = http_head(url, headers=auth_headers, timeout=10)
-        etag_val = head_hdrs.get("etag", "")
-        if etag_val:
-            m304 = measure_endpoint(url, headers={**auth_headers, "If-None-Match": etag_val}, repeat=1)
-            if m304["http_code"] == 304:
-                etag_ok = True
-    if etag_ok:
-        scores["DE02_DE03_cache"] = 15
-        details["DE02_DE03_cache"] = {"http_code": 304, "note": "ETag + 304 supported"}
-    else:
-        scores["DE02_DE03_cache"] = 0
-        details["DE02_DE03_cache"] = {"note": "ETag/304 not detected"}
 
-    # ── DE06 Delta ──
-    has_delta = any("change" in e["path"].lower() or "delta" in e["path"].lower()
-                     for e in endpoints if e["method"] == "get")
-    if has_delta:
-        scores["DE06_delta"] = 10
-        details["DE06_delta"] = {"note": "Delta/changes endpoint detected"}
-    else:
-        scores["DE06_delta"] = 0
-        details["DE06_delta"] = {"note": "No delta endpoint found"}
-
-    # ── Range 206 ──
-    range_ok = False
-    if single_eps and base_url:
-        for test_ep in single_eps + collection_eps[:1]:
-            url = build_url(base_url, test_ep["path"], {})
-            mr = measure_endpoint(url, headers={**auth_headers, "Range": "bytes=0-99"}, repeat=1)
-            if mr["http_code"] == 206:
-                range_ok = True
-                break
-    if range_ok:
-        scores["range_206"] = 10
-        details["range_206"] = {"http_code": 206, "note": "Range/206 supported"}
-    else:
-        scores["range_206"] = 0
-        details["range_206"] = {"note": "Range not supported"}
-
-    # ── AR02 Binary format ──
-    has_cbor = any("cbor" in e["path"].lower() or "protobuf" in e["path"].lower()
-                    or "application/cbor" in str(e.get("produces", []))
-                    for e in endpoints)
-    if has_cbor:
-        scores["AR02_format_cbor"] = 10
-        details["AR02_format_cbor"] = {"note": "Binary format endpoint detected"}
-    else:
-        scores["AR02_format_cbor"] = 0
-        details["AR02_format_cbor"] = {"note": "No binary format endpoint"}
-
-    # ── LO01 Observability ──
-    actuator_ok = False
     if base_url:
-        for p in ["/actuator/health", "/health", "/actuator"]:
+        tested_paths = set()
+        for test_ep in single_eps[:5]:
+            tested_paths.add(test_ep["path"])
+            url = build_url(base_url, test_ep["path"], {})
+            _, head_hdrs = http_head(url, headers=auth_headers, timeout=10)
+            etag_val = head_hdrs.get("etag", "")
+            if etag_val:
+                m304 = measure_endpoint(
+                    url,
+                    headers={**auth_headers, "If-None-Match": etag_val},
+                    repeat=1,
+                )
+                if m304["http_code"] == 304:
+                    register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
+                             True,
+                             f"ETag={etag_val[:40]}… → 304 Not Modified")
+                    etag_ok = True
+                else:
+                    register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
+                             False,
+                             f"ETag present but If-None-Match → {m304['http_code']}")
+            else:
+                register("DE02_DE03_cache", test_ep["method"], test_ep["path"],
+                         False, "No ETag header in HEAD response")
+
+        for e in single_eps:
+            if e["path"] not in tested_paths:
+                register(
+                    "DE02_DE03_cache", e["method"], e["path"], False,
+                    "Not individually tested"
+                    + (" (ETag supported on other endpoints)" if etag_ok else ""),
+                )
+    else:
+        for e in single_eps:
+            register("DE02_DE03_cache", e["method"], e["path"], False,
+                     "No base_url — cannot test")
+
+    scores["DE02_DE03_cache"] = 15 if etag_ok else 0
+    details["DE02_DE03_cache"] = (
+        {"http_code": 304, "note": "ETag + 304 supported"} if etag_ok
+        else {"note": "ETag/304 not detected"}
+    )
+
+    # ═══════════════════════════════════════════════════════════════════
+    # DE06 — Delta / Changes
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("DE06_delta")
+    for e in all_get_eps:
+        pl = e["path"].lower()
+        is_delta = "change" in pl or "delta" in pl or "since" in pl
+        register(
+            "DE06_delta", e["method"], e["path"], is_delta,
+            "Path contains 'change', 'delta' or 'since'" if is_delta
+            else "Not a delta/changes endpoint",
+        )
+    for e in collection_eps:
+        pnames = {p.get("name", "").lower() for p in e.get("parameters", [])}
+        if "since" in pnames or "updatedsince" in pnames:
+            for c in mapping["DE06_delta"]["candidates"]:
+                if c["path"] == e["path"] and c["method"] == e["method"].upper():
+                    if not c["matched"]:
+                        c["matched"] = True
+                        c["reason"] = "Has 'since' query parameter"
+
+    n = _matched_count("DE06_delta")
+    scores["DE06_delta"] = 10 if n else 0
+    details["DE06_delta"] = {
+        "note": f"Delta endpoint(s) found: {n}" if n
+        else "No delta endpoint found",
+    }
+
+    # ═══════════════════════════════════════════════════════════════════
+    # Range 206 — Partial Content
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("range_206")
+    range_ok = False
+    range_reason_spec = None
+
+    # 0) Spec-level detection — check OpenAPI spec for Range/206 declarations
+    #    a) servers[*].x-server-range-support.enabled
+    for srv in (spec.get("servers") or []):
+        xrange = (srv.get("x-server-range-support") or
+                  srv.get("extensions", {}).get("x-server-range-support") or {})
+        if isinstance(xrange, dict) and xrange.get("enabled") is True:
+            range_ok = True
+            range_reason_spec = "OpenAPI servers.x-server-range-support.enabled=true"
+
+    #    b) info.description mentions range / partial content / 206
+    if not range_ok:
+        info_desc = (spec.get("info") or {}).get("description") or ""
+        info_lower = info_desc.lower()
+        if ("range" in info_lower and "partial content" in info_lower) or "206" in info_lower:
+            range_ok = True
+            range_reason_spec = "OpenAPI info.description mentions Range / Partial Content"
+
+    #    c) Any operation has a 206 response code
+    if not range_ok:
+        for _path, ops in (spec.get("paths") or {}).items():
+            if range_ok:
+                break
+            for _method in ("get", "post", "put", "patch", "delete", "head"):
+                op = ops.get(_method) if isinstance(ops, dict) else None
+                if not op or not isinstance(op, dict):
+                    continue
+                if "206" in (op.get("responses") or {}):
+                    range_ok = True
+                    range_reason_spec = f"OpenAPI operation {_method.upper()} {_path} declares 206 response"
+                    break
+
+    #    d) Response headers contain Accept-Ranges: bytes
+    if not range_ok:
+        for _path, ops in (spec.get("paths") or {}).items():
+            if range_ok:
+                break
+            for _method in ("get", "post", "put", "patch", "delete", "head"):
+                op = ops.get(_method) if isinstance(ops, dict) else None
+                if not op or not isinstance(op, dict):
+                    continue
+                for _code, resp in (op.get("responses") or {}).items():
+                    if not isinstance(resp, dict):
+                        continue
+                    ar_hdr = (resp.get("headers") or {}).get("Accept-Ranges")
+                    if not ar_hdr:
+                        continue
+                    schema = ar_hdr.get("schema") or {}
+                    enum_vals = schema.get("enum") or []
+                    desc = (ar_hdr.get("description") or "").lower()
+                    if "bytes" in desc or "bytes" in [str(v).lower() for v in enum_vals]:
+                        range_ok = True
+                        range_reason_spec = "OpenAPI response header Accept-Ranges declares bytes"
+                        break
+                if range_ok:
+                    break
+
+    if base_url and not range_ok:
+        test_candidates = (single_eps + collection_eps)[:5]
+        tested_paths = set()
+        for test_ep in test_candidates:
+            tested_paths.add(test_ep["path"])
+            url = build_url(base_url, test_ep["path"], {})
+            mr = measure_endpoint(
+                url,
+                headers={**auth_headers, "Range": "bytes=0-99"},
+                repeat=1,
+            )
+            if mr["http_code"] == 206:
+                register("range_206", test_ep["method"], test_ep["path"], True,
+                         "Range: bytes=0-99 → 206 Partial Content")
+                range_ok = True
+            else:
+                register("range_206", test_ep["method"], test_ep["path"], False,
+                         f"Range: bytes=0-99 → {mr['http_code']} (not 206)")
+        for e in all_get_eps:
+            if e["path"] not in tested_paths:
+                register("range_206", e["method"], e["path"], False,
+                         "Not individually tested"
+                         + (" (Range supported on other endpoints)" if range_ok else ""))
+    elif range_ok:
+        # Spec-level detection succeeded — register all GET endpoints as matched
+        for e in all_get_eps:
+            register("range_206", e["method"], e["path"], True,
+                     range_reason_spec or "Range/206 declared in OpenAPI spec")
+    else:
+        for e in all_get_eps:
+            register("range_206", e["method"], e["path"], False,
+                     "No base_url — cannot test")
+
+    scores["range_206"] = 10 if range_ok else 0
+    details["range_206"] = (
+        {"http_code": 206, "note": "Range/206 supported"
+         + (f" ({range_reason_spec})" if range_reason_spec else "")} if range_ok
+        else {"note": "Range not supported"}
+    )
+
+    # ═══════════════════════════════════════════════════════════════════
+    # AR02 — Binary format (CBOR / Protobuf)
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("AR02_format_cbor")
+    for e in endpoints:
+        pl = e["path"].lower()
+        produces = str(e.get("produces", []))
+        responses_str = json.dumps(e.get("responses", {})).lower()
+        is_binary = (
+            "cbor" in pl or "protobuf" in pl or "grpc" in pl
+            or "application/cbor" in produces
+            or "application/cbor" in responses_str
+            or "application/protobuf" in produces
+            or "application/x-protobuf" in produces
+            or "application/octet-stream" in responses_str
+        )
+        register(
+            "AR02_format_cbor", e["method"], e["path"], is_binary,
+            "Binary format (CBOR/protobuf/octet-stream)" if is_binary
+            else "Standard JSON format",
+        )
+    n = _matched_count("AR02_format_cbor")
+    scores["AR02_format_cbor"] = 10 if n else 0
+    details["AR02_format_cbor"] = {
+        "note": f"Binary format on {n} endpoint(s)" if n
+        else "No binary format endpoint",
+    }
+
+    # ═══════════════════════════════════════════════════════════════════
+    # LO01 — Observability (actuator / health)
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("LO01_observability")
+    actuator_ok = False
+
+    if base_url:
+        for p in ["/actuator/health", "/health", "/actuator",
+                  "/actuator/metrics", "/actuator/info"]:
             s, _, _ = http_get(base_url.rstrip("/") + p, timeout=5)
             if s == 200:
+                register("LO01_observability", "GET", p, True, f"HTTP {s} OK")
                 actuator_ok = True
-                break
-    if actuator_ok:
-        scores["LO01_observability"] = 5
-        details["LO01_observability"] = {"note": "Actuator/health detected"}
-    else:
-        scores["LO01_observability"] = 0
-        details["LO01_observability"] = {"note": "No health endpoint"}
+            else:
+                register("LO01_observability", "GET", p, False,
+                         f"HTTP {s}" if s else "Unreachable")
 
-    # ── US07 Rate limiting ──
-    # Heuristic: assumed if the API is running and has proper middleware
-    if base_url and full_payload_size > 0:
-        scores["US07_rate_limit"] = 5
-        details["US07_rate_limit"] = {"note": "Assumed present (API running)"}
+    for e in endpoints:
+        keywords = ("health", "actuator", "metrics", "info", "status")
+        if any(kw in e["path"].lower() for kw in keywords):
+            already = any(
+                c["path"] == e["path"]
+                for c in mapping["LO01_observability"]["candidates"]
+            )
+            if not already:
+                register("LO01_observability", e["method"], e["path"], True,
+                         "Health/observability endpoint in OpenAPI spec")
+                actuator_ok = True
+
+    scores["LO01_observability"] = 5 if actuator_ok else 0
+    details["LO01_observability"] = {
+        "note": "Actuator/health detected" if actuator_ok
+        else "No health endpoint",
+    }
+
+    # ═══════════════════════════════════════════════════════════════════
+    # US07 — Rate Limiting
+    # ═══════════════════════════════════════════════════════════════════
+    _init_rule("US07_rate_limit")
+    rl_detected = False
+
+    for e in endpoints:
+        key = f"{e['method']}:{e['path']}"
+        m = measurements.get(key, {})
+        hdrs = m.get("response_headers", {})
+        rl_hdrs = {
+            k: v for k, v in hdrs.items()
+            if any(tok in k.lower() for tok in
+                   ("ratelimit", "x-rate-limit", "retry-after",
+                    "x-ratelimit", "ratelimit-limit"))
+        }
+        if rl_hdrs:
+            register("US07_rate_limit", e["method"], e["path"], True,
+                     f"Rate-limit headers: {', '.join(rl_hdrs.keys())}")
+            rl_detected = True
+        else:
+            register("US07_rate_limit", e["method"], e["path"], False,
+                     "No rate-limit headers in response")
+
+    full_payload_size = max(
+        (measurements.get(f"get:{e['path']}", {}).get("size_download", 0)
+         for e in collection_eps),
+        default=0,
+    )
+    heuristic_ok = (not rl_detected and base_url and full_payload_size > 0)
+
+    if rl_detected:
+        note = "Rate-limit headers detected"
+    elif heuristic_ok:
+        note = "Assumed present (API running, no explicit headers)"
     else:
-        scores["US07_rate_limit"] = 0
-        details["US07_rate_limit"] = {"note": "Cannot verify"}
+        note = "Cannot verify"
+
+    scores["US07_rate_limit"] = 5 if (rl_detected or heuristic_ok) else 0
+    details["US07_rate_limit"] = {"note": note}
+
+    # ═══════════════════════════════════════════════════════════════════
+    # Finalize mapping: validated/score/counts + reverse index
+    # ═══════════════════════════════════════════════════════════════════
+    for rule_key in GREEN_RULES:
+        _init_rule(rule_key)
+        rd = mapping[rule_key]
+        matched = [c for c in rd["candidates"] if c["matched"]]
+        rd["validated"] = len(matched) > 0
+        rd["score"] = scores.get(rule_key, 0)
+        rd["matched_count"] = len(matched)
+        rd["candidate_count"] = len(rd["candidates"])
+
+    # ═══════════════════════════════════════════════════════════════════
+    # Generate improvement suggestions for unvalidated rules
+    # ═══════════════════════════════════════════════════════════════════
+    _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, endpoints)
+
+    endpoint_rules = {}
+    for rule_key, rd in mapping.items():
+        for c in rd["candidates"]:
+            ep_key = f"{c['method'].lower()}:{c['path']}"
+            endpoint_rules.setdefault(ep_key, [])
+            if rule_key not in endpoint_rules[ep_key]:
+                endpoint_rules[ep_key].append(rule_key)
 
     total = sum(scores.values())
     max_score = sum(r["max_pts"] for r in GREEN_RULES.values())
@@ -489,7 +882,238 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
         "grade": grade,
         "breakdown": scores,
         "details": details,
+        "rule_resource_mapping": mapping,
+        "endpoint_rules": endpoint_rules,
     }
+
+
+def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_eps):
+    """Populate ``suggestions`` for every **unvalidated** rule."""
+
+    def _top_collections(n=3):
+        return [e["path"] for e in collection_eps[:n]]
+
+    def _top_singles(n=3):
+        return [e["path"] for e in single_eps[:n]]
+
+    for rule_key, rd in mapping.items():
+        if rd["validated"]:
+            rd["suggestions"] = []
+            continue
+
+        suggestions = []
+        unmatched = [c for c in rd["candidates"] if not c["matched"]]
+
+        if rule_key == "DE11_pagination":
+            real_collections = [
+                c for c in unmatched
+                if not any(skip in c["path"] for skip in ("/config", "/me", "/auth", "/health"))
+            ]
+            for c in real_collections[:5]:
+                suggestions.append({
+                    "target": f"{c['method'].upper()} {c['path']}",
+                    "action": "Add pagination parameters (page & size)",
+                    "priority": "high",
+                    "impact": f"+{rd['max_pts']} pts — reduces payload size for large collections",
+                    "how": (
+                        "Spring Boot: Change return type from List<T> to Page<T> and add "
+                        "@RequestParam defaultValue parameters:\n"
+                        "  @GetMapping\n"
+                        "  public ApiResponse<Page<T>> list(\n"
+                        "      @RequestParam(defaultValue = \"0\") int page,\n"
+                        "      @RequestParam(defaultValue = \"20\") int size) {\n"
+                        "    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n"
+                        "  }\n"
+                        "OpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+                    ),
+                })
+
+        elif rule_key == "DE08_fields":
+            top_targets = [
+                c for c in unmatched
+                if c["method"] == "GET"
+                and not any(skip in c["path"] for skip in ("/config", "/download"))
+            ]
+            for c in top_targets[:5]:
+                is_collection = "{" not in c["path"]
+                suggestions.append({
+                    "target": f"{c['method'].upper()} {c['path']}",
+                    "action": "Add a 'fields' query parameter for sparse fieldsets",
+                    "priority": "high" if is_collection else "medium",
+                    "impact": f"+{rd['max_pts']} pts — lets clients request only needed fields, reducing payload",
+                    "how": (
+                        "Spring Boot: Add an optional @RequestParam and filter the DTO:\n"
+                        "  @GetMapping\n"
+                        "  public ApiResponse<?> list(\n"
+                        "      @RequestParam(required = false) String fields) {\n"
+                        "    // If fields != null, use Jackson @JsonFilter or a projection\n"
+                        "    // to return only the requested fields.\n"
+                        "  }\n"
+                        "Alternative: Use a custom Jackson MappingJacksonValue with a\n"
+                        "SimpleFilterProvider that keeps only the requested properties.\n"
+                        "OpenAPI: The 'fields' param will appear automatically."
+                    ),
+                })
+
+        elif rule_key == "DE01_compression":
+            suggestions.append({
+                "target": "ALL endpoints (server-level)",
+                "action": "Enable gzip compression on the server",
+                "priority": "high",
+                "impact": f"+{rd['max_pts']} pts — typically 60-80% payload reduction",
+                "how": (
+                    "Option 1 — Spring Boot application.yml:\n"
+                    "  server:\n"
+                    "    compression:\n"
+                    "      enabled: true\n"
+                    "      min-response-size: 1024\n"
+                    "      mime-types: application/json,application/xml,text/html,text/plain\n\n"
+                    "Option 2 — Nginx (if reverse proxy):\n"
+                    "  gzip on;\n"
+                    "  gzip_types application/json application/xml text/plain;\n"
+                    "  gzip_min_length 1024;\n"
+                    "  gzip_comp_level 6;\n\n"
+                    "Both options apply to ALL endpoints automatically."
+                ),
+            })
+
+        elif rule_key == "DE02_DE03_cache":
+            for c in unmatched[:5]:
+                suggestions.append({
+                    "target": f"{c['method'].upper()} {c['path']}",
+                    "action": "Add ETag support and If-None-Match → 304 Not Modified",
+                    "priority": "high",
+                    "impact": f"+{rd['max_pts']} pts — avoids resending unchanged resources, saves bandwidth",
+                    "how": (
+                        "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n"
+                        "  Option A — Global filter (easiest):\n"
+                        "  @Bean\n"
+                        "  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n"
+                        "    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n"
+                        "    reg.setFilter(new ShallowEtagHeaderFilter());\n"
+                        "    reg.addUrlPatterns(\"/api/*\");\n"
+                        "    return reg;\n"
+                        "  }\n\n"
+                        "  Option B — Manual per endpoint:\n"
+                        "  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n"
+                        "  if (request.checkNotModified(etag)) return null; // → 304\n"
+                        "  return ResponseEntity.ok().eTag(etag).body(body);"
+                    ),
+                })
+
+        elif rule_key == "DE06_delta":
+            for path in _top_collections(3):
+                suggestions.append({
+                    "target": f"GET {path}/changes  (new endpoint)",
+                    "action": "Add a delta/changes endpoint with a 'since' parameter",
+                    "priority": "medium",
+                    "impact": f"+{rd['max_pts']} pts — clients fetch only what changed since last sync",
+                    "how": (
+                        "Spring Boot: Add a new endpoint that filters by updatedAt:\n"
+                        "  @GetMapping(\"/changes\")\n"
+                        "  public ApiResponse<List<T>> getChanges(\n"
+                        "      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n"
+                        "    return ApiResponse.success(\n"
+                        "        repository.findByUpdatedAtAfter(since));\n"
+                        "  }\n\n"
+                        "Prerequisite: Add an 'updatedAt' column with @UpdateTimestamp\n"
+                        "to your entity, and a repository method findByUpdatedAtAfter().\n"
+                        f"Alternative: Add @RequestParam 'since' to existing {path}."
+                    ),
+                })
+
+        elif rule_key == "range_206":
+            download_eps = [c for c in unmatched if "download" in c["path"].lower()]
+            other_eps = [c for c in unmatched if "download" not in c["path"].lower()]
+            targets = download_eps + other_eps[:2]
+            for c in targets[:3]:
+                is_download = "download" in c["path"].lower()
+                suggestions.append({
+                    "target": f"{c['method'].upper()} {c['path']}",
+                    "action": "Support HTTP Range header for partial content (206)",
+                    "priority": "high" if is_download else "low",
+                    "impact": f"+{rd['max_pts']} pts — enables resumable downloads and partial fetches",
+                    "how": (
+                        "Spring Boot: Use ResourceHttpRequestHandler or manual range parsing:\n\n"
+                        "  @GetMapping(\"/{id}/download\")\n"
+                        "  public ResponseEntity<Resource> download(\n"
+                        "      @PathVariable UUID id,\n"
+                        "      @RequestHeader(value = \"Range\", required = false) String range) {\n"
+                        "    Resource resource = new FileSystemResource(filePath);\n"
+                        "    if (range != null) {\n"
+                        "      // Parse 'bytes=start-end', return 206 with Content-Range header\n"
+                        "      long start = parseStart(range);\n"
+                        "      long end = parseEnd(range, resource.contentLength());\n"
+                        "      return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)\n"
+                        "          .header(\"Content-Range\", ...)\n"
+                        "          .body(new InputStreamResource(rangedStream));\n"
+                        "    }\n"
+                        "    return ResponseEntity.ok(resource);\n"
+                        "  }"
+                    ) if is_download else (
+                        "For JSON endpoints, Range/206 is rarely useful.\n"
+                        "Focus on the file download endpoint(s) instead."
+                    ),
+                })
+
+        elif rule_key == "AR02_format_cbor":
+            for path in _top_collections(2):
+                suggestions.append({
+                    "target": f"GET {path}  (add CBOR variant)",
+                    "action": "Add a binary format alternative (CBOR or Protobuf)",
+                    "priority": "low",
+                    "impact": f"+{rd['max_pts']} pts — binary formats are 30-50% smaller than JSON",
+                    "how": (
+                        "Spring Boot + CBOR:\n"
+                        "  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n"
+                        "  2. Register the converter:\n"
+                        "     @Bean\n"
+                        "     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n"
+                        "       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n"
+                        "       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n"
+                        "     }\n"
+                        "  3. Clients send: Accept: application/cbor"
+                    ),
+                })
+
+        elif rule_key == "LO01_observability":
+            suggestions.append({
+                "target": "/actuator/health, /actuator/metrics",
+                "action": "Expose Spring Boot Actuator endpoints",
+                "priority": "high",
+                "impact": f"+{rd['max_pts']} pts — essential for production monitoring",
+                "how": (
+                    "Spring Boot application.yml:\n"
+                    "  management:\n"
+                    "    endpoints:\n"
+                    "      web:\n"
+                    "        exposure:\n"
+                    "          include: health,info,metrics\n"
+                    "Add dependency: spring-boot-starter-actuator."
+                ),
+            })
+
+        elif rule_key == "US07_rate_limit":
+            suggestions.append({
+                "target": "ALL endpoints (server-level)",
+                "action": "Add rate-limit response headers",
+                "priority": "medium",
+                "impact": f"+{rd['max_pts']} pts — protects the API from abuse and signals limits to clients",
+                "how": (
+                    "Option 1 — Spring Boot filter:\n"
+                    "  Add a OncePerRequestFilter that adds:\n"
+                    "    X-RateLimit-Limit: 100\n"
+                    "    X-RateLimit-Remaining: 97\n"
+                    "    X-RateLimit-Reset: 1620000000\n\n"
+                    "Option 2 — Use Bucket4j + Spring Boot Starter:\n"
+                    "  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n\n"
+                    "Option 3 — Nginx:\n"
+                    "  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n"
+                    "  add_header X-RateLimit-Limit 100;"
+                ),
+            })
+
+        rd["suggestions"] = suggestions
 
 
 # ─── Step 5: Build Dashboard-Compatible Report ────────────────────────────
@@ -629,7 +1253,7 @@ Examples:
     parser.add_argument("--bearer", default="", help="Bearer token for authenticated APIs")
     parser.add_argument("--param", action="append", default=[], help="Path/query param key=value (repeatable)")
     parser.add_argument("--repeat", type=int, default=3, help="Number of repetitions per endpoint (default: 3)")
-    parser.add_argument("--methods", default="get", help="Comma-separated HTTP methods to measure (default: get)")
+    parser.add_argument("--methods", default="get,post,put", help="Comma-separated HTTP methods to measure (default: get)")
     parser.add_argument("--dry-run", action="store_true", help="List endpoints without calling them")
     parser.add_argument("--spectral-config", default="", help="Path to .spectral.yml (auto-detected)")
     parser.add_argument("--network-kwh-per-gb", type=float, default=DEFAULT_NETWORK_KWH_PER_GB)
@@ -719,23 +1343,23 @@ Examples:
             print(f"  {e['method'].upper():6s} {e['path']:50s} -> {url}")
         sys.exit(0)
 
-    # ── Step 2: Spectral Linting ──
+    # ── Step 2: Spectral Linting (always runs unless --skip-spectral) ──
     spectral_issues = None
     if not args.skip_spectral:
-        spectral_config = args.spectral_config
+        spectral_config = args.spectral_config or None
         if not spectral_config:
             candidates = [root_dir / ".spectral.yml", root_dir / ".spectral.yaml"]
             for c in candidates:
                 if c.is_file():
                     spectral_config = str(c)
+                    log(f"Using Spectral config: {c}", "OK")
                     break
-        if spectral_config:
-            spectral_output = output_dir / "spectral-results.json"
-            spectral_issues = run_spectral(
-                str(spec_local), spectral_config, str(spectral_output)
-            )
-        else:
-            log("No .spectral.yml found. Skipping lint.", "WARN")
+            if not spectral_config:
+                log("No .spectral.yml found — using Spectral built-in OAS ruleset", "INFO")
+        spectral_output = output_dir / "spectral-results.json"
+        spectral_issues = run_spectral(
+            str(spec_local), spectral_config, str(spectral_output)
+        )
 
     # ── Step 3: Measure Endpoints ──
     log(f"Measuring {len(filtered_eps)} endpoints ({args.repeat} repeats each)...")
@@ -778,7 +1402,8 @@ Examples:
         # Save per-endpoint file
         ep_dir = output_dir / "analysis" / "endpoints"
         ep_dir.mkdir(parents=True, exist_ok=True)
-        ep_file = ep_dir / f"analysis-endpoint-{slugify(f'{ep["method"]}-{ep["path"]}')}.json"
+        ep_slug = slugify(ep["method"] + "-" + ep["path"])
+        ep_file = ep_dir / f"analysis-endpoint-{ep_slug}.json"
         with open(ep_file, "w", encoding="utf-8") as f:
             json.dump(ep_report, f, indent=2)
 
@@ -786,6 +1411,80 @@ Examples:
     log("Computing Green Score...")
     green_score = analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers)
     log(f"  GREEN SCORE: {green_score['total']}/{green_score['max']}  Grade: {green_score['grade']}", "OK")
+
+    # ── Step 4b: Display Rule ↔ Resource Mapping ──
+    rule_mapping = green_score.get("rule_resource_mapping", {})
+    endpoint_rules = green_score.get("endpoint_rules", {})
+
+    log("")
+    log("=" * 60)
+    log("  📋 Rule ↔ API Resource Mapping")
+    log("=" * 60)
+    for rule_key, rd in rule_mapping.items():
+        status = "✅" if rd["validated"] else "❌"
+        log(f"  {status} [{rd['id']}] {rd['label']}  "
+            f"({rd['score']}/{rd['max_pts']} pts)  "
+            f"— {rd['matched_count']}/{rd['candidate_count']} resource(s) matched",
+            "OK" if rd["validated"] else "WARN")
+        for c in rd["candidates"]:
+            icon = "🟢" if c["matched"] else "⚪"
+            log(f"      {icon} {c['method']:6s} {c['path']}")
+            log(f"         └─ {c['reason']}")
+
+    log("")
+    log("  📋 Reverse Index: API Resource → Rules")
+    log("-" * 60)
+    for ep_key in sorted(endpoint_rules.keys()):
+        rules_list = endpoint_rules[ep_key]
+        rule_ids = [rule_mapping[rk]["id"] for rk in rules_list if rk in rule_mapping]
+        log(f"  {ep_key:50s} → {', '.join(rule_ids)}")
+    log("=" * 60)
+
+    # ── Step 4c: Display Improvement Suggestions ──
+    unvalidated = {k: rd for k, rd in rule_mapping.items()
+                   if not rd["validated"] and rd.get("suggestions")}
+    if unvalidated:
+        log("")
+        log("=" * 60)
+        log("  💡 Improvement Suggestions (unvalidated rules)")
+        log("=" * 60)
+        total_potential = sum(rd["max_pts"] for rd in unvalidated.values())
+        log(f"  Potential score gain: +{total_potential} pts", "INFO")
+        log("")
+        for rule_key, rd in unvalidated.items():
+            log(f"  ── [{rd['id']}] {rd['label']}  (0/{rd['max_pts']} pts) ──", "WARN")
+            for i, s in enumerate(rd["suggestions"], 1):
+                prio_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(s["priority"], "⚪")
+                log(f"    {prio_icon} Suggestion {i}: {s['action']}")
+                log(f"       Target:   {s['target']}")
+                log(f"       Priority: {s['priority'].upper()}")
+                log(f"       Impact:   {s['impact']}")
+                for line in s["how"].split("\n"):
+                    log(f"       {line}")
+                log("")
+        log("=" * 60)
+    else:
+        log("")
+        log("  🎉 All rules validated — no suggestions needed!", "OK")
+    log("")
+
+    # Save rule-resource mapping as a separate report file
+    mapping_report = {
+        "timestamp": timestamp_str,
+        "service_base_url": base_url,
+        "green_score_summary": {
+            "total": green_score["total"],
+            "max": green_score["max"],
+            "grade": green_score["grade"],
+        },
+        "rule_resource_mapping": rule_mapping,
+        "endpoint_rules": endpoint_rules,
+    }
+    mapping_file = output_dir / "analysis" / "rule-resource-mapping.json"
+    mapping_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(mapping_file, "w", encoding="utf-8") as f:
+        json.dump(mapping_report, f, indent=2)
+    log(f"Rule-Resource mapping saved: {mapping_file}", "OK")
 
     # Find the full payload key (largest GET)
     full_key = max(measurements.keys(),
@@ -885,7 +1584,15 @@ Examples:
     print(f"  GREEN SCORE: {green_score['total']}/{green_score['max']}   Grade: {green_score['grade']}")
     print(f"  Endpoints discovered: {len(endpoints)}")
     print(f"  Endpoints measured:   {len(measurements)}")
-    print(f"  Report: {report_file}")
+    print()
+    print("  Rules breakdown:")
+    for rk, rd in rule_mapping.items():
+        icon = "✅" if rd["validated"] else "❌"
+        print(f"    {icon} {rd['id']:20s} {rd['score']:3d}/{rd['max_pts']:3d}  "
+              f"({rd['matched_count']}/{rd['candidate_count']} resources)")
+    print()
+    print(f"  Report:    {report_file}")
+    print(f"  Mapping:   {mapping_file}")
     print(f"  Dashboard: dashboard/index.html")
     print("=" * 60)
 

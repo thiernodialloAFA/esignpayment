@@ -5,8 +5,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("!test")
 @Getter
 public class TwilioConfig {
 
@@ -21,6 +23,8 @@ public class TwilioConfig {
 
     @PostConstruct
     public void init() {
-        Twilio.init(accountSid, authToken);
+        if (accountSid != null && !accountSid.startsWith("AC_placeholder")) {
+            Twilio.init(accountSid, authToken);
+        }
     }
 }

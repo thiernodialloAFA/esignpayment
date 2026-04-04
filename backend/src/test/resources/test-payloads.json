@@ -1,0 +1,217 @@
+{
+  "_description": "Test payloads for all ESignPay API POST/PUT endpoints. UUIDs and tokens reference seed data from TestDataInitializer.",
+
+  "POST /api/documents": {
+    "description": "Create a new document with signers",
+    "payload": {
+      "title": "Contrat de bail - Appartement Paris 15e",
+      "description": "Contrat de location meublée entre bailleur et locataire",
+      "fileName": "contrat-bail.pdf",
+      "contentType": "application/pdf",
+      "fileContent": "JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2Jq",
+      "signers": [
+        {
+          "email": "locataire@example.com",
+          "name": "Pierre Durand",
+          "phone": "+33612345678"
+        },
+        {
+          "email": "bailleur@example.com",
+          "name": "Sophie Lambert",
+          "phone": "+33698765432"
+        }
+      ]
+    }
+  },
+
+  "POST /api/documents/{id}/send": {
+    "description": "Send a document for signature (no body required)",
+    "payload": null,
+    "note": "Use the ID of a DRAFT document from seed data"
+  },
+
+  "POST /api/documents/{id}/resend": {
+    "description": "Resend signing request to pending signers (no body required)",
+    "payload": null,
+    "note": "Use the ID of a PENDING_SIGNATURE document from seed data"
+  },
+
+  "POST /api/documents/{id}/live-sign/{signerId}": {
+    "description": "Sign a document in-person (owner signs on behalf of present signer)",
+    "payload": {
+      "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
+    "note": "Use document ID and signer ID from the PENDING_SIGNATURE document"
+  },
+
+  "POST /api/sign/{token}": {
+    "description": "Submit a signature for a document (public endpoint, requires OTP verified)",
+    "payload": {
+      "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
+    "note": "Use token 'test-token-signer-1' or 'test-token-signer-2' from seed data. OTP must be verified first."
+  },
+
+  "POST /api/sign/{token}/send-otp": {
+    "description": "Send OTP code via SMS (public endpoint)",
+    "payload": {
+      "phoneNumber": "+33612345678"
+    },
+    "note": "Use token 'test-token-signer-1' from seed data"
+  },
+
+  "POST /api/sign/{token}/verify-otp": {
+    "description": "Verify an OTP code (public endpoint)",
+    "payload": {
+      "otpCode": "123456"
+    },
+    "note": "Use token 'test-token-signer-1' from seed data. OTP code must match what was generated."
+  },
+
+  "POST /api/payments": {
+    "description": "Create a new Stripe payment (requires Stripe API)",
+    "payload": {
+      "amount": 99.99,
+      "currency": "EUR",
+      "description": "Paiement pour signature électronique - Dossier #2024-001"
+    }
+  },
+
+  "POST /api/payments/confirm": {
+    "description": "Confirm payment after 3D Secure",
+    "payload": {
+      "paymentIntentId": "pi_test_pending_abc12345"
+    },
+    "note": "Use the stripePaymentIntentId from the PENDING payment in seed data"
+  },
+
+  "POST /api/payments/{id}/cancel": {
+    "description": "Cancel a pending payment (no body required)",
+    "payload": null,
+    "note": "Use the ID of the PENDING payment from seed data"
+  },
+
+  "POST /api/account-applications": {
+    "description": "Create a new account application",
+    "payload": {
+      "accountTypeCode": "CHECKING",
+      "dateOfBirth": "1985-03-22",
+      "phoneNumber": "+33612345678",
+      "nationality": "Française",
+      "addressLine1": "15 avenue des Champs-Élysées",
+      "addressLine2": "Bâtiment A",
+      "city": "Paris",
+      "postalCode": "75008",
+      "country": "France",
+      "employmentStatus": "EMPLOYED",
+      "employerName": "Digital Solutions SAS",
+      "jobTitle": "Chef de projet",
+      "monthlyIncome": 3800.00
+    }
+  },
+
+  "PUT /api/account-applications/{id}": {
+    "description": "Update an existing account application (DRAFT only)",
+    "payload": {
+      "accountTypeCode": "SAVINGS",
+      "phoneNumber": "+33698765432",
+      "addressLine1": "8 boulevard Haussmann",
+      "addressLine2": null,
+      "city": "Paris",
+      "postalCode": "75009",
+      "country": "France",
+      "employmentStatus": "SELF_EMPLOYED",
+      "employerName": null,
+      "jobTitle": "Consultant indépendant",
+      "monthlyIncome": 5200.00
+    },
+    "note": "Use the ID of the DRAFT application from seed data"
+  },
+
+  "POST /api/account-applications/{id}/submit": {
+    "description": "Submit an application for review (no body required)",
+    "payload": null,
+    "note": "Application must have required KYC docs (ID + proof of address) and all mandatory fields"
+  },
+
+  "POST /api/account-applications/{id}/kyc": {
+    "description": "Upload a KYC document (base64 encoded)",
+    "payload": {
+      "documentType": "ID_CARD",
+      "fileName": "carte-identite-recto.jpg",
+      "contentType": "image/jpeg",
+      "fileContent": "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy"
+    },
+    "note": "Valid documentType values: ID_CARD, PASSPORT, PROOF_OF_ADDRESS, INCOME_PROOF"
+  },
+
+  "POST /api/account-applications/{id}/generate-contract": {
+    "description": "Generate contract PDF (requires KYC_VERIFIED status or auto-verifies from KYC_PENDING)",
+    "payload": null,
+    "note": "Application must have KYC documents verified"
+  },
+
+  "POST /api/account-applications/{id}/regenerate-contract": {
+    "description": "Regenerate contract PDF (requires CONTRACT_PENDING status)",
+    "payload": null,
+    "note": "Deletes old contract and creates a new one with fresh signing tokens"
+  },
+
+  "POST /api/webhooks/stripe": {
+    "description": "Stripe webhook endpoint (public, requires valid Stripe-Signature header)",
+    "payload": {
+      "type": "payment_intent.succeeded",
+      "data": {
+        "object": {
+          "id": "pi_test_pending_abc12345",
+          "status": "succeeded"
+        }
+      }
+    },
+    "note": "Requires Stripe-Signature header — cannot be tested without Stripe's signing key"
+  },
+
+  "_GET_endpoints": {
+    "GET /api/auth/me": {
+      "description": "Get current authenticated user profile",
+      "expectedData": "Returns the test user (Test User, test@esignpay.com)"
+    },
+    "GET /api/documents": {
+      "description": "List all documents owned by current user",
+      "expectedData": "Returns 2 documents (DRAFT + PENDING_SIGNATURE)"
+    },
+    "GET /api/documents/{id}": {
+      "description": "Get a specific document by ID",
+      "expectedData": "Returns document details with signers"
+    },
+    "GET /api/payments": {
+      "description": "List all payments for current user",
+      "expectedData": "Returns 2 payments (PENDING + SUCCEEDED)"
+    },
+    "GET /api/payments/{id}": {
+      "description": "Get a specific payment by ID",
+      "expectedData": "Returns payment details"
+    },
+    "GET /api/payments/config": {
+      "description": "Get Stripe publishable key",
+      "expectedData": "Returns { publishableKey: 'pk_test_placeholder' }"
+    },
+    "GET /api/account-types": {
+      "description": "List active account types",
+      "expectedData": "Returns 3 types (CHECKING, SAVINGS, PREMIUM)"
+    },
+    "GET /api/account-applications": {
+      "description": "List all applications for current user",
+      "expectedData": "Returns 1 application (DRAFT)"
+    },
+    "GET /api/account-applications/{id}": {
+      "description": "Get a specific application by ID",
+      "expectedData": "Returns application with KYC documents and status history"
+    },
+    "GET /api/sign/verify/{token}": {
+      "description": "Verify a signature token (public endpoint)",
+      "expectedData": "Returns signer details for token 'test-token-signer-1'"
+    }
+  }
+}
+

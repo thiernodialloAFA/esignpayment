@@ -5,6 +5,7 @@ import com.esign.payment.dto.response.UserResponse;
 import com.esign.payment.model.User;
 import com.esign.payment.service.KeycloakUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,10 @@ public class AuthController {
     private final KeycloakUserService keycloakUserService;
 
     @GetMapping("/me")
-    @Operation(summary = "Get current authenticated user")
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+    @Operation(summary = "Get current authenticated user (supports field filtering)")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
+            @Parameter(description = "Comma-separated list of fields to include")
+            @RequestParam(required = false) String fields) {
         User user = keycloakUserService.getCurrentUser();
         UserResponse response = UserResponse.builder()
                 .id(user.getId())

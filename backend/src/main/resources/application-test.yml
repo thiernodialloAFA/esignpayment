@@ -1,0 +1,61 @@
+# ── Test profile: H2 in-memory, no external dependencies ──
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: false
+
+  mail:
+    host: localhost
+    port: 1025
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://localhost:9090/dummy
+
+stripe:
+  api-key: sk_test_placeholder
+  webhook-secret: whsec_placeholder
+  publishable-key: pk_test_placeholder
+
+twilio:
+  account-sid: AC_placeholder
+  auth-token: placeholder
+  phone-number: "+15005550006"
+
+management:
+  tracing:
+    sampling:
+      probability: 0.0
+    export:
+      otlp:
+        enabled: false
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  logging:
+    export:
+      otlp:
+        enabled: false
+
+app:
+  frontend-url: http://localhost:3000
+  ocr:
+    enabled: false
+    languages: fra+eng
+

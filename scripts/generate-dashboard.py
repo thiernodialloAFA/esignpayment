@@ -171,6 +171,104 @@ def generate_markdown(report: dict) -> str:
             a(f"- *… et {len(issues) - 25} autres*")
         a("")
 
+    # ── Suggestions d'amélioration ──
+    rrm = gs.get("rule_resource_mapping", {})
+    all_suggestions: list[dict] = []
+    rules_with_suggestions: list[dict] = []
+
+    rule_icons = {
+        "DE11_pagination": "📄", "DE08_fields": "🔍", "DE01_compression": "🗜️",
+        "DE02_DE03_cache": "💾", "DE06_delta": "🔄", "range_206": "✂️",
+        "AR02_format_cbor": "📦", "LO01_observability": "👁️", "US07_rate_limit": "🚦",
+    }
+    rule_display_names = {
+        "DE11_pagination": "DE11 — Pagination", "DE08_fields": "DE08 — Filtrage de champs",
+        "DE01_compression": "DE01 — Compression Gzip", "DE02_DE03_cache": "DE02/03 — Cache ETag/304",
+        "DE06_delta": "DE06 — Delta / Changes", "range_206": "206 — Range / Partial Content",
+        "AR02_format_cbor": "AR02 — Format binaire (CBOR)", "LO01_observability": "LO01 — Observabilité",
+        "US07_rate_limit": "US07 — Rate Limiting",
+    }
+    priority_icons = {"high": "🔴 Haute", "medium": "🟡 Moyenne", "low": "⚪ Basse"}
+
+    for rule_key, rule_data in rrm.items():
+        suggs = rule_data.get("suggestions", [])
+        if not suggs:
+            continue
+        rules_with_suggestions.append({
+            "key": rule_key,
+            "icon": rule_icons.get(rule_key, "📌"),
+            "name": rule_display_names.get(rule_key, rule_key),
+            "description": rule_data.get("description", ""),
+            "max_pts": rule_data.get("max_pts", 0),
+            "score": rule_data.get("score", 0),
+            "validated": rule_data.get("validated", False),
+            "matched_count": rule_data.get("matched_count", 0),
+            "candidate_count": rule_data.get("candidate_count", 0),
+            "suggestions": suggs,
+        })
+        all_suggestions.extend(suggs)
+
+    if all_suggestions:
+        potential_gain = sum(
+            max(0, r["max_pts"] - r["score"]) for r in rules_with_suggestions
+        )
+        potential_score = min(total + potential_gain, gs.get("max", 100))
+
+        a("### 💡 Suggestions d'amélioration")
+        a("")
+        a(f"> **Score actuel : {total}/{gs.get('max', 100)}** — "
+          f"Score potentiel avec toutes les suggestions : **{potential_score}/{gs.get('max', 100)}** "
+          f"(+{potential_gain} pts possibles)")
+        a("")
+
+        high_count = sum(1 for s in all_suggestions if s.get("priority") == "high")
+        medium_count = sum(1 for s in all_suggestions if s.get("priority") == "medium")
+        low_count = sum(1 for s in all_suggestions if s.get("priority") == "low")
+        a(f"🔴 Haute priorité : {high_count} | "
+          f"🟡 Moyenne : {medium_count} | "
+          f"⚪ Basse : {low_count} | "
+          f"**Total : {len(all_suggestions)} suggestions**")
+        a("")
+
+        # Sort: failed first, then by max_pts desc
+        rules_with_suggestions.sort(
+            key=lambda r: (r["validated"], -r["max_pts"])
+        )
+
+        for rule in rules_with_suggestions:
+            gap = max(0, rule["max_pts"] - rule["score"])
+            status = "✅ Validé" if rule["validated"] else "❌ Non validé"
+            a(f"#### {rule['icon']} {rule['name']} ({status}"
+              f"{f' — +{gap} pts possibles' if gap > 0 else ''})")
+            a("")
+            a(f"> {rule['description']} "
+              f"({rule['matched_count']}/{rule['candidate_count']} endpoints validés)")
+            a("")
+            a("| Priorité | Cible | Action | Impact |")
+            a("|:--------:|-------|--------|--------|")
+            for s in rule["suggestions"][:8]:
+                prio = priority_icons.get(s.get("priority", "medium"), "🟡 Moyenne")
+                target = s.get("target", "").replace("|", "\\|")
+                action = s.get("action", "").replace("|", "\\|")
+                impact = s.get("impact", "").replace("|", "\\|")
+                a(f"| {prio} | `{target}` | {action} | {impact} |")
+            if len(rule["suggestions"]) > 8:
+                a(f"| | *… et {len(rule['suggestions']) - 8} autres* | | |")
+            a("")
+
+            # Show first suggestion's 'how' as a collapsible block
+            first_how = next(
+                (s.get("how") for s in rule["suggestions"] if s.get("how")), None
+            )
+            if first_how:
+                a("<details><summary>🔧 Comment implémenter</summary>")
+                a("")
+                a("```")
+                a(first_how)
+                a("```")
+                a("</details>")
+                a("")
+
     # ── Footer ──
     a("---")
     a("")

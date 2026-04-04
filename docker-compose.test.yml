@@ -1,0 +1,17 @@
+###############################################################################
+#  docker-compose.test.yml — Override for running with profile "test"
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.test.yml up --build backend frontend
+#
+#  This override:
+#    - Activates the "test" Spring profile (H2 in-memory, no Keycloak/DB needed)
+#    - Removes dependencies on db, keycloak, keycloak-db
+#    - Keeps the same ports (8080, 3000)
+###############################################################################
+services:
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+    depends_on: []
+

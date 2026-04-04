@@ -61,14 +61,8 @@ while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
       echo "  ✅ Baseline (8080) prêt après ${ELAPSED}s"
     fi
   fi
-  if ! $OPT_READY; then
-    if curl -sf http://localhost:8081/actuator/health >/dev/null 2>&1; then
-      OPT_READY=true
-      echo "  ✅ Optimized (8081) prêt après ${ELAPSED}s"
-    fi
-  fi
 
-  if $BASE_READY && $OPT_READY; then
+  if $BASE_READY; then
     echo "🚀 Les 2 services sont démarrés !"
     break
   fi
@@ -76,7 +70,7 @@ while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
   ELAPSED=$((ELAPSED + 1))
 done
 
-if ! $BASE_READY || ! $OPT_READY; then
+if ! $BASE_READY; then
   echo ""
   echo "⚠️  Timeout (${TIMEOUT}s) — services non prêts :"
   $BASE_READY || echo "    ❌ Baseline (8080) non disponible"

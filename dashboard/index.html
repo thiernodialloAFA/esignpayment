@@ -350,6 +350,271 @@
         }
         .sidebar-right input[type="file"] { display: none; }
 
+        /* ─── Suggestions d'amélioration ──────────────────── */
+        .suggestions-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(22,101,52,0.3), rgba(31,41,55,0.8));
+            border: 1px solid var(--green-800);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+        .suggestions-summary .potential-score {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--green-400);
+        }
+        .suggestions-summary .potential-label {
+            font-size: 0.82rem;
+            color: var(--gray-300);
+        }
+        .suggestions-summary .potential-bar {
+            flex: 1;
+            height: 22px;
+            background: var(--gray-700);
+            border-radius: 11px;
+            overflow: hidden;
+            position: relative;
+        }
+        .suggestions-summary .potential-bar .current {
+            height: 100%;
+            background: var(--red-500);
+            border-radius: 11px 0 0 11px;
+            transition: width 0.8s ease;
+            position: absolute;
+            left: 0; top: 0;
+        }
+        .suggestions-summary .potential-bar .target {
+            height: 100%;
+            background: var(--green-500);
+            border-radius: 11px;
+            transition: width 0.8s ease;
+            position: absolute;
+            left: 0; top: 0;
+            opacity: 0.35;
+        }
+        .suggestions-summary .potential-bar .bar-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: white;
+            line-height: 22px;
+            z-index: 1;
+        }
+        .suggestions-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .suggestions-filters .filter-btn {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--gray-600);
+            background: var(--gray-800);
+            color: var(--gray-300);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .suggestions-filters .filter-btn:hover {
+            border-color: var(--green-500);
+            color: var(--green-200);
+        }
+        .suggestions-filters .filter-btn.active {
+            background: var(--green-800);
+            border-color: var(--green-500);
+            color: var(--green-200);
+        }
+        .suggestion-rule-group {
+            margin-bottom: 18px;
+            border: 1px solid var(--gray-700);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .suggestion-rule-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(31,41,55,0.95);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .suggestion-rule-header:hover {
+            background: rgba(22,101,52,0.2);
+        }
+        .suggestion-rule-header .rule-icon {
+            font-size: 1.2rem;
+        }
+        .suggestion-rule-header .rule-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--gray-100);
+            flex: 1;
+        }
+        .suggestion-rule-header .rule-points {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: var(--green-800);
+            color: var(--green-200);
+        }
+        .suggestion-rule-header .rule-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .suggestion-rule-header .rule-status.failed {
+            background: rgba(239,68,68,0.2);
+            color: var(--red-400);
+        }
+        .suggestion-rule-header .rule-status.passed {
+            background: var(--green-800);
+            color: var(--green-200);
+        }
+        .suggestion-rule-header .chevron-small {
+            color: var(--gray-400);
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+        }
+        .suggestion-rule-header[aria-expanded="true"] .chevron-small {
+            transform: rotate(180deg);
+        }
+        .suggestion-rule-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 16px;
+        }
+        .suggestion-rule-body.expanded {
+            max-height: 3000px;
+            padding: 12px 16px 16px;
+        }
+        .suggestion-item {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        .suggestion-item:hover {
+            border-color: var(--green-600);
+        }
+        .suggestion-item:last-child {
+            margin-bottom: 0;
+        }
+        .suggestion-item-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .suggestion-priority {
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .suggestion-priority.high {
+            background: rgba(239,68,68,0.2);
+            color: var(--red-400);
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+        .suggestion-priority.medium {
+            background: rgba(234,179,8,0.15);
+            color: var(--yellow-400);
+            border: 1px solid rgba(234,179,8,0.25);
+        }
+        .suggestion-priority.low {
+            background: rgba(107,114,128,0.2);
+            color: var(--gray-400);
+            border: 1px solid var(--gray-600);
+        }
+        .suggestion-target {
+            font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--green-400);
+            flex: 1;
+        }
+        .suggestion-action {
+            font-size: 0.84rem;
+            color: var(--gray-200);
+            margin-bottom: 6px;
+        }
+        .suggestion-impact {
+            font-size: 0.78rem;
+            color: var(--green-400);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .suggestion-how-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-600);
+            background: none;
+            color: var(--gray-400);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .suggestion-how-toggle:hover {
+            border-color: var(--green-500);
+            color: var(--green-200);
+        }
+        .suggestion-how {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, margin 0.2s ease;
+        }
+        .suggestion-how.expanded {
+            max-height: 600px;
+            margin-top: 10px;
+        }
+        .suggestion-how pre {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-600);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            line-height: 1.55;
+            color: var(--gray-200);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .suggestion-count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 11px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: var(--gray-700);
+            color: var(--gray-300);
+            padding: 0 6px;
+        }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 1.4rem; }
             .grid { grid-template-columns: 1fr; }
@@ -357,6 +622,8 @@
             .score-circle .number { font-size: 2.25rem; }
             .dashboard-layout { flex-direction: column; }
             .sidebar-panel, .sidebar-right { width: 100%; min-width: 0; position: static; }
+            .suggestions-summary { flex-direction: column; text-align: center; }
+            .suggestion-item-header { flex-direction: column; }
         }
     </style>
 </head>
@@ -519,6 +786,16 @@
         </div>
 
 
+        <!-- Suggestions d'amélioration -->
+        <div class="card" id="suggestions-card" style="display:none;grid-column:1/-1;">
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">💡 Suggestions d'amélioration <span id="suggestions-count-badge" class="suggestion-count-badge" style="margin-left:6px;">0</span> <span class="chevron">▼</span></button>
+            <div class="accordion-body collapsed" id="suggestions-accordion">
+                <div id="suggestions-summary-bar"></div>
+                <div id="suggestions-filters" class="suggestions-filters"></div>
+                <div id="suggestions-list"></div>
+            </div>
+        </div>
+
         <!-- Measurements Table -->
         <div class="card" id="table-card" style="display:none;grid-column:1/-1;">
             <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📐 Détail des mesures <span class="chevron">▼</span></button>
@@ -600,7 +877,7 @@
 
 <script>
 const STORAGE_KEY = 'green-api-score-history';
-const EMBEDDED_REPORT = {"timestamp": "2026-04-03T12:53:00Z", "green_score": {"total": 90.4, "max": 100, "grade": "A+", "breakdown": {"DE11_pagination": 15, "DE08_fields": 15, "DE01_compression": 8, "DE02_DE03_cache": 15, "DE06_delta": 10, "range_206": 10, "LO01_observability": 5, "US07_rate_limit": 5, "AR02_format_cbor": 7.4}, "details": {"DE11_pagination": {"baseline_bytes": 138327793, "optimized_bytes": 3805, "reduction_pct": 100.0}, "DE08_fields": {"paginated_bytes": 3805, "filtered_bytes": 974, "reduction_pct": 74.4}, "DE01_compression": {"note": "gzip active"}, "DE02_DE03_cache": {"http_code": 304, "body_bytes": 0, "note": "perfect 304"}, "DE06_delta": {"delta_bytes": 178, "full_bytes": 203213429, "reduction_pct": 100.0, "note": "delta endpoint active"}, "range_206": {"http_code": 206, "bytes": 17, "note": "partial content supported"}, "LO01_observability": {"note": "PayloadLoggingFilter detected"}, "US07_rate_limit": {"note": "RateLimitFilter detected"}, "AR02_format_cbor": {"cbor_bytes": 153786191, "json_bytes": 203213429, "reduction_pct": 24.3, "note": "CBOR active"}}}, "measurements": {"baseline": {"full_payload": {"http_code": 200, "size_download": 138327793, "time_total": 1.373071, "speed_download": 100743365}, "single_resource": {"http_code": 200, "size_download": 127, "time_total": 0.229903, "speed_download": 552}, "single_repeat": {"http_code": 200, "size_download": 127, "time_total": 0.215403, "speed_download": 589}}, "optimized": {"pagination": {"http_code": 200, "size_download": 3805, "time_total": 0.387613, "speed_download": 9816}, "fields_filter": {"http_code": 200, "size_download": 974, "time_total": 0.292987, "speed_download": 3324}, "gzip_compression": {"http_code": 200, "size_download": 2457, "time_total": 0.259909, "speed_download": 9453}, "etag_first_call": {"http_code": 200, "size_download": 187, "time_total": 0.247877, "speed_download": 754}, "etag_304": {"http_code": 304, "size_download": 0, "time_total": 0.235458, "speed_download": 0}, "delta_changes": {"http_code": 200, "size_download": 178, "time_total": 0.268048, "speed_download": 664}, "range_206": {"http_code": 206, "size_download": 17, "time_total": 0.217917, "speed_download": 78}, "cbor_format": {"http_code": 200, "size_download": 153786191, "time_total": 1.776668, "speed_download": 86558766}, "full_payload": {"http_code": 200, "size_download": 203213429, "time_total": 1.895557, "speed_download": 107205127}}}, "auto_discovery": {"base_url": "http://localhost:8081", "swagger_url": "http://localhost:8081/v3/api-docs", "endpoints_discovered": 20, "endpoints_measured": 0, "all_measurements": {}, "discovered_endpoints": []}, "spectral": {"issues_count": 0, "errors": 0, "warnings": 0, "infos": 0, "issues": []}};
+const EMBEDDED_REPORT = {"timestamp": "2026-04-04T09:00:01Z", "green_score": {"total": 85, "max": 100, "grade": "A", "breakdown": {"DE11_pagination": 15, "DE08_fields": 15, "DE01_compression": 15, "DE02_DE03_cache": 0, "DE06_delta": 10, "range_206": 10, "AR02_format_cbor": 10, "LO01_observability": 5, "US07_rate_limit": 5}, "details": {"DE11_pagination": {"note": "Pagination on 3/9 collection endpoint(s)"}, "DE08_fields": {"note": "Field filtering on 12 endpoint(s)"}, "DE01_compression": {"note": "Gzip compression active (OpenAPI servers.x-server-compression.enabled=true)"}, "DE02_DE03_cache": {"note": "ETag/304 not detected"}, "DE06_delta": {"note": "Delta endpoint(s) found: 3"}, "range_206": {"http_code": 206, "note": "Range/206 supported (OpenAPI servers.x-server-range-support.enabled=true)"}, "AR02_format_cbor": {"note": "Binary format on 1 endpoint(s)"}, "LO01_observability": {"note": "Actuator/health detected"}, "US07_rate_limit": {"note": "Rate-limit headers detected"}}, "rule_resource_mapping": {"DE11_pagination": {"id": "DE11", "label": "Pagination", "description": "Les endpoints de collection doivent supporter la pagination (page/size ou limit/offset).", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/payments", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Pagination params: page, size"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "No pagination params (page/size/limit/offset/cursor)"}], "validated": true, "score": 15, "matched_count": 3, "candidate_count": 9, "suggestions": []}, "DE08_fields": {"id": "DE08", "label": "Filtrage de champs", "description": "Supporter un parametre 'fields' pour reduire le payload.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No field filter param (fields/select)"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Field filter params: fields"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Field filter params: fields"}], "validated": true, "score": 15, "matched_count": 12, "candidate_count": 14, "suggestions": []}, "DE01_compression": {"id": "DE01", "label": "Compression", "description": "Le serveur doit supporter Accept-Encoding: gzip.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/payments/confirm", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": true, "reason": "OpenAPI servers.x-server-compression.enabled=true"}], "validated": true, "score": 15, "matched_count": 34, "candidate_count": 34, "suggestions": []}, "DE02_DE03_cache": {"id": "DE02/DE03", "label": "Cache ETag/304", "description": "Les ressources unitaires doivent supporter ETag + If-None-Match -> 304.", "max_pts": 15, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "No ETag header in HEAD response"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "No ETag header in HEAD response"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "No ETag header in HEAD response"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "No ETag header in HEAD response"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No ETag header in HEAD response"}], "validated": false, "score": 0, "matched_count": 0, "candidate_count": 5, "suggestions": [{"target": "GET /api/account-applications/{id}", "action": "Add ETag support and If-None-Match \u2192 304 Not Modified", "priority": "high", "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth", "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"}, {"target": "GET /api/sign/verify/{token}", "action": "Add ETag support and If-None-Match \u2192 304 Not Modified", "priority": "high", "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth", "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"}, {"target": "GET /api/payments/{id}", "action": "Add ETag support and If-None-Match \u2192 304 Not Modified", "priority": "high", "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth", "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"}, {"target": "GET /api/documents/{id}", "action": "Add ETag support and If-None-Match \u2192 304 Not Modified", "priority": "high", "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth", "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"}, {"target": "GET /api/documents/{id}/download", "action": "Add ETag support and If-None-Match \u2192 304 Not Modified", "priority": "high", "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth", "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"}]}, "DE06_delta": {"id": "DE06", "label": "Delta / Changes", "description": "Un endpoint /changes?since= ou equivalent doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Not a delta/changes endpoint"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "Path contains 'change', 'delta' or 'since'"}], "validated": true, "score": 10, "matched_count": 3, "candidate_count": 14, "suggestions": []}, "range_206": {"id": "206", "label": "Range / Partial Content", "description": "Supporter le header Range pour les gros payloads.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/payments/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/documents/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/auth/me", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": true, "reason": "OpenAPI servers.x-server-range-support.enabled=true"}], "validated": true, "score": 10, "matched_count": 14, "candidate_count": 14, "suggestions": []}, "AR02_format_cbor": {"id": "AR02", "label": "Format binaire (CBOR)", "description": "Un endpoint en format binaire (CBOR, protobuf...) doit exister.", "max_pts": 10, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/payments/confirm", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": false, "reason": "Standard JSON format"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/config", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": true, "reason": "Binary format (CBOR/protobuf/octet-stream)"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-types", "matched": false, "reason": "Standard JSON format"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "Standard JSON format"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": false, "reason": "Standard JSON format"}], "validated": true, "score": 10, "matched_count": 1, "candidate_count": 34, "suggestions": []}, "LO01_observability": {"id": "LO01", "label": "Observabilite", "description": "Actuator / health / metrics doit etre expose.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/actuator/health", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/health", "matched": false, "reason": "HTTP 500"}, {"method": "GET", "path": "/actuator", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/metrics", "matched": true, "reason": "HTTP 200 OK"}, {"method": "GET", "path": "/actuator/info", "matched": true, "reason": "HTTP 200 OK"}], "validated": true, "score": 5, "matched_count": 4, "candidate_count": 5, "suggestions": []}, "US07_rate_limit": {"id": "US07", "label": "Rate Limiting", "description": "Un mecanisme de rate limiting doit etre present.", "max_pts": 5, "candidates": [{"method": "GET", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "PUT", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/account-applications/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/webhooks/stripe", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/sign/{token}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/payments", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/payments/{id}/cancel", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/payments/confirm", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/documents", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/send", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/resend", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/account-applications", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "POST", "path": "/api/account-applications", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/sign/verify/{token}", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/payments/config", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/payments/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/documents/{id}", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/{id}/download", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/documents/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/auth/me", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "GET", "path": "/api/account-types", "matched": true, "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"}, {"method": "GET", "path": "/api/account-applications/changes", "matched": false, "reason": "No rate-limit headers in response"}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "matched": false, "reason": "No rate-limit headers in response"}], "validated": true, "score": 5, "matched_count": 9, "candidate_count": 34, "suggestions": []}}, "endpoint_rules": {"get:/api/payments": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/config": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/auth/me": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-types": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/changes": ["DE11_pagination", "DE08_fields", "DE01_compression", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/account-applications/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/sign/verify/{token}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/payments/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "get:/api/documents/{id}/download": ["DE08_fields", "DE01_compression", "DE02_DE03_cache", "DE06_delta", "range_206", "AR02_format_cbor", "US07_rate_limit"], "put:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/webhooks/stripe": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/verify-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/sign/{token}/send-otp": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/{id}/cancel": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/payments/confirm": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/send": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/resend": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/documents/{id}/live-sign/{signerId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/submit": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/regenerate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/kyc": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "post:/api/account-applications/{id}/generate-contract": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/documents/{id}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "delete:/api/account-applications/{id}/kyc/{kycId}": ["DE01_compression", "AR02_format_cbor", "US07_rate_limit"], "get:/actuator/health": ["LO01_observability"], "get:/health": ["LO01_observability"], "get:/actuator": ["LO01_observability"], "get:/actuator/metrics": ["LO01_observability"], "get:/actuator/info": ["LO01_observability"]}}, "measurements": {"baseline": {"full_payload": {"http_code": 500, "size_download": 70, "time_total": 0.023979, "speed_download": 2919}, "single_resource": {"http_code": 500, "size_download": 70, "time_total": 0.011218, "speed_download": 6239}, "single_repeat": {"http_code": 500, "size_download": 70, "time_total": 0.010213, "speed_download": 6854}}, "optimized": {"delta_changes": {"http_code": 500, "size_download": 70, "time_total": 0.003702, "speed_download": 18908}, "full_payload": {"http_code": 200, "size_download": 1342, "time_total": 0.032749, "speed_download": 40978}}}, "auto_discovery": {"base_url": "http://localhost:8080", "endpoints_discovered": 33, "endpoints_measured": 33, "all_measurements": {"get:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.008827, "speed_download": 11215}, "put:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.027821, "speed_download": 3558}, "delete:/api/account-applications/{id}": {"http_code": 403, "size_download": 99, "time_total": 0.004658, "speed_download": 21253}, "post:/api/sign/{token}": {"http_code": 200, "size_download": 1342, "time_total": 0.032749, "speed_download": 40978}, "post:/api/sign/{token}/verify-otp": {"http_code": 200, "size_download": 117, "time_total": 0.007528, "speed_download": 15542}, "post:/api/sign/{token}/send-otp": {"http_code": 200, "size_download": 135, "time_total": 0.006562, "speed_download": 20573}, "get:/api/payments": {"http_code": 200, "size_download": 356, "time_total": 0.010184, "speed_download": 34955}, "post:/api/payments": {"http_code": 500, "size_download": 70, "time_total": 0.061455, "speed_download": 1139}, "post:/api/payments/{id}/cancel": {"http_code": 403, "size_download": 95, "time_total": 0.006091, "speed_download": 15596}, "post:/api/payments/confirm": {"http_code": 403, "size_download": 95, "time_total": 0.007487, "speed_download": 12688}, "get:/api/documents": {"http_code": 200, "size_download": 356, "time_total": 0.006312, "speed_download": 56400}, "post:/api/documents": {"http_code": 500, "size_download": 70, "time_total": 0.013701, "speed_download": 5108}, "post:/api/documents/{id}/send": {"http_code": 403, "size_download": 96, "time_total": 0.0056, "speed_download": 17142}, "post:/api/documents/{id}/resend": {"http_code": 403, "size_download": 96, "time_total": 0.005035, "speed_download": 19065}, "post:/api/documents/{id}/live-sign/{signerId}": {"http_code": 403, "size_download": 96, "time_total": 0.005572, "speed_download": 17229}, "get:/api/account-applications": {"http_code": 200, "size_download": 356, "time_total": 0.006289, "speed_download": 56607}, "post:/api/account-applications": {"http_code": 500, "size_download": 70, "time_total": 0.012869, "speed_download": 5439}, "post:/api/account-applications/{id}/submit": {"http_code": 403, "size_download": 99, "time_total": 0.004574, "speed_download": 21642}, "post:/api/account-applications/{id}/regenerate-contract": {"http_code": 403, "size_download": 99, "time_total": 0.003887, "speed_download": 25468}, "post:/api/account-applications/{id}/kyc": {"http_code": 403, "size_download": 99, "time_total": 0.006068, "speed_download": 16315}, "post:/api/account-applications/{id}/generate-contract": {"http_code": 500, "size_download": 70, "time_total": 0.32691, "speed_download": 214}, "get:/api/sign/verify/{token}": {"http_code": 200, "size_download": 228, "time_total": 0.005028, "speed_download": 45346}, "get:/api/payments/{id}": {"http_code": 403, "size_download": 95, "time_total": 0.0053, "speed_download": 17926}, "get:/api/payments/config": {"http_code": 200, "size_download": 79, "time_total": 0.002891, "speed_download": 27329}, "get:/api/payments/changes": {"http_code": 500, "size_download": 70, "time_total": 0.003702, "speed_download": 18908}, "get:/api/documents/{id}": {"http_code": 403, "size_download": 96, "time_total": 0.005812, "speed_download": 16517}, "delete:/api/documents/{id}": {"http_code": 403, "size_download": 96, "time_total": 0.005076, "speed_download": 18912}, "get:/api/documents/{id}/download": {"http_code": 403, "size_download": 96, "time_total": 0.004825, "speed_download": 19898}, "get:/api/documents/changes": {"http_code": 500, "size_download": 70, "time_total": 0.003126, "speed_download": 22396}, "get:/api/auth/me": {"http_code": 500, "size_download": 70, "time_total": 0.007078, "speed_download": 9889}, "get:/api/account-types": {"http_code": 200, "size_download": 559, "time_total": 0.005621, "speed_download": 99449}, "get:/api/account-applications/changes": {"http_code": 500, "size_download": 70, "time_total": 0.00418, "speed_download": 16748}, "delete:/api/account-applications/{id}/kyc/{kycId}": {"http_code": 403, "size_download": 99, "time_total": 0.005713, "speed_download": 17327}}, "discovered_endpoints": [{"method": "GET", "path": "/api/account-applications/{id}", "operationId": "get", "summary": "Get account application detail (supports field filtering)", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.008827, "speed_download": 11215}, {"method": "PUT", "path": "/api/account-applications/{id}", "operationId": "update", "summary": "Update an account application", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.027821, "speed_download": 3558}, {"method": "DELETE", "path": "/api/account-applications/{id}", "operationId": "delete", "summary": "Delete an account application", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.004658, "speed_download": 21253}, {"method": "POST", "path": "/api/sign/{token}", "operationId": "signDocument", "summary": "Submit signature for a document (public)", "tags": ["Documents"], "http_code": 200, "size_download": 1342, "time_total": 0.032749, "speed_download": 40978}, {"method": "POST", "path": "/api/sign/{token}/verify-otp", "operationId": "verifyOtp", "summary": "Verify OTP code (public)", "tags": ["Documents"], "http_code": 200, "size_download": 117, "time_total": 0.007528, "speed_download": 15542}, {"method": "POST", "path": "/api/sign/{token}/send-otp", "operationId": "sendOtp", "summary": "Send OTP code via SMS to signer (public)", "tags": ["Documents"], "http_code": 200, "size_download": 135, "time_total": 0.006562, "speed_download": 20573}, {"method": "GET", "path": "/api/payments", "operationId": "getMyPayments", "summary": "List my payments (supports pagination & field filtering)", "tags": ["Payments"], "http_code": 200, "size_download": 356, "time_total": 0.010184, "speed_download": 34955}, {"method": "POST", "path": "/api/payments", "operationId": "createPayment", "summary": "Create a new payment", "tags": ["Payments"], "http_code": 500, "size_download": 70, "time_total": 0.061455, "speed_download": 1139}, {"method": "POST", "path": "/api/payments/{id}/cancel", "operationId": "cancelPayment", "summary": "Cancel a payment", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.006091, "speed_download": 15596}, {"method": "POST", "path": "/api/payments/confirm", "operationId": "confirmPayment", "summary": "Confirm payment after 3D Secure", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.007487, "speed_download": 12688}, {"method": "GET", "path": "/api/documents", "operationId": "getMyDocuments", "summary": "List my documents (supports pagination & field filtering)", "tags": ["Documents"], "http_code": 200, "size_download": 356, "time_total": 0.006312, "speed_download": 56400}, {"method": "POST", "path": "/api/documents", "operationId": "createDocument", "summary": "Create a new document", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.013701, "speed_download": 5108}, {"method": "POST", "path": "/api/documents/{id}/send", "operationId": "sendForSignature", "summary": "Send document for signature", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.0056, "speed_download": 17142}, {"method": "POST", "path": "/api/documents/{id}/resend", "operationId": "resendForSignature", "summary": "Resend signature request to pending signers", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.005035, "speed_download": 19065}, {"method": "POST", "path": "/api/documents/{id}/live-sign/{signerId}", "operationId": "liveSign", "summary": "Live/in-person signature on behalf of a signer", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.005572, "speed_download": 17229}, {"method": "GET", "path": "/api/account-applications", "operationId": "list", "summary": "List my account applications (supports pagination & field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 356, "time_total": 0.006289, "speed_download": 56607}, {"method": "POST", "path": "/api/account-applications", "operationId": "create", "summary": "Create a new account application", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.012869, "speed_download": 5439}, {"method": "POST", "path": "/api/account-applications/{id}/submit", "operationId": "submit", "summary": "Submit an account application for review", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.004574, "speed_download": 21642}, {"method": "POST", "path": "/api/account-applications/{id}/regenerate-contract", "operationId": "regenerateContract", "summary": "Regenerate contract PDF", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.003887, "speed_download": 25468}, {"method": "POST", "path": "/api/account-applications/{id}/kyc", "operationId": "uploadKyc", "summary": "Upload a KYC document (base64)", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.006068, "speed_download": 16315}, {"method": "POST", "path": "/api/account-applications/{id}/generate-contract", "operationId": "generateContract", "summary": "Generate contract PDF for the application", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.32691, "speed_download": 214}, {"method": "GET", "path": "/api/sign/verify/{token}", "operationId": "verifySignatureToken", "summary": "Verify a signature token (public)", "tags": ["Documents"], "http_code": 200, "size_download": 228, "time_total": 0.005028, "speed_download": 45346}, {"method": "GET", "path": "/api/payments/{id}", "operationId": "getPayment", "summary": "Get payment detail (supports field filtering)", "tags": ["Payments"], "http_code": 403, "size_download": 95, "time_total": 0.0053, "speed_download": 17926}, {"method": "GET", "path": "/api/payments/config", "operationId": "getPaymentConfig", "summary": "Get Stripe publishable key", "tags": ["Payments"], "http_code": 200, "size_download": 79, "time_total": 0.002891, "speed_download": 27329}, {"method": "GET", "path": "/api/payments/changes", "operationId": "getPaymentsChanges", "summary": "Get payments changed since a given timestamp (delta sync)", "tags": ["Payments"], "http_code": 500, "size_download": 70, "time_total": 0.003702, "speed_download": 18908}, {"method": "GET", "path": "/api/documents/{id}", "operationId": "getDocument", "summary": "Get document detail (supports field filtering)", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.005812, "speed_download": 16517}, {"method": "DELETE", "path": "/api/documents/{id}", "operationId": "deleteDocument", "summary": "Delete a document", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.005076, "speed_download": 18912}, {"method": "GET", "path": "/api/documents/{id}/download", "operationId": "downloadDocument", "summary": "Download document file (supports Range/206 partial content)", "tags": ["Documents"], "http_code": 403, "size_download": 96, "time_total": 0.004825, "speed_download": 19898}, {"method": "GET", "path": "/api/documents/changes", "operationId": "getDocumentsChanges", "summary": "Get documents changed since a given timestamp (delta sync)", "tags": ["Documents"], "http_code": 500, "size_download": 70, "time_total": 0.003126, "speed_download": 22396}, {"method": "GET", "path": "/api/auth/me", "operationId": "getCurrentUser", "summary": "Get current authenticated user (supports field filtering)", "tags": ["Authentication"], "http_code": 500, "size_download": 70, "time_total": 0.007078, "speed_download": 9889}, {"method": "GET", "path": "/api/account-types", "operationId": "getAccountTypes", "summary": "List available account types (supports field filtering)", "tags": ["Account Applications"], "http_code": 200, "size_download": 559, "time_total": 0.005621, "speed_download": 99449}, {"method": "GET", "path": "/api/account-applications/changes", "operationId": "getChanges", "summary": "Get applications changed since a given timestamp (delta sync)", "tags": ["Account Applications"], "http_code": 500, "size_download": 70, "time_total": 0.00418, "speed_download": 16748}, {"method": "DELETE", "path": "/api/account-applications/{id}/kyc/{kycId}", "operationId": "deleteKyc", "summary": "Delete a KYC document", "tags": ["Account Applications"], "http_code": 403, "size_download": 99, "time_total": 0.005713, "speed_download": 17327}]}};
 
 // ─── State ─────────────────────────────────────────────────────
 let currentReport = null;
@@ -949,6 +1226,9 @@ function renderReport(report) {
     // Update sidebar projection
     updateProjectionSummary();
 
+    // Suggestions d'amélioration
+    renderSuggestions(report);
+
     // Measurements table
     const tableCard = document.getElementById('table-card');
     tableCard.style.display = 'block';
@@ -1271,6 +1551,205 @@ function renderCO2History() {
             }
         }
     }
+}
+
+// ─── Suggestions d'amélioration ────────────────────────────────
+let suggestionsFilterPriority = 'all';
+
+function renderSuggestions(report) {
+    const card = document.getElementById('suggestions-card');
+    const rrm = report.green_score?.rule_resource_mapping;
+    if (!rrm) { card.style.display = 'none'; return; }
+
+    // Collect all suggestions across rules
+    const ruleIcons = {
+        'DE11_pagination': '📄', 'DE08_fields': '🔍', 'DE01_compression': '🗜️',
+        'DE02_DE03_cache': '💾', 'DE06_delta': '🔄', 'range_206': '✂️',
+        'AR02_format_cbor': '📦', 'LO01_observability': '👁️', 'US07_rate_limit': '🚦'
+    };
+    const ruleNames = {
+        'DE11_pagination': 'DE11 — Pagination', 'DE08_fields': 'DE08 — Filtrage de champs',
+        'DE01_compression': 'DE01 — Compression Gzip', 'DE02_DE03_cache': 'DE02/03 — Cache ETag/304',
+        'DE06_delta': 'DE06 — Delta / Changes', 'range_206': '206 — Partial Content / Range',
+        'AR02_format_cbor': 'AR02 — Format binaire (CBOR)', 'LO01_observability': 'LO01 — Observabilité',
+        'US07_rate_limit': 'US07 — Rate Limiting'
+    };
+
+    let allSuggestions = [];
+    let rulesWithSuggestions = [];
+
+    for (const [ruleKey, ruleData] of Object.entries(rrm)) {
+        const suggs = ruleData.suggestions || [];
+        if (suggs.length === 0) continue;
+        rulesWithSuggestions.push({
+            key: ruleKey,
+            icon: ruleIcons[ruleKey] || '📌',
+            name: ruleNames[ruleKey] || ruleKey,
+            label: ruleData.label || ruleKey,
+            description: ruleData.description || '',
+            max_pts: ruleData.max_pts || 0,
+            score: ruleData.score || 0,
+            validated: ruleData.validated || false,
+            matched_count: ruleData.matched_count || 0,
+            candidate_count: ruleData.candidate_count || 0,
+            suggestions: suggs
+        });
+        for (const s of suggs) {
+            allSuggestions.push({ ...s, ruleKey });
+        }
+    }
+
+    if (allSuggestions.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+
+    // Count badge
+    document.getElementById('suggestions-count-badge').textContent = allSuggestions.length;
+
+    // ── Summary bar: current vs potential score ──
+    const gs = report.green_score;
+    const currentScore = gs.total || 0;
+    const maxScore = gs.max || 100;
+    let potentialGain = 0;
+    for (const r of rulesWithSuggestions) {
+        potentialGain += Math.max(0, r.max_pts - r.score);
+    }
+    const potentialScore = Math.min(currentScore + potentialGain, maxScore);
+    const currentPct = maxScore > 0 ? (currentScore / maxScore * 100) : 0;
+    const potentialPct = maxScore > 0 ? (potentialScore / maxScore * 100) : 0;
+
+    const summaryBar = document.getElementById('suggestions-summary-bar');
+    summaryBar.innerHTML = `
+        <div class="suggestions-summary">
+            <div style="text-align:center;min-width:90px;">
+                <div class="potential-score">${currentScore} → ${potentialScore}</div>
+                <div class="potential-label">sur ${maxScore} pts</div>
+            </div>
+            <div style="flex:1;">
+                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--gray-400);margin-bottom:4px;">
+                    <span>Score actuel : <strong style="color:var(--red-400);">${currentScore}</strong></span>
+                    <span>Potentiel : <strong style="color:var(--green-400);">+${potentialGain} pts</strong></span>
+                    <span>Score cible : <strong style="color:var(--green-400);">${potentialScore}</strong></span>
+                </div>
+                <div class="potential-bar">
+                    <div class="target" style="width:${potentialPct.toFixed(1)}%"></div>
+                    <div class="current" style="width:${currentPct.toFixed(1)}%"></div>
+                    <div class="bar-label">${currentScore} → ${potentialScore} / ${maxScore} (+${potentialGain} pts possibles)</div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:6px;font-size:0.72rem;color:var(--gray-400);">
+                    <span>🔴 Haute : ${allSuggestions.filter(s=>s.priority==='high').length}</span>
+                    <span>🟡 Moyenne : ${allSuggestions.filter(s=>s.priority==='medium').length}</span>
+                    <span>⚪ Basse : ${allSuggestions.filter(s=>s.priority==='low').length}</span>
+                </div>
+            </div>
+        </div>`;
+
+    // ── Filters ──
+    const filtersDiv = document.getElementById('suggestions-filters');
+    const priorities = ['all', 'high', 'medium', 'low'];
+    const priorityLabels = { all: '🎯 Toutes', high: '🔴 Haute', medium: '🟡 Moyenne', low: '⚪ Basse' };
+    filtersDiv.innerHTML = priorities.map(p =>
+        `<button class="filter-btn ${suggestionsFilterPriority === p ? 'active' : ''}"
+                 onclick="filterSuggestions('${p}')">${priorityLabels[p]}
+         ${p !== 'all' ? '(' + allSuggestions.filter(s => s.priority === p).length + ')' : '(' + allSuggestions.length + ')'}
+         </button>`
+    ).join('');
+
+    // ── Grouped suggestions by rule ──
+    const listDiv = document.getElementById('suggestions-list');
+    let html = '';
+
+    // Sort rules: failed first, then by max_pts descending
+    rulesWithSuggestions.sort((a, b) => {
+        if (a.validated !== b.validated) return a.validated ? 1 : -1;
+        return b.max_pts - a.max_pts;
+    });
+
+    for (const rule of rulesWithSuggestions) {
+        const filteredSuggs = suggestionsFilterPriority === 'all'
+            ? rule.suggestions
+            : rule.suggestions.filter(s => s.priority === suggestionsFilterPriority);
+        if (filteredSuggs.length === 0) continue;
+
+        const ruleId = 'sugg-rule-' + rule.key;
+        const statusCls = rule.validated ? 'passed' : 'failed';
+        const statusLabel = rule.validated ? '✅ Validé' : '❌ Non validé';
+        const gapPts = Math.max(0, rule.max_pts - rule.score);
+
+        html += `
+        <div class="suggestion-rule-group">
+            <div class="suggestion-rule-header" aria-expanded="true" onclick="toggleSuggestionRule(this, '${ruleId}')">
+                <span class="rule-icon">${rule.icon}</span>
+                <span class="rule-title">${rule.name}</span>
+                <span class="rule-status ${statusCls}">${statusLabel}</span>
+                ${gapPts > 0 ? `<span class="rule-points">+${gapPts} pts</span>` : ''}
+                <span class="suggestion-count-badge">${filteredSuggs.length}</span>
+                <span class="chevron-small">▼</span>
+            </div>
+            <div class="suggestion-rule-body expanded" id="${ruleId}">
+                <div style="font-size:0.78rem;color:var(--gray-400);margin-bottom:10px;">
+                    ${rule.description}
+                    <span style="margin-left:8px;color:var(--gray-500);">(${rule.matched_count}/${rule.candidate_count} endpoints validés)</span>
+                </div>`;
+
+        for (let si = 0; si < filteredSuggs.length; si++) {
+            const s = filteredSuggs[si];
+            const howId = `sugg-how-${rule.key}-${si}`;
+            const priorityCls = s.priority || 'medium';
+
+            html += `
+                <div class="suggestion-item" data-priority="${priorityCls}">
+                    <div class="suggestion-item-header">
+                        <span class="suggestion-priority ${priorityCls}">${priorityCls === 'high' ? '🔴 Haute' : priorityCls === 'medium' ? '🟡 Moyenne' : '⚪ Basse'}</span>
+                        <span class="suggestion-target">${escapeHtml(s.target || '')}</span>
+                    </div>
+                    <div class="suggestion-action">${escapeHtml(s.action || '')}</div>
+                    <div class="suggestion-impact">📈 ${escapeHtml(s.impact || '')}</div>
+                    ${s.how ? `
+                    <button class="suggestion-how-toggle" onclick="toggleSuggestionHow('${howId}', this)">
+                        🔧 Comment implémenter <span style="font-size:0.7rem;">▼</span>
+                    </button>
+                    <div class="suggestion-how" id="${howId}">
+                        <pre>${escapeHtml(s.how)}</pre>
+                    </div>` : ''}
+                </div>`;
+        }
+
+        html += `
+            </div>
+        </div>`;
+    }
+
+    listDiv.innerHTML = html;
+}
+
+function filterSuggestions(priority) {
+    suggestionsFilterPriority = priority;
+    if (currentReport) renderSuggestions(currentReport);
+}
+
+function toggleSuggestionRule(header, bodyId) {
+    const body = document.getElementById(bodyId);
+    const expanded = header.getAttribute('aria-expanded') === 'true';
+    header.setAttribute('aria-expanded', String(!expanded));
+    if (expanded) {
+        body.classList.remove('expanded');
+    } else {
+        body.classList.add('expanded');
+    }
+}
+
+function toggleSuggestionHow(howId, btn) {
+    const el = document.getElementById(howId);
+    const expanded = el.classList.contains('expanded');
+    el.classList.toggle('expanded');
+    const arrow = btn.querySelector('span');
+    if (arrow) arrow.textContent = expanded ? '▼' : '▲';
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
 
 function toggleAccordion(btn) {

@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-04-04T09:00:01Z",
+  "service_base_url": "http://localhost:8080",
+  "endpoint": {
+    "method": "get",
+    "path": "/api/documents",
+    "url": "http://localhost:8080/api/documents",
+    "http_code": 200,
+    "size_download": 356,
+    "time_total": 0.006312,
+    "speed_download": 56400,
+    "energy_network_wh": 1.989305019378662e-05,
+    "energy_server_wh": 4.383333333333333e-05,
+    "energy_total_wh": 6.372638352711995e-05
+  }
+}

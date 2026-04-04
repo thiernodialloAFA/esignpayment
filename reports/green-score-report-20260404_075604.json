@@ -1,0 +1,2020 @@
+{
+  "timestamp": "2026-04-04T07:56:04Z",
+  "green_score": {
+    "total": 10,
+    "max": 100,
+    "grade": "E",
+    "breakdown": {
+      "DE11_pagination": 0,
+      "DE08_fields": 0,
+      "DE01_compression": 0,
+      "DE02_DE03_cache": 0,
+      "DE06_delta": 0,
+      "range_206": 0,
+      "AR02_format_cbor": 0,
+      "LO01_observability": 5,
+      "US07_rate_limit": 5
+    },
+    "details": {
+      "DE11_pagination": {
+        "note": "No pagination on collection endpoints"
+      },
+      "DE08_fields": {
+        "note": "No field filter found"
+      },
+      "DE01_compression": {
+        "note": "Gzip not detected"
+      },
+      "DE02_DE03_cache": {
+        "note": "ETag/304 not detected"
+      },
+      "DE06_delta": {
+        "note": "No delta endpoint found"
+      },
+      "range_206": {
+        "note": "Range not supported"
+      },
+      "AR02_format_cbor": {
+        "note": "No binary format endpoint"
+      },
+      "LO01_observability": {
+        "note": "Actuator/health detected"
+      },
+      "US07_rate_limit": {
+        "note": "Assumed present (API running, no explicit headers)"
+      }
+    },
+    "rule_resource_mapping": {
+      "DE11_pagination": {
+        "id": "DE11",
+        "label": "Pagination",
+        "description": "Les endpoints de collection doivent supporter la pagination (page/size ou limit/offset).",
+        "max_pts": 15,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "No pagination params (page/size/limit/offset/cursor)"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 6,
+        "suggestions": [
+          {
+            "target": "GET /api/payments",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+15 pts \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/documents",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+15 pts \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/account-applications",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+15 pts \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          },
+          {
+            "target": "GET /api/account-types",
+            "action": "Add pagination parameters (page & size)",
+            "priority": "high",
+            "impact": "+15 pts \u2014 reduces payload size for large collections",
+            "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+          }
+        ]
+      },
+      "DE08_fields": {
+        "id": "DE08",
+        "label": "Filtrage de champs",
+        "description": "Supporter un parametre 'fields' pour reduire le payload.",
+        "max_pts": 15,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "No field filter param (fields/select)"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 11,
+        "suggestions": [
+          {
+            "target": "GET /api/account-applications/{id}",
+            "action": "Add a 'fields' query parameter for sparse fieldsets",
+            "priority": "medium",
+            "impact": "+15 pts \u2014 lets clients request only needed fields, reducing payload",
+            "how": "Spring Boot: Add an optional @RequestParam and filter the DTO:\n  @GetMapping\n  public ApiResponse<?> list(\n      @RequestParam(required = false) String fields) {\n    // If fields != null, use Jackson @JsonFilter or a projection\n    // to return only the requested fields.\n  }\nAlternative: Use a custom Jackson MappingJacksonValue with a\nSimpleFilterProvider that keeps only the requested properties.\nOpenAPI: The 'fields' param will appear automatically."
+          },
+          {
+            "target": "GET /api/payments",
+            "action": "Add a 'fields' query parameter for sparse fieldsets",
+            "priority": "high",
+            "impact": "+15 pts \u2014 lets clients request only needed fields, reducing payload",
+            "how": "Spring Boot: Add an optional @RequestParam and filter the DTO:\n  @GetMapping\n  public ApiResponse<?> list(\n      @RequestParam(required = false) String fields) {\n    // If fields != null, use Jackson @JsonFilter or a projection\n    // to return only the requested fields.\n  }\nAlternative: Use a custom Jackson MappingJacksonValue with a\nSimpleFilterProvider that keeps only the requested properties.\nOpenAPI: The 'fields' param will appear automatically."
+          },
+          {
+            "target": "GET /api/documents",
+            "action": "Add a 'fields' query parameter for sparse fieldsets",
+            "priority": "high",
+            "impact": "+15 pts \u2014 lets clients request only needed fields, reducing payload",
+            "how": "Spring Boot: Add an optional @RequestParam and filter the DTO:\n  @GetMapping\n  public ApiResponse<?> list(\n      @RequestParam(required = false) String fields) {\n    // If fields != null, use Jackson @JsonFilter or a projection\n    // to return only the requested fields.\n  }\nAlternative: Use a custom Jackson MappingJacksonValue with a\nSimpleFilterProvider that keeps only the requested properties.\nOpenAPI: The 'fields' param will appear automatically."
+          },
+          {
+            "target": "GET /api/account-applications",
+            "action": "Add a 'fields' query parameter for sparse fieldsets",
+            "priority": "high",
+            "impact": "+15 pts \u2014 lets clients request only needed fields, reducing payload",
+            "how": "Spring Boot: Add an optional @RequestParam and filter the DTO:\n  @GetMapping\n  public ApiResponse<?> list(\n      @RequestParam(required = false) String fields) {\n    // If fields != null, use Jackson @JsonFilter or a projection\n    // to return only the requested fields.\n  }\nAlternative: Use a custom Jackson MappingJacksonValue with a\nSimpleFilterProvider that keeps only the requested properties.\nOpenAPI: The 'fields' param will appear automatically."
+          },
+          {
+            "target": "GET /api/sign/verify/{token}",
+            "action": "Add a 'fields' query parameter for sparse fieldsets",
+            "priority": "medium",
+            "impact": "+15 pts \u2014 lets clients request only needed fields, reducing payload",
+            "how": "Spring Boot: Add an optional @RequestParam and filter the DTO:\n  @GetMapping\n  public ApiResponse<?> list(\n      @RequestParam(required = false) String fields) {\n    // If fields != null, use Jackson @JsonFilter or a projection\n    // to return only the requested fields.\n  }\nAlternative: Use a custom Jackson MappingJacksonValue with a\nSimpleFilterProvider that keeps only the requested properties.\nOpenAPI: The 'fields' param will appear automatically."
+          }
+        ]
+      },
+      "DE01_compression": {
+        "id": "DE01",
+        "label": "Compression",
+        "description": "Le serveur doit supporter Accept-Encoding: gzip.",
+        "max_pts": 15,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/webhooks/stripe",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/verify-otp",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/send-otp",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/{id}/cancel",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/confirm",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/send",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/resend",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/live-sign/{signerId}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/submit",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/regenerate-contract",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/kyc",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/generate-contract",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}/kyc/{kycId}",
+            "matched": false,
+            "reason": "No gzip compression detected"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 31,
+        "suggestions": [
+          {
+            "target": "ALL endpoints (server-level)",
+            "action": "Enable gzip compression on the server",
+            "priority": "high",
+            "impact": "+15 pts \u2014 typically 60-80% payload reduction",
+            "how": "Option 1 \u2014 Spring Boot application.yml:\n  server:\n    compression:\n      enabled: true\n      min-response-size: 1024\n      mime-types: application/json,application/xml,text/html,text/plain\n\nOption 2 \u2014 Nginx (if reverse proxy):\n  gzip on;\n  gzip_types application/json application/xml text/plain;\n  gzip_min_length 1024;\n  gzip_comp_level 6;\n\nBoth options apply to ALL endpoints automatically."
+          }
+        ]
+      },
+      "DE02_DE03_cache": {
+        "id": "DE02/DE03",
+        "label": "Cache ETag/304",
+        "description": "Les ressources unitaires doivent supporter ETag + If-None-Match -> 304.",
+        "max_pts": 15,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No ETag header in HEAD response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "No ETag header in HEAD response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "No ETag header in HEAD response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No ETag header in HEAD response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "No ETag header in HEAD response"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 5,
+        "suggestions": [
+          {
+            "target": "GET /api/account-applications/{id}",
+            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+            "priority": "high",
+            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+          },
+          {
+            "target": "GET /api/sign/verify/{token}",
+            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+            "priority": "high",
+            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+          },
+          {
+            "target": "GET /api/payments/{id}",
+            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+            "priority": "high",
+            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+          },
+          {
+            "target": "GET /api/documents/{id}",
+            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+            "priority": "high",
+            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+          },
+          {
+            "target": "GET /api/documents/{id}/download",
+            "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+            "priority": "high",
+            "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+            "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+          }
+        ]
+      },
+      "DE06_delta": {
+        "id": "DE06",
+        "label": "Delta / Changes",
+        "description": "Un endpoint /changes?since= ou equivalent doit exister.",
+        "max_pts": 10,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "Not a delta/changes endpoint"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 11,
+        "suggestions": [
+          {
+            "target": "GET /api/payments/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+10 pts \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."
+          },
+          {
+            "target": "GET /api/documents/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+10 pts \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."
+          },
+          {
+            "target": "GET /api/account-applications/changes  (new endpoint)",
+            "action": "Add a delta/changes endpoint with a 'since' parameter",
+            "priority": "medium",
+            "impact": "+10 pts \u2014 clients fetch only what changed since last sync",
+            "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."
+          }
+        ]
+      },
+      "range_206": {
+        "id": "206",
+        "label": "Range / Partial Content",
+        "description": "Supporter le header Range pour les gros payloads.",
+        "max_pts": 10,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "Range: bytes=0-99 \u2192 500 (not 206)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "Range: bytes=0-99 \u2192 404 (not 206)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "Range: bytes=0-99 \u2192 500 (not 206)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "Range: bytes=0-99 \u2192 500 (not 206)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "Range: bytes=0-99 \u2192 500 (not 206)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "Not individually tested"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "Not individually tested"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "Not individually tested"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "Not individually tested"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "Not individually tested"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "Not individually tested"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 11,
+        "suggestions": [
+          {
+            "target": "GET /api/documents/{id}/download",
+            "action": "Support HTTP Range header for partial content (206)",
+            "priority": "high",
+            "impact": "+10 pts \u2014 enables resumable downloads and partial fetches",
+            "how": "Spring Boot: Use ResourceHttpRequestHandler or manual range parsing:\n\n  @GetMapping(\"/{id}/download\")\n  public ResponseEntity<Resource> download(\n      @PathVariable UUID id,\n      @RequestHeader(value = \"Range\", required = false) String range) {\n    Resource resource = new FileSystemResource(filePath);\n    if (range != null) {\n      // Parse 'bytes=start-end', return 206 with Content-Range header\n      long start = parseStart(range);\n      long end = parseEnd(range, resource.contentLength());\n      return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)\n          .header(\"Content-Range\", \"bytes \" + start + \"-\" + end + \"/\" + resource.contentLength())\n          .body(new InputStreamResource(rangedStream));\n    }\n    return ResponseEntity.ok(resource);\n  }\n\nAlternative: Use Spring's ResourceRegion support for automatic range handling."
+          },
+          {
+            "target": "GET /api/account-applications/{id}",
+            "action": "Support HTTP Range header for partial content (206)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 enables resumable downloads and partial fetches",
+            "how": "For JSON endpoints, Range/206 is rarely useful.\nFocus on the file download endpoint(s) instead."
+          },
+          {
+            "target": "GET /api/sign/verify/{token}",
+            "action": "Support HTTP Range header for partial content (206)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 enables resumable downloads and partial fetches",
+            "how": "For JSON endpoints, Range/206 is rarely useful.\nFocus on the file download endpoint(s) instead."
+          }
+        ]
+      },
+      "AR02_format_cbor": {
+        "id": "AR02",
+        "label": "Format binaire (CBOR)",
+        "description": "Un endpoint en format binaire (CBOR, protobuf...) doit exister.",
+        "max_pts": 10,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/webhooks/stripe",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/verify-otp",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/send-otp",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/{id}/cancel",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/confirm",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/send",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/resend",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/live-sign/{signerId}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/submit",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/regenerate-contract",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/kyc",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/generate-contract",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "Standard JSON format"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}/kyc/{kycId}",
+            "matched": false,
+            "reason": "Standard JSON format"
+          }
+        ],
+        "validated": false,
+        "score": 0,
+        "matched_count": 0,
+        "candidate_count": 31,
+        "suggestions": [
+          {
+            "target": "GET /api/payments  (add CBOR variant)",
+            "action": "Add a binary format alternative (CBOR or Protobuf)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+            "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+          },
+          {
+            "target": "GET /api/documents  (add CBOR variant)",
+            "action": "Add a binary format alternative (CBOR or Protobuf)",
+            "priority": "low",
+            "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+            "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+          }
+        ]
+      },
+      "LO01_observability": {
+        "id": "LO01",
+        "label": "Observabilite",
+        "description": "Actuator / health / metrics doit etre expose.",
+        "max_pts": 5,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/actuator/health",
+            "matched": true,
+            "reason": "HTTP 200 OK"
+          },
+          {
+            "method": "GET",
+            "path": "/health",
+            "matched": false,
+            "reason": "HTTP 500"
+          },
+          {
+            "method": "GET",
+            "path": "/actuator",
+            "matched": true,
+            "reason": "HTTP 200 OK"
+          },
+          {
+            "method": "GET",
+            "path": "/actuator/metrics",
+            "matched": true,
+            "reason": "HTTP 200 OK"
+          },
+          {
+            "method": "GET",
+            "path": "/actuator/info",
+            "matched": true,
+            "reason": "HTTP 200 OK"
+          }
+        ],
+        "validated": true,
+        "score": 5,
+        "matched_count": 4,
+        "candidate_count": 5,
+        "suggestions": []
+      },
+      "US07_rate_limit": {
+        "id": "US07",
+        "label": "Rate Limiting",
+        "description": "Un mecanisme de rate limiting doit etre present.",
+        "max_pts": 5,
+        "candidates": [
+          {
+            "method": "GET",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/webhooks/stripe",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/verify-otp",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/sign/{token}/send-otp",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/{id}/cancel",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/payments/confirm",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/send",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/resend",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/documents/{id}/live-sign/{signerId}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/submit",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/regenerate-contract",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/kyc",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "POST",
+            "path": "/api/account-applications/{id}/generate-contract",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/sign/verify/{token}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/payments/config",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/documents/{id}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/documents/{id}/download",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "GET",
+            "path": "/api/account-types",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/account-applications/{id}/kyc/{kycId}",
+            "matched": false,
+            "reason": "No rate-limit headers in response"
+          }
+        ],
+        "validated": false,
+        "score": 5,
+        "matched_count": 0,
+        "candidate_count": 31,
+        "suggestions": [
+          {
+            "target": "ALL endpoints (server-level)",
+            "action": "Add rate-limit response headers",
+            "priority": "medium",
+            "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients",
+            "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"
+          }
+        ]
+      }
+    },
+    "endpoint_rules": {
+      "get:/api/payments": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/documents": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/account-applications": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/payments/config": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/auth/me": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/account-types": [
+        "DE11_pagination",
+        "DE08_fields",
+        "DE01_compression",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/account-applications/{id}": [
+        "DE08_fields",
+        "DE01_compression",
+        "DE02_DE03_cache",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/sign/verify/{token}": [
+        "DE08_fields",
+        "DE01_compression",
+        "DE02_DE03_cache",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/payments/{id}": [
+        "DE08_fields",
+        "DE01_compression",
+        "DE02_DE03_cache",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/documents/{id}": [
+        "DE08_fields",
+        "DE01_compression",
+        "DE02_DE03_cache",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/api/documents/{id}/download": [
+        "DE08_fields",
+        "DE01_compression",
+        "DE02_DE03_cache",
+        "DE06_delta",
+        "range_206",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "put:/api/account-applications/{id}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "delete:/api/account-applications/{id}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/webhooks/stripe": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/sign/{token}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/sign/{token}/verify-otp": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/sign/{token}/send-otp": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/payments": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/payments/{id}/cancel": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/payments/confirm": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/documents": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/documents/{id}/send": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/documents/{id}/resend": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/documents/{id}/live-sign/{signerId}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/account-applications": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/account-applications/{id}/submit": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/account-applications/{id}/regenerate-contract": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/account-applications/{id}/kyc": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "post:/api/account-applications/{id}/generate-contract": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "delete:/api/documents/{id}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "delete:/api/account-applications/{id}/kyc/{kycId}": [
+        "DE01_compression",
+        "AR02_format_cbor",
+        "US07_rate_limit"
+      ],
+      "get:/actuator/health": [
+        "LO01_observability"
+      ],
+      "get:/health": [
+        "LO01_observability"
+      ],
+      "get:/actuator": [
+        "LO01_observability"
+      ],
+      "get:/actuator/metrics": [
+        "LO01_observability"
+      ],
+      "get:/actuator/info": [
+        "LO01_observability"
+      ]
+    }
+  },
+  "measurements": {
+    "baseline": {
+      "full_payload": {
+        "http_code": 500,
+        "size_download": 70,
+        "time_total": 0.023979,
+        "speed_download": 2919
+      },
+      "single_resource": {
+        "http_code": 500,
+        "size_download": 70,
+        "time_total": 0.011218,
+        "speed_download": 6239
+      },
+      "single_repeat": {
+        "http_code": 500,
+        "size_download": 70,
+        "time_total": 0.010213,
+        "speed_download": 6854
+      }
+    },
+    "optimized": {
+      "full_payload": {
+        "http_code": 200,
+        "size_download": 5959,
+        "time_total": 0.008331,
+        "speed_download": 715308
+      }
+    }
+  },
+  "auto_discovery": {
+    "base_url": "http://localhost:8080",
+    "endpoints_discovered": 30,
+    "endpoints_measured": 30,
+    "all_measurements": {
+      "get:/api/account-applications/{id}": {
+        "http_code": 200,
+        "size_download": 917,
+        "time_total": 0.011641,
+        "speed_download": 78772
+      },
+      "put:/api/account-applications/{id}": {
+        "http_code": 200,
+        "size_download": 938,
+        "time_total": 0.030403,
+        "speed_download": 30852
+      },
+      "delete:/api/account-applications/{id}": {
+        "http_code": 200,
+        "size_download": 60,
+        "time_total": 0.015227,
+        "speed_download": 3940
+      },
+      "post:/api/sign/{token}": {
+        "http_code": 200,
+        "size_download": 1344,
+        "time_total": 0.029289,
+        "speed_download": 45887
+      },
+      "post:/api/sign/{token}/verify-otp": {
+        "http_code": 200,
+        "size_download": 117,
+        "time_total": 0.006995,
+        "speed_download": 16725
+      },
+      "post:/api/sign/{token}/send-otp": {
+        "http_code": 200,
+        "size_download": 135,
+        "time_total": 0.006636,
+        "speed_download": 20343
+      },
+      "get:/api/payments": {
+        "http_code": 200,
+        "size_download": 1008,
+        "time_total": 0.00464,
+        "speed_download": 217249
+      },
+      "post:/api/payments": {
+        "http_code": 201,
+        "size_download": 492,
+        "time_total": 0.062011,
+        "speed_download": 7934
+      },
+      "post:/api/payments/{id}/cancel": {
+        "http_code": 200,
+        "size_download": 373,
+        "time_total": 0.006875,
+        "speed_download": 54255
+      },
+      "post:/api/payments/confirm": {
+        "http_code": 200,
+        "size_download": 384,
+        "time_total": 0.01024,
+        "speed_download": 37498
+      },
+      "get:/api/documents": {
+        "http_code": 200,
+        "size_download": 5245,
+        "time_total": 0.006472,
+        "speed_download": 810426
+      },
+      "post:/api/documents": {
+        "http_code": 201,
+        "size_download": 758,
+        "time_total": 0.009188,
+        "speed_download": 82501
+      },
+      "post:/api/documents/{id}/send": {
+        "http_code": 200,
+        "size_download": 752,
+        "time_total": 0.005222,
+        "speed_download": 144013
+      },
+      "post:/api/documents/{id}/resend": {
+        "http_code": 200,
+        "size_download": 772,
+        "time_total": 0.004675,
+        "speed_download": 165138
+      },
+      "post:/api/documents/{id}/live-sign/{signerId}": {
+        "http_code": 200,
+        "size_download": 768,
+        "time_total": 0.363574,
+        "speed_download": 2112
+      },
+      "get:/api/account-applications": {
+        "http_code": 200,
+        "size_download": 5959,
+        "time_total": 0.008331,
+        "speed_download": 715308
+      },
+      "post:/api/account-applications": {
+        "http_code": 201,
+        "size_download": 930,
+        "time_total": 0.009431,
+        "speed_download": 98608
+      },
+      "post:/api/account-applications/{id}/submit": {
+        "http_code": 200,
+        "size_download": 1949,
+        "time_total": 0.010085,
+        "speed_download": 193250
+      },
+      "post:/api/account-applications/{id}/regenerate-contract": {
+        "http_code": 200,
+        "size_download": 1317,
+        "time_total": 0.015864,
+        "speed_download": 83019
+      },
+      "post:/api/account-applications/{id}/kyc": {
+        "http_code": 201,
+        "size_download": 363,
+        "time_total": 0.009886,
+        "speed_download": 36718
+      },
+      "post:/api/account-applications/{id}/generate-contract": {
+        "http_code": 200,
+        "size_download": 1144,
+        "time_total": 0.012485,
+        "speed_download": 91633
+      },
+      "get:/api/sign/verify/{token}": {
+        "http_code": 200,
+        "size_download": 229,
+        "time_total": 0.00311,
+        "speed_download": 73643
+      },
+      "get:/api/payments/{id}": {
+        "http_code": 200,
+        "size_download": 359,
+        "time_total": 0.002761,
+        "speed_download": 130030
+      },
+      "get:/api/payments/config": {
+        "http_code": 200,
+        "size_download": 79,
+        "time_total": 0.00192,
+        "speed_download": 41141
+      },
+      "get:/api/documents/{id}": {
+        "http_code": 200,
+        "size_download": 723,
+        "time_total": 0.003187,
+        "speed_download": 226876
+      },
+      "delete:/api/documents/{id}": {
+        "http_code": 200,
+        "size_download": 70,
+        "time_total": 0.005218,
+        "speed_download": 13414
+      },
+      "get:/api/documents/{id}/download": {
+        "http_code": 404,
+        "size_download": 106,
+        "time_total": 0.003242,
+        "speed_download": 32697
+      },
+      "get:/api/auth/me": {
+        "http_code": 200,
+        "size_download": 209,
+        "time_total": 0.0026,
+        "speed_download": 80370
+      },
+      "get:/api/account-types": {
+        "http_code": 200,
+        "size_download": 559,
+        "time_total": 0.003751,
+        "speed_download": 149043
+      },
+      "delete:/api/account-applications/{id}/kyc/{kycId}": {
+        "http_code": 200,
+        "size_download": 61,
+        "time_total": 0.005447,
+        "speed_download": 11198
+      }
+    },
+    "discovered_endpoints": [
+      {
+        "method": "GET",
+        "path": "/api/account-applications/{id}",
+        "operationId": "get",
+        "summary": "Get account application detail",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 917,
+        "time_total": 0.011641,
+        "speed_download": 78772
+      },
+      {
+        "method": "PUT",
+        "path": "/api/account-applications/{id}",
+        "operationId": "update",
+        "summary": "Update an account application",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 938,
+        "time_total": 0.030403,
+        "speed_download": 30852
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/account-applications/{id}",
+        "operationId": "delete",
+        "summary": "Delete an account application",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 60,
+        "time_total": 0.015227,
+        "speed_download": 3940
+      },
+      {
+        "method": "POST",
+        "path": "/api/sign/{token}",
+        "operationId": "signDocument",
+        "summary": "Submit signature for a document (public)",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 1344,
+        "time_total": 0.029289,
+        "speed_download": 45887
+      },
+      {
+        "method": "POST",
+        "path": "/api/sign/{token}/verify-otp",
+        "operationId": "verifyOtp",
+        "summary": "Verify OTP code (public)",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 117,
+        "time_total": 0.006995,
+        "speed_download": 16725
+      },
+      {
+        "method": "POST",
+        "path": "/api/sign/{token}/send-otp",
+        "operationId": "sendOtp",
+        "summary": "Send OTP code via SMS to signer (public)",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 135,
+        "time_total": 0.006636,
+        "speed_download": 20343
+      },
+      {
+        "method": "GET",
+        "path": "/api/payments",
+        "operationId": "getMyPayments",
+        "summary": "List my payments",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 200,
+        "size_download": 1008,
+        "time_total": 0.00464,
+        "speed_download": 217249
+      },
+      {
+        "method": "POST",
+        "path": "/api/payments",
+        "operationId": "createPayment",
+        "summary": "",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 201,
+        "size_download": 492,
+        "time_total": 0.062011,
+        "speed_download": 7934
+      },
+      {
+        "method": "POST",
+        "path": "/api/payments/{id}/cancel",
+        "operationId": "cancelPayment",
+        "summary": "Cancel a payment",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 200,
+        "size_download": 373,
+        "time_total": 0.006875,
+        "speed_download": 54255
+      },
+      {
+        "method": "POST",
+        "path": "/api/payments/confirm",
+        "operationId": "confirmPayment",
+        "summary": "Confirm payment after 3D Secure",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 200,
+        "size_download": 384,
+        "time_total": 0.01024,
+        "speed_download": 37498
+      },
+      {
+        "method": "GET",
+        "path": "/api/documents",
+        "operationId": "getMyDocuments",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 5245,
+        "time_total": 0.006472,
+        "speed_download": 810426
+      },
+      {
+        "method": "POST",
+        "path": "/api/documents",
+        "operationId": "createDocument",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 201,
+        "size_download": 758,
+        "time_total": 0.009188,
+        "speed_download": 82501
+      },
+      {
+        "method": "POST",
+        "path": "/api/documents/{id}/send",
+        "operationId": "sendForSignature",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 752,
+        "time_total": 0.005222,
+        "speed_download": 144013
+      },
+      {
+        "method": "POST",
+        "path": "/api/documents/{id}/resend",
+        "operationId": "resendForSignature",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 772,
+        "time_total": 0.004675,
+        "speed_download": 165138
+      },
+      {
+        "method": "POST",
+        "path": "/api/documents/{id}/live-sign/{signerId}",
+        "operationId": "liveSign",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 768,
+        "time_total": 0.363574,
+        "speed_download": 2112
+      },
+      {
+        "method": "GET",
+        "path": "/api/account-applications",
+        "operationId": "list",
+        "summary": "List my account applications",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 5959,
+        "time_total": 0.008331,
+        "speed_download": 715308
+      },
+      {
+        "method": "POST",
+        "path": "/api/account-applications",
+        "operationId": "create",
+        "summary": "Create a new account application",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 201,
+        "size_download": 930,
+        "time_total": 0.009431,
+        "speed_download": 98608
+      },
+      {
+        "method": "POST",
+        "path": "/api/account-applications/{id}/submit",
+        "operationId": "submit",
+        "summary": "Submit an account application for review",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 1949,
+        "time_total": 0.010085,
+        "speed_download": 193250
+      },
+      {
+        "method": "POST",
+        "path": "/api/account-applications/{id}/regenerate-contract",
+        "operationId": "regenerateContract",
+        "summary": "Regenerate contract PDF",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 1317,
+        "time_total": 0.015864,
+        "speed_download": 83019
+      },
+      {
+        "method": "POST",
+        "path": "/api/account-applications/{id}/kyc",
+        "operationId": "uploadKyc",
+        "summary": "Upload a KYC document (base64)",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 201,
+        "size_download": 363,
+        "time_total": 0.009886,
+        "speed_download": 36718
+      },
+      {
+        "method": "POST",
+        "path": "/api/account-applications/{id}/generate-contract",
+        "operationId": "generateContract",
+        "summary": "Generate contract PDF for the application",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 1144,
+        "time_total": 0.012485,
+        "speed_download": 91633
+      },
+      {
+        "method": "GET",
+        "path": "/api/sign/verify/{token}",
+        "operationId": "verifySignatureToken",
+        "summary": "Verify a signature token (public)",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 229,
+        "time_total": 0.00311,
+        "speed_download": 73643
+      },
+      {
+        "method": "GET",
+        "path": "/api/payments/{id}",
+        "operationId": "getPayment",
+        "summary": "Get payment detail",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 200,
+        "size_download": 359,
+        "time_total": 0.002761,
+        "speed_download": 130030
+      },
+      {
+        "method": "GET",
+        "path": "/api/payments/config",
+        "operationId": "getPaymentConfig",
+        "summary": "Get Stripe publishable key",
+        "tags": [
+          "Payments"
+        ],
+        "http_code": 200,
+        "size_download": 79,
+        "time_total": 0.00192,
+        "speed_download": 41141
+      },
+      {
+        "method": "GET",
+        "path": "/api/documents/{id}",
+        "operationId": "getDocument",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 723,
+        "time_total": 0.003187,
+        "speed_download": 226876
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/documents/{id}",
+        "operationId": "deleteDocument",
+        "summary": "",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 200,
+        "size_download": 70,
+        "time_total": 0.005218,
+        "speed_download": 13414
+      },
+      {
+        "method": "GET",
+        "path": "/api/documents/{id}/download",
+        "operationId": "downloadDocument",
+        "summary": "Download document file (supports Range/206)",
+        "tags": [
+          "Documents"
+        ],
+        "http_code": 404,
+        "size_download": 106,
+        "time_total": 0.003242,
+        "speed_download": 32697
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/me",
+        "operationId": "getCurrentUser",
+        "summary": "Get current authenticated user",
+        "tags": [
+          "Authentication"
+        ],
+        "http_code": 200,
+        "size_download": 209,
+        "time_total": 0.0026,
+        "speed_download": 80370
+      },
+      {
+        "method": "GET",
+        "path": "/api/account-types",
+        "operationId": "getAccountTypes",
+        "summary": "List available account types",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 559,
+        "time_total": 0.003751,
+        "speed_download": 149043
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/account-applications/{id}/kyc/{kycId}",
+        "operationId": "deleteKyc",
+        "summary": "Delete a KYC document",
+        "tags": [
+          "Account Applications"
+        ],
+        "http_code": 200,
+        "size_download": 61,
+        "time_total": 0.005447,
+        "speed_download": 11198
+      }
+    ]
+  }
+}

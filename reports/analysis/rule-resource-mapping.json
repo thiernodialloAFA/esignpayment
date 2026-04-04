@@ -1,0 +1,1385 @@
+{
+  "timestamp": "2026-04-04T09:00:01Z",
+  "service_base_url": "http://localhost:8080",
+  "green_score_summary": {
+    "total": 85,
+    "max": 100,
+    "grade": "A"
+  },
+  "rule_resource_mapping": {
+    "DE11_pagination": {
+      "id": "DE11",
+      "label": "Pagination",
+      "description": "Les endpoints de collection doivent supporter la pagination (page/size ou limit/offset).",
+      "max_pts": 15,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "Pagination params: page, size"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "Pagination params: page, size"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "Pagination params: page, size"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": false,
+          "reason": "No pagination params (page/size/limit/offset/cursor)"
+        }
+      ],
+      "validated": true,
+      "score": 15,
+      "matched_count": 3,
+      "candidate_count": 9,
+      "suggestions": []
+    },
+    "DE08_fields": {
+      "id": "DE08",
+      "label": "Filtrage de champs",
+      "description": "Supporter un parametre 'fields' pour reduire le payload.",
+      "max_pts": 15,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": false,
+          "reason": "No field filter param (fields/select)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": false,
+          "reason": "No field filter param (fields/select)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": true,
+          "reason": "Field filter params: fields"
+        }
+      ],
+      "validated": true,
+      "score": 15,
+      "matched_count": 12,
+      "candidate_count": 14,
+      "suggestions": []
+    },
+    "DE01_compression": {
+      "id": "DE01",
+      "label": "Compression",
+      "description": "Le serveur doit supporter Accept-Encoding: gzip.",
+      "max_pts": 15,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/account-applications/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/webhooks/stripe",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/verify-otp",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/send-otp",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/{id}/cancel",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/confirm",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/send",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/resend",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/live-sign/{signerId}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/submit",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/regenerate-contract",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/kyc",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/generate-contract",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/documents/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}/kyc/{kycId}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-compression.enabled=true"
+        }
+      ],
+      "validated": true,
+      "score": 15,
+      "matched_count": 34,
+      "candidate_count": 34,
+      "suggestions": []
+    },
+    "DE02_DE03_cache": {
+      "id": "DE02/DE03",
+      "label": "Cache ETag/304",
+      "description": "Les ressources unitaires doivent supporter ETag + If-None-Match -> 304.",
+      "max_pts": 15,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "No ETag header in HEAD response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": false,
+          "reason": "No ETag header in HEAD response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": false,
+          "reason": "No ETag header in HEAD response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "No ETag header in HEAD response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": false,
+          "reason": "No ETag header in HEAD response"
+        }
+      ],
+      "validated": false,
+      "score": 0,
+      "matched_count": 0,
+      "candidate_count": 5,
+      "suggestions": [
+        {
+          "target": "GET /api/account-applications/{id}",
+          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+          "priority": "high",
+          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+        },
+        {
+          "target": "GET /api/sign/verify/{token}",
+          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+          "priority": "high",
+          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+        },
+        {
+          "target": "GET /api/payments/{id}",
+          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+          "priority": "high",
+          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+        },
+        {
+          "target": "GET /api/documents/{id}",
+          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+          "priority": "high",
+          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+        },
+        {
+          "target": "GET /api/documents/{id}/download",
+          "action": "Add ETag support and If-None-Match \u2192 304 Not Modified",
+          "priority": "high",
+          "impact": "+15 pts \u2014 avoids resending unchanged resources, saves bandwidth",
+          "how": "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n  Option A \u2014 Global filter (easiest):\n  @Bean\n  public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {\n    FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();\n    reg.setFilter(new ShallowEtagHeaderFilter());\n    reg.addUrlPatterns(\"/api/*\");\n    return reg;\n  }\n\n  Option B \u2014 Manual per endpoint:\n  String etag = '\"' + DigestUtils.md5DigestAsHex(body.getBytes()) + '\"';\n  if (request.checkNotModified(etag)) return null; // \u2192 304\n  return ResponseEntity.ok().eTag(etag).body(body);"
+        }
+      ]
+    },
+    "DE06_delta": {
+      "id": "DE06",
+      "label": "Delta / Changes",
+      "description": "Un endpoint /changes?since= ou equivalent doit exister.",
+      "max_pts": 10,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": true,
+          "reason": "Path contains 'change', 'delta' or 'since'"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": true,
+          "reason": "Path contains 'change', 'delta' or 'since'"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": false,
+          "reason": "Not a delta/changes endpoint"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": true,
+          "reason": "Path contains 'change', 'delta' or 'since'"
+        }
+      ],
+      "validated": true,
+      "score": 10,
+      "matched_count": 3,
+      "candidate_count": 14,
+      "suggestions": []
+    },
+    "range_206": {
+      "id": "206",
+      "label": "Range / Partial Content",
+      "description": "Supporter le header Range pour les gros payloads.",
+      "max_pts": 10,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": true,
+          "reason": "OpenAPI servers.x-server-range-support.enabled=true"
+        }
+      ],
+      "validated": true,
+      "score": 10,
+      "matched_count": 14,
+      "candidate_count": 14,
+      "suggestions": []
+    },
+    "AR02_format_cbor": {
+      "id": "AR02",
+      "label": "Format binaire (CBOR)",
+      "description": "Un endpoint en format binaire (CBOR, protobuf...) doit exister.",
+      "max_pts": 10,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/webhooks/stripe",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/verify-otp",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/send-otp",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/{id}/cancel",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/confirm",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/send",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/resend",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/live-sign/{signerId}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/submit",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/regenerate-contract",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/kyc",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/generate-contract",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": true,
+          "reason": "Binary format (CBOR/protobuf/octet-stream)"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": false,
+          "reason": "Standard JSON format"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}/kyc/{kycId}",
+          "matched": false,
+          "reason": "Standard JSON format"
+        }
+      ],
+      "validated": true,
+      "score": 10,
+      "matched_count": 1,
+      "candidate_count": 34,
+      "suggestions": []
+    },
+    "LO01_observability": {
+      "id": "LO01",
+      "label": "Observabilite",
+      "description": "Actuator / health / metrics doit etre expose.",
+      "max_pts": 5,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/actuator/health",
+          "matched": true,
+          "reason": "HTTP 200 OK"
+        },
+        {
+          "method": "GET",
+          "path": "/health",
+          "matched": false,
+          "reason": "HTTP 500"
+        },
+        {
+          "method": "GET",
+          "path": "/actuator",
+          "matched": true,
+          "reason": "HTTP 200 OK"
+        },
+        {
+          "method": "GET",
+          "path": "/actuator/metrics",
+          "matched": true,
+          "reason": "HTTP 200 OK"
+        },
+        {
+          "method": "GET",
+          "path": "/actuator/info",
+          "matched": true,
+          "reason": "HTTP 200 OK"
+        }
+      ],
+      "validated": true,
+      "score": 5,
+      "matched_count": 4,
+      "candidate_count": 5,
+      "suggestions": []
+    },
+    "US07_rate_limit": {
+      "id": "US07",
+      "label": "Rate Limiting",
+      "description": "Un mecanisme de rate limiting doit etre present.",
+      "max_pts": 5,
+      "candidates": [
+        {
+          "method": "GET",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/webhooks/stripe",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/verify-otp",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/sign/{token}/send-otp",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/{id}/cancel",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/payments/confirm",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/send",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/resend",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documents/{id}/live-sign/{signerId}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/submit",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/regenerate-contract",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/kyc",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "POST",
+          "path": "/api/account-applications/{id}/generate-contract",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/sign/verify/{token}",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/config",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "GET",
+          "path": "/api/payments/changes",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/documents/{id}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/{id}/download",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/documents/changes",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-types",
+          "matched": true,
+          "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+        },
+        {
+          "method": "GET",
+          "path": "/api/account-applications/changes",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/account-applications/{id}/kyc/{kycId}",
+          "matched": false,
+          "reason": "No rate-limit headers in response"
+        }
+      ],
+      "validated": true,
+      "score": 5,
+      "matched_count": 9,
+      "candidate_count": 34,
+      "suggestions": []
+    }
+  },
+  "endpoint_rules": {
+    "get:/api/payments": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/documents": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/account-applications": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/payments/config": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/payments/changes": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/documents/changes": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/auth/me": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/account-types": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/account-applications/changes": [
+      "DE11_pagination",
+      "DE08_fields",
+      "DE01_compression",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/account-applications/{id}": [
+      "DE08_fields",
+      "DE01_compression",
+      "DE02_DE03_cache",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/sign/verify/{token}": [
+      "DE08_fields",
+      "DE01_compression",
+      "DE02_DE03_cache",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/payments/{id}": [
+      "DE08_fields",
+      "DE01_compression",
+      "DE02_DE03_cache",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/documents/{id}": [
+      "DE08_fields",
+      "DE01_compression",
+      "DE02_DE03_cache",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/api/documents/{id}/download": [
+      "DE08_fields",
+      "DE01_compression",
+      "DE02_DE03_cache",
+      "DE06_delta",
+      "range_206",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "put:/api/account-applications/{id}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "delete:/api/account-applications/{id}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/webhooks/stripe": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/sign/{token}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/sign/{token}/verify-otp": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/sign/{token}/send-otp": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/payments": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/payments/{id}/cancel": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/payments/confirm": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/documents": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/documents/{id}/send": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/documents/{id}/resend": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/documents/{id}/live-sign/{signerId}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/account-applications": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/account-applications/{id}/submit": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/account-applications/{id}/regenerate-contract": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/account-applications/{id}/kyc": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "post:/api/account-applications/{id}/generate-contract": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "delete:/api/documents/{id}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "delete:/api/account-applications/{id}/kyc/{kycId}": [
+      "DE01_compression",
+      "AR02_format_cbor",
+      "US07_rate_limit"
+    ],
+    "get:/actuator/health": [
+      "LO01_observability"
+    ],
+    "get:/health": [
+      "LO01_observability"
+    ],
+    "get:/actuator": [
+      "LO01_observability"
+    ],
+    "get:/actuator/metrics": [
+      "LO01_observability"
+    ],
+    "get:/actuator/info": [
+      "LO01_observability"
+    ]
+  }
+}

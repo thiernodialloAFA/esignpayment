@@ -19,10 +19,14 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +94,22 @@ public class DocumentService {
     public List<DocumentResponse> getMyDocuments() {
         User owner = currentUser();
         return documentRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId())
+                .stream()
+                .map(this::toDocumentResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentResponse> getMyDocumentsPaged(Pageable pageable) {
+        User owner = currentUser();
+        return documentRepository.findByOwnerId(owner.getId(), pageable)
+                .map(this::toDocumentResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DocumentResponse> getDocumentsChangedSince(LocalDateTime since) {
+        User owner = currentUser();
+        return documentRepository.findByOwnerIdAndUpdatedAtAfterOrderByUpdatedAtDesc(owner.getId(), since)
                 .stream()
                 .map(this::toDocumentResponse)
                 .collect(Collectors.toList());

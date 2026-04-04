@@ -8,6 +8,8 @@ import com.esign.payment.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,6 +101,20 @@ public class AccountApplicationService {
     public List<AccountApplicationResponse> getMyApplications() {
         User user = keycloakUserService.getCurrentUser();
         return applicationRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AccountApplicationResponse> getMyApplicationsPaged(Pageable pageable) {
+        User user = keycloakUserService.getCurrentUser();
+        return applicationRepository.findByUserId(user.getId(), pageable)
+                .map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountApplicationResponse> getApplicationsChangedSince(LocalDateTime since) {
+        User user = keycloakUserService.getCurrentUser();
+        return applicationRepository.findByUserIdAndUpdatedAtAfterOrderByUpdatedAtDesc(user.getId(), since)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
