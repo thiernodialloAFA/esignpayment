@@ -49,6 +49,13 @@ public class OpenApiConfig {
                 "unit", "bytes",
                 "endpoints", List.of("/api/documents/{id}/download")
         ));
+        // Server-level extension documenting ETag/304 cache support
+        serverExtensions.put("x-server-etag-support", Map.of(
+                "enabled", true,
+                "filter", "ShallowEtagHeaderFilter",
+                "scope", "all GET /api/* endpoints",
+                "mechanism", "If-None-Match → 304 Not Modified"
+        ));
         server.setExtensions(serverExtensions);
 
         return new OpenAPI()
@@ -171,6 +178,47 @@ public class OpenApiConfig {
                                             .example("bytes=0-1023")));
                 }
             });
+        });
+    }
+
+    /**
+     * Adds ETag and 304 Not Modified response documentation to all GET endpoints.
+     * This makes the ShallowEtagHeaderFilter behavior visible in the OpenAPI spec.
+     */
+    @Bean
+    public OpenApiCustomizer etagCacheCustomizer() {
+        return openApi -> openApi.getPaths().forEach((path, pathItem) -> {
+            if (pathItem.getGet() == null) {
+                return;
+            }
+            var getOp = pathItem.getGet();
+            if (getOp.getResponses() == null) {
+                return;
+            }
+            // Add ETag header to all existing responses
+            getOp.getResponses().forEach((statusCode, resp) ->
+                    resp.addHeaderObject("ETag", new Header()
+                            .description("Entity tag for cache validation (MD5 of response body)")
+                            .schema(new StringSchema().example("\"0a1b2c3d4e5f\"")))
+            );
+
+            // Add 304 Not Modified response
+            ApiResponse notModified = new ApiResponse()
+                    .description("Not Modified — returned when If-None-Match matches current ETag. "
+                            + "No body is sent, saving bandwidth.");
+            getOp.getResponses().addApiResponse("304", notModified);
+
+            // Add If-None-Match parameter if not already present
+            if (getOp.getParameters() == null
+                    || getOp.getParameters().stream()
+                        .noneMatch(p -> "If-None-Match".equalsIgnoreCase(p.getName()))) {
+                getOp.addParametersItem(
+                        new io.swagger.v3.oas.models.parameters.HeaderParameter()
+                                .name("If-None-Match")
+                                .description("Previous ETag value. If it matches, server returns 304.")
+                                .required(false)
+                                .schema(new StringSchema().example("\"0a1b2c3d4e5f\"")));
+            }
         });
     }
 }

@@ -115,6 +115,7 @@
         }
         .rule-score.good { background: var(--green-800); color: var(--green-200); }
         .rule-score.medium { background: rgba(234,179,8,0.2); color: var(--yellow-400); }
+        .rule-score.partial { background: rgba(234,179,8,0.2); color: #facc15; }
         .rule-score.bad { background: rgba(239,68,68,0.2); color: var(--red-400); }
         .bar-container { width: 100%; background: var(--gray-700); border-radius: 6px; height: 21px; overflow: hidden; margin: 5px 0; }
         .bar { height: 100%; border-radius: 6px; transition: width 0.8s ease; display: flex; align-items: center; padding-left: 7px; font-size: 0.7rem; font-weight: 600; color: white; }
@@ -481,6 +482,10 @@
             background: var(--green-800);
             color: var(--green-200);
         }
+        .suggestion-rule-header .rule-status.partial {
+            background: rgba(234,179,8,0.2);
+            color: #facc15;
+        }
         .suggestion-rule-header .chevron-small {
             color: var(--gray-400);
             transition: transform 0.3s;
@@ -632,6 +637,12 @@
         <h1>🌿 Green API Score Dashboard</h1>
         <div class="subtitle">Green Architecture : moins de gras, plus d'impact, plus d'efficacité !</div>
         <div class="badge">Devoxx France 2026 — Tools in Action</div>
+        <div id="app-selector-bar" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+            <span style="color:var(--gray-400);font-size:0.85rem;">📦 API :</span>
+            <span id="appname-display" style="font-weight:700;font-size:1.05rem;color:var(--green-400);"></span>
+            <select id="app-selector" style="background:var(--gray-800);border:1px solid var(--gray-600);color:var(--green-200);border-radius:8px;padding:4px 12px;font-size:0.85rem;font-weight:600;cursor:pointer;" onchange="switchApp(this.value)"></select>
+            <button onclick="deleteCurrentApp()" style="background:none;border:1px solid var(--red-500);color:var(--red-400);border-radius:6px;padding:3px 10px;font-size:0.75rem;cursor:pointer;" title="Supprimer cet app de l'historique">🗑️</button>
+        </div>
     </div>
 
     <div class="dashboard-layout">
@@ -743,9 +754,9 @@
             </div>
         </div>
 
-        <!-- Before/After Comparison -->
+        <!-- Payload per endpoint -->
         <div class="card" id="comparison-card" style="display:none;">
-            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Avant / Après — Payload (bytes) <span class="chevron">▼</span></button>
+            <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Payload par endpoint (bytes) <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="comparison-accordion">
                 <div id="comparison-bars"></div>
             </div>
@@ -834,8 +845,8 @@
             <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⚡ Historique Consommation Énergie <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="energy-history-accordion">
                 <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
-                    <span style="color:#ef4444;">● Énergie naive / full (Wh)</span>
-                    <span style="color:#22c55e;">● Énergie optimisée (Wh)</span>
+                    <span style="color:#22c55e;">● Énergie totale API (Wh)</span>
+                    <span style="color:#9ca3af;font-style:italic;">Somme de tous les endpoints découverts</span>
                 </div>
                 <canvas id="energy-timeline-canvas"></canvas>
             </div>
@@ -846,8 +857,8 @@
             <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">🌍 Historique Émissions CO₂ <span class="chevron">▼</span></button>
             <div class="accordion-body collapsed" id="co2-history-accordion">
                 <div style="display:flex;gap:16px;margin-bottom:8px;font-size:0.8rem;">
-                    <span style="color:#ef4444;">● CO₂ naive (g)</span>
-                    <span style="color:#3b82f6;">● CO₂ optimisée (g)</span>
+                    <span style="color:#3b82f6;">● CO₂ total API (g)</span>
+                    <span style="color:#9ca3af;font-style:italic;">Somme de tous les endpoints découverts</span>
                 </div>
                 <canvas id="co2-timeline-canvas"></canvas>
             </div>
@@ -876,19 +887,133 @@
     </div>
 
 <script>
-const STORAGE_KEY = 'green-api-score-history';
-const EMBEDDED_REPORT = __REPORT_JSON__;
+const STORAGE_KEY_PREFIX = 'green-api-score-history';
+const APP_LIST_KEY = 'green-api-score-apps';
+const RAW_EMBEDDED = __REPORT_JSON__;
+
+// ─── Unwrap envelope {appname, report} ─────────────────────────
+function unwrapEnvelope(data) {
+    if (data && typeof data === 'object' && 'appname' in data && 'report' in data) {
+        return { appname: data.appname, report: data.report };
+    }
+    return { appname: '', report: data };
+}
+
+function storageKeyFor(appname) {
+    if (!appname) return STORAGE_KEY_PREFIX;
+    return STORAGE_KEY_PREFIX + '-' + appname;
+}
+
+function getAppList() {
+    try { return JSON.parse(localStorage.getItem(APP_LIST_KEY) || '[]'); }
+    catch { return []; }
+}
+function saveAppList(apps) {
+    localStorage.setItem(APP_LIST_KEY, JSON.stringify([...new Set(apps)]));
+}
+function registerApp(appname) {
+    if (!appname) return;
+    const apps = getAppList();
+    if (!apps.includes(appname)) {
+        apps.push(appname);
+        apps.sort();
+        saveAppList(apps);
+    }
+}
 
 // ─── State ─────────────────────────────────────────────────────
+let currentAppname = '';
 let currentReport = null;
-let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let history = [];
+
+function loadHistoryForApp(appname) {
+    const key = storageKeyFor(appname);
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { history = []; }
+}
+
+function refreshAppSelector() {
+    const sel = document.getElementById('app-selector');
+    const apps = getAppList();
+    // Always include currentAppname even if not in list yet
+    const allApps = [...new Set([...(currentAppname ? [currentAppname] : []), ...apps])].sort();
+    sel.innerHTML = '';
+    if (allApps.length === 0) {
+        sel.innerHTML = '<option value="">(aucune app)</option>';
+        sel.style.display = 'none';
+        document.querySelector('[onclick="deleteCurrentApp()"]').style.display = 'none';
+    } else {
+        for (const a of allApps) {
+            const opt = document.createElement('option');
+            opt.value = a;
+            opt.textContent = a;
+            if (a === currentAppname) opt.selected = true;
+            sel.appendChild(opt);
+        }
+        sel.style.display = allApps.length > 1 ? '' : 'none';
+        document.querySelector('[onclick="deleteCurrentApp()"]').style.display = allApps.length > 1 ? '' : 'none';
+    }
+    document.getElementById('appname-display').textContent = currentAppname || '—';
+}
+
+function switchApp(appname) {
+    currentAppname = appname;
+    loadHistoryForApp(appname);
+    document.getElementById('appname-display').textContent = appname || '—';
+    // Re-render last report from history
+    if (history.length > 0) {
+        // Try to reconstruct a minimal report from last history entry
+        const last = history[history.length - 1];
+        if (last._fullReport) {
+            renderReport(last._fullReport);
+        } else {
+            // No full report cached, show history only
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('score-display').style.display = 'block';
+            document.getElementById('score-number').textContent = last.total;
+            document.getElementById('score-max').textContent = '/ ' + (last.max || 100);
+            document.getElementById('score-grade').textContent = last.grade || '?';
+            document.getElementById('score-timestamp').textContent = '📅 ' + (last.timestamp || '');
+            renderHistory();
+            renderEnergyHistory();
+            renderCO2History();
+        }
+    } else {
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('score-display').style.display = 'none';
+    }
+    refreshAppSelector();
+}
+
+function deleteCurrentApp() {
+    if (!currentAppname) return;
+    if (!confirm(`Supprimer tout l'historique de l'app "${currentAppname}" ?`)) return;
+    localStorage.removeItem(storageKeyFor(currentAppname));
+    const apps = getAppList().filter(a => a !== currentAppname);
+    saveAppList(apps);
+    if (apps.length > 0) {
+        switchApp(apps[0]);
+    } else {
+        currentAppname = '';
+        history = [];
+        refreshAppSelector();
+        location.reload();
+    }
+}
 
 // ─── File Input ────────────────────────────────────────────────
 document.getElementById('file-input').addEventListener('change', async (e) => {
     for (const file of e.target.files) {
         const text = await file.text();
         try {
-            const report = JSON.parse(text);
+            const raw = JSON.parse(text);
+            const { appname, report } = unwrapEnvelope(raw);
+            if (appname && appname !== currentAppname) {
+                currentAppname = appname;
+                registerApp(appname);
+                loadHistoryForApp(appname);
+                refreshAppSelector();
+            }
             addToHistory(report);
             renderReport(report);
         } catch (err) {
@@ -902,53 +1027,80 @@ function loadFromUrl() {
     if (!url) return;
     fetch(url)
         .then(r => r.json())
-        .then(report => { addToHistory(report); renderReport(report); })
+        .then(raw => {
+            const { appname, report } = unwrapEnvelope(raw);
+            if (appname && appname !== currentAppname) {
+                currentAppname = appname;
+                registerApp(appname);
+                loadHistoryForApp(appname);
+                refreshAppSelector();
+            }
+            addToHistory(report);
+            renderReport(report);
+        })
         .catch(err => alert('Erreur: ' + err.message));
 }
 
 function addToHistory(report) {
     // Avoid duplicates by timestamp
     if (!history.find(h => h.timestamp === report.timestamp)) {
-        // Compute energy & CO2 for this report
-        const m = report.measurements || {};
-        const optKeys = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
+        // Compute energy & CO₂ from ALL discovered endpoints (single API model)
+        const disc = report.auto_discovery?.discovered_endpoints;
         let eWh = 0;
-        for (const k of optKeys) {
-            const ep = m.optimized?.[k];
-            if (ep) {
+        let epCount = 0;
+        let totalBytes = 0;
+
+        if (disc && disc.length > 0) {
+            // Sum energy from every discovered endpoint
+            for (const ep of disc) {
                 eWh += energyNetworkWh(ep.size_download || 0) + energyServerWh(ep.time_total || 0);
+                totalBytes += (ep.size_download || 0);
+                epCount++;
+            }
+        } else {
+            // Legacy fallback: sum from all optimized + baseline measurements
+            const m = report.measurements || {};
+            for (const section of [m.optimized || {}, m.baseline || {}]) {
+                for (const [k, ep] of Object.entries(section)) {
+                    if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                        eWh += energyNetworkWh(ep.size_download || 0) + energyServerWh(ep.time_total || 0);
+                        totalBytes += (ep.size_download || 0);
+                        epCount++;
+                    }
+                }
             }
         }
         const co2 = energyWhToCO2g(eWh);
 
-        // Naive full payload energy (non optimisé)
-        const naiveSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-        const naiveTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-        const naiveWh = energyNetworkWh(naiveSize) + energyServerWh(naiveTime);
-        const naiveCO2 = energyWhToCO2g(naiveWh);
-
         history.push({
             timestamp: report.timestamp,
             total: report.green_score.total,
-            max: report.green_score.max || 9,
+            max: report.green_score.max || 100,
             grade: report.green_score.grade,
             breakdown: report.green_score.breakdown,
             energyWh: eWh,
             co2g: co2,
-            naiveEnergyWh: naiveWh,
-            naiveCO2g: naiveCO2
+            endpointCount: epCount,
+            totalBytes: totalBytes
         });
         history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
         // Keep last 50
         if (history.length > 50) history = history.slice(-50);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        localStorage.setItem(storageKeyFor(currentAppname), JSON.stringify(history));
     }
 }
 
 function clearHistory() {
-    if (confirm('Supprimer tout l\'historique ?')) {
+    if (confirm('Supprimer tout l\'historique (toutes les apps) ?')) {
+        // Remove all per-app history keys
+        const apps = getAppList();
+        for (const a of apps) {
+            localStorage.removeItem(storageKeyFor(a));
+        }
+        // Also remove default (no appname) key
+        localStorage.removeItem(STORAGE_KEY_PREFIX);
+        localStorage.removeItem(APP_LIST_KEY);
         history = [];
-        localStorage.removeItem(STORAGE_KEY);
         location.reload();
     }
 }
@@ -983,141 +1135,142 @@ function renderReport(report) {
     rulesList.innerHTML = '';
 
     const ruleLabels = {
-        'DE11_pagination': { name: 'DE11 — Pagination', max: 1, icon: '📄' },
-        'DE08_fields': { name: 'DE08 — Filtrage champs', max: 1, icon: '🔍' },
-        'DE01_compression': { name: 'DE01 — Compression Gzip', max: 1, icon: '🗜️' },
-        'DE02_DE03_cache': { name: 'DE02/03 — Cache ETag/304', max: 1, icon: '💾' },
-        'DE06_delta': { name: 'DE06 — Delta changes', max: 1, icon: '🔄' },
-        'range_206': { name: '206 — Partial Content', max: 1, icon: '✂️' },
-        'LO01_observability': { name: 'LO01 — Observabilité', max: 1, icon: '👁️' },
-        'US07_rate_limit': { name: 'US07 — Rate Limiting', max: 1, icon: '🚦' },
-        'AR02_format_cbor': { name: 'AR02 — Format CBOR', max: 1, icon: '📦' },
+        'DE11_pagination': { name: 'DE11 — Pagination', defaultMax: 15, icon: '📄' },
+        'DE08_fields': { name: 'DE08 — Filtrage champs', defaultMax: 15, icon: '🔍' },
+        'DE01_compression': { name: 'DE01 — Compression Gzip', defaultMax: 15, icon: '🗜️' },
+        'DE02_DE03_cache': { name: 'DE02/03 — Cache ETag/304', defaultMax: 15, icon: '💾' },
+        'DE06_delta': { name: 'DE06 — Delta changes', defaultMax: 10, icon: '🔄' },
+        'range_206': { name: '206 — Partial Content', defaultMax: 10, icon: '✂️' },
+        'LO01_observability': { name: 'LO01 — Observabilité', defaultMax: 5, icon: '👁️' },
+        'US07_rate_limit': { name: 'US07 — Rate Limiting', defaultMax: 5, icon: '🚦' },
+        'AR02_format_cbor': { name: 'AR02 — Format CBOR', defaultMax: 10, icon: '📦' },
     };
+
+    const rrm = gs.rule_resource_mapping || {};
 
     for (const [key, meta] of Object.entries(ruleLabels)) {
         const score = gs.breakdown[key] || 0;
-        const passed = score >= meta.max;
-        const cls = passed ? 'good' : 'bad';
+        const rrmEntry = rrm[key] || {};
+        const maxPts = rrmEntry.max_pts || meta.defaultMax;
+        const matchedCount = rrmEntry.matched_count;
+        const candidateCount = rrmEntry.candidate_count;
+        const hasMapping = matchedCount !== undefined && candidateCount !== undefined;
+
+        const passed = score >= maxPts;
+        const isPartial = !passed && score > 0;
+        const cls = passed ? 'good' : isPartial ? 'partial' : 'bad';
+        const icon = passed ? '✅' : isPartial ? '⚠️' : '❌';
         const detail = gs.details && gs.details[key] ? gs.details[key] : {};
         const note = detail.reduction_pct ? `(-${detail.reduction_pct}%)` : (detail.note || '');
-        const icon = passed ? '✅' : '❌';
+        const epInfo = hasMapping ? ` <span style="font-size:0.7rem;color:var(--gray-500);">(${matchedCount}/${candidateCount} endpoints)</span>` : '';
 
         rulesList.innerHTML += `
             <div class="rule-row">
                 <div>
                     <span class="rule-name">${meta.icon} ${meta.name}</span>
                     <span style="font-size:0.75rem;color:var(--gray-400);margin-left:8px;">${note}</span>
+                    ${epInfo}
                 </div>
-                <span class="rule-score ${cls}">${icon} ${score} / ${meta.max}</span>
+                <span class="rule-score ${cls}">${icon} ${score} / ${maxPts}</span>
             </div>`;
     }
 
-    // Comparison bars
+    // Comparison bars — Payload per endpoint
     const compCard = document.getElementById('comparison-card');
     compCard.style.display = 'block';
     const compBars = document.getElementById('comparison-bars');
     compBars.innerHTML = '';
 
-    const fullNaiveBytes = m.baseline?.full_payload?.size_download || 0;
-    const fullOptBytes = m.optimized?.full_payload?.size_download || fullNaiveBytes;
-
-    // ── Build payload comparisons dynamically or fallback ──
+    // ── Build payload list from discovered endpoints or legacy ──
     let comparisons = [];
     const discEps = currentReport.auto_discovery?.discovered_endpoints;
     if (discEps && discEps.length > 0) {
-        const baseRef = fullOptBytes || fullNaiveBytes;
         for (const ep of discEps) {
             if ((ep.size_download || 0) === 0) continue;
             const label = `${ep.method} ${ep.path}`;
-            comparisons.push({ label, baseline: baseRef, optimized: ep.size_download || 0 });
+            comparisons.push({ label, size: ep.size_download || 0 });
         }
     } else {
-        comparisons = [
-            { label: 'Pagination (DE11)', baseline: fullNaiveBytes, optimized: m.optimized?.pagination?.size_download, rule: 'DE11' },
-            { label: 'Fields filter (DE08)', baseline: fullNaiveBytes, optimized: m.optimized?.fields_filter?.size_download, rule: 'DE08' },
-            { label: 'Gzip compression (DE01)', baseline: fullNaiveBytes, optimized: m.optimized?.gzip_compression?.size_download, rule: 'DE01' },
-            { label: 'ETag 304 (DE02)', baseline: fullNaiveBytes, optimized: m.optimized?.etag_304?.size_download, rule: 'DE02' },
-            { label: 'Delta changes (DE06)', baseline: fullOptBytes, optimized: m.optimized?.delta_changes?.size_download, rule: 'DE06', note: 'vs full optimise' },
-            { label: 'Range 206', baseline: fullNaiveBytes, optimized: m.optimized?.range_206?.size_download, rule: '206' },
-            { label: 'CBOR format (AR02)', baseline: fullOptBytes, optimized: m.optimized?.cbor_format?.size_download, rule: 'AR02', note: 'vs full optimise JSON' },
+        // Legacy fallback
+        const fullRef = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
+        const legacyEntries = [
+            { label: 'Full payload', key: 'full_payload' },
+            { label: 'Pagination (DE11)', key: 'pagination' },
+            { label: 'Fields filter (DE08)', key: 'fields_filter' },
+            { label: 'Gzip (DE01)', key: 'gzip_compression' },
+            { label: 'ETag 304 (DE02)', key: 'etag_304' },
+            { label: 'Delta (DE06)', key: 'delta_changes' },
+            { label: 'Range 206', key: 'range_206' },
+            { label: 'CBOR (AR02)', key: 'cbor_format' },
         ];
+        for (const e of legacyEntries) {
+            const ep = m.optimized?.[e.key] || m.baseline?.[e.key];
+            if (ep && (ep.size_download || 0) > 0) {
+                comparisons.push({ label: e.label, size: ep.size_download });
+            }
+        }
     }
 
-    const maxBytes = Math.max(...comparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 1);
+    // Sort by size descending for visual impact
+    comparisons.sort((a, b) => b.size - a.size);
+    const maxBytes = comparisons.length > 0 ? comparisons[0].size : 1;
 
     for (const c of comparisons) {
-        const b = c.baseline || 0;
-        const o = c.optimized || 0;
-        const gain = b > 0 ? Math.round((1 - o / b) * 100) : 0;
-        const gainCls = gain > 0 ? 'positive' : 'negative';
-        const noteHtml = c.note ? ` <span style="font-size:0.7rem;color:var(--gray-400);">(${c.note})</span>` : '';
-
+        const pct = maxBytes > 0 ? (c.size / maxBytes * 100).toFixed(1) : 0;
         compBars.innerHTML += `
             <div class="comparison-row">
-                <div class="comparison-label">${c.label}${noteHtml} <span class="gain-badge ${gainCls}">${gain > 0 ? '-' : '+'}${Math.abs(gain)}%</span></div>
-                <div class="comparison-values"><span>Avant: ${formatBytes(b)}</span><span>Après: ${formatBytes(o)}</span></div>
+                <div class="comparison-label">${c.label} <span style="color:var(--gray-400);font-size:0.78rem;">${formatBytes(c.size)}</span></div>
                 <div class="bar-container">
-                    <div class="bar baseline" style="width:${(b/maxBytes*100).toFixed(1)}%">${formatBytes(b)}</div>
-                </div>
-                <div class="bar-container">
-                    <div class="bar optimized" style="width:${(o/maxBytes*100).toFixed(1)}%">${formatBytes(o)}</div>
+                    <div class="bar optimized" style="width:${pct}%">${formatBytes(c.size)}</div>
                 </div>
             </div>`;
     }
 
-    // Response Times card
+    // Response Times card — time per endpoint
     const rtCard = document.getElementById('response-times-card');
     rtCard.style.display = 'block';
     const rtBars = document.getElementById('response-times-bars');
     rtBars.innerHTML = '';
 
-    const bFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-
-    // ── Build time comparisons dynamically or fallback ──
-    let timeComparisons = [];
+    // ── Build time list from discovered endpoints or legacy ──
+    let timeEntries = [];
     if (discEps && discEps.length > 0) {
         for (const ep of discEps) {
             if ((ep.time_total || 0) === 0) continue;
             const label = `${ep.method} ${ep.path}`;
-            timeComparisons.push({ label, baseline: bFullTime, optimized: ep.time_total || 0 });
+            timeEntries.push({ label, time: ep.time_total || 0 });
         }
     } else {
-        timeComparisons = [
-            { label: 'GET /books (full naif)', baseline: bFullTime, optimized: bFullTime },
-            { label: 'GET /books (paginated)', baseline: bFullTime, optimized: m.optimized?.pagination?.time_total },
-            { label: 'GET /books/select (fields)', baseline: bFullTime, optimized: m.optimized?.fields_filter?.time_total },
-            { label: 'GET /books (gzip)', baseline: bFullTime, optimized: m.optimized?.gzip_compression?.time_total },
-            { label: 'GET /books/1 (1er appel)', baseline: bFullTime, optimized: m.optimized?.etag_first_call?.time_total },
-            { label: 'GET /books/1 (ETag 304)', baseline: bFullTime, optimized: m.optimized?.etag_304?.time_total },
-            { label: 'GET /books/changes (delta)', baseline: bFullTime, optimized: m.optimized?.delta_changes?.time_total },
-            { label: 'GET /books/1/summary (range)', baseline: bFullTime, optimized: m.optimized?.range_206?.time_total },
+        const legacyTimeEntries = [
+            { label: 'Full payload', key: 'full_payload' },
+            { label: 'Pagination', key: 'pagination' },
+            { label: 'Fields filter', key: 'fields_filter' },
+            { label: 'Gzip', key: 'gzip_compression' },
+            { label: 'ETag 1st call', key: 'etag_first_call' },
+            { label: 'ETag 304', key: 'etag_304' },
+            { label: 'Delta', key: 'delta_changes' },
+            { label: 'Range 206', key: 'range_206' },
         ];
+        for (const e of legacyTimeEntries) {
+            const ep = m.optimized?.[e.key] || m.baseline?.[e.key];
+            if (ep && (ep.time_total || 0) > 0) {
+                timeEntries.push({ label: e.label, time: ep.time_total });
+            }
+        }
     }
 
-    const maxTime = Math.max(...timeComparisons.map(c => Math.max(c.baseline || 0, c.optimized || 0)), 0.001);
+    // Sort by time descending
+    timeEntries.sort((a, b) => b.time - a.time);
+    const maxTime = timeEntries.length > 0 ? timeEntries[0].time : 0.001;
 
-    for (const tc of timeComparisons) {
-        const bt = tc.baseline || 0;
-        const ot = tc.optimized || 0;
-        let speedupHtml = '';
-        if (bt > 0 && ot > 0) {
-            const speedup = Math.round((1 - ot / bt) * 100);
-            const cls = speedup > 0 ? 'faster' : 'slower';
-            speedupHtml = `<span class=\"time-speedup ${cls}\">${speedup > 0 ? '⚡' : '🐢'} ${speedup > 0 ? '-' : '+'}${Math.abs(speedup)}%</span>`;
-        }
+    for (const tc of timeEntries) {
+        const pct = maxTime > 0 ? (tc.time / maxTime * 100).toFixed(1) : 0;
         rtBars.innerHTML += `
-            <div class=\"time-row\">
-                <div class=\"endpoint-label\">${tc.label} ${speedupHtml}</div>
-                ${bt > 0 ? `
-                <div class=\"time-pair\">
-                    <div class=\"label\">Full naive</div>
-                    <div class=\"bar-container\"><div class=\"bar time-baseline\" style=\"width:${(bt/maxTime*100).toFixed(1)}%\"></div></div>
-                    <div class=\"value\">${bt.toFixed(3)}s</div>
-                </div>` : ''}
-                <div class=\"time-pair\">
-                    <div class=\"label\">Mesure</div>
-                    <div class=\"bar-container\"><div class=\"bar time-optimized\" style=\"width:${(ot/maxTime*100).toFixed(1)}%\"></div></div>
-                    <div class=\"value\">${ot.toFixed(3)}s</div>
+            <div class="time-row">
+                <div class="endpoint-label">${tc.label} <span style="color:var(--gray-400);font-size:0.78rem;">${tc.time.toFixed(3)}s</span></div>
+                <div class="time-pair">
+                    <div class="bar-container"><div class="bar time-optimized" style="width:${pct}%"></div></div>
+                    <div class="value">${tc.time.toFixed(3)}s</div>
                 </div>
             </div>`;
     }
@@ -1126,33 +1279,41 @@ function renderReport(report) {
     const metricsCard = document.getElementById('metrics-card');
     metricsCard.style.display = 'block';
     const mg = document.getElementById('metrics-grid');
-    const bFull = m.baseline?.full_payload?.size_download || 0;
-    const oGzip = m.optimized?.gzip_compression?.size_download || 0;
-    const etag304 = m.optimized?.etag_304?.http_code || 0;
-    const totalGain = bFull > 0 ? Math.round((1 - oGzip / bFull) * 100) : 0;
 
-    // Temps moyens
-    const baselineTimes = [m.baseline?.full_payload?.time_total, m.baseline?.single_resource?.time_total].filter(t => t > 0);
-    const optimizedTimes = [
-        m.optimized?.pagination?.time_total,
-        m.optimized?.fields_filter?.time_total,
-        m.optimized?.gzip_compression?.time_total,
-        m.optimized?.etag_first_call?.time_total,
-        m.optimized?.etag_304?.time_total,
-    ].filter(t => t > 0);
-    const avgBaseline = baselineTimes.length > 0 ? baselineTimes.reduce((a,b)=>a+b,0) / baselineTimes.length : 0;
-    const avgOptimized = optimizedTimes.length > 0 ? optimizedTimes.reduce((a,b)=>a+b,0) / optimizedTimes.length : 0;
-    const timeGain = avgBaseline > 0 ? Math.round((1 - avgOptimized / avgBaseline) * 100) : 0;
+    // Compute from discovered endpoints or legacy
+    const discEpsMet = currentReport.auto_discovery?.discovered_endpoints;
+    let totalTransfer = 0, epCountMet = 0;
+    let allTimes = [];
+
+    if (discEpsMet && discEpsMet.length > 0) {
+        for (const ep of discEpsMet) {
+            totalTransfer += (ep.size_download || 0);
+            if ((ep.time_total || 0) > 0) allTimes.push(ep.time_total);
+            epCountMet++;
+        }
+    } else {
+        // Legacy fallback
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    totalTransfer += (ep.size_download || 0);
+                    if ((ep.time_total || 0) > 0) allTimes.push(ep.time_total);
+                    epCountMet++;
+                }
+            }
+        }
+    }
+    const avgTime = allTimes.length > 0 ? allTimes.reduce((a,b)=>a+b,0) / allTimes.length : 0;
+    const avgTransfer = epCountMet > 0 ? Math.round(totalTransfer / epCountMet) : 0;
+    const etag304 = m.optimized?.etag_304?.http_code || 0;
 
     mg.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatBytes(bFull)}</div><div class="metric-label">Baseline payload</div></div>
-        <div class="metric-item"><div class="metric-value">${formatBytes(oGzip)}</div><div class="metric-label">Optimized + Gzip</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${totalGain>50?'var(--green-400)':'var(--yellow-400)'}">${totalGain}%</div><div class="metric-label">Réduction payload</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${etag304===304?'var(--green-400)':'var(--red-400)'}">${etag304}</div><div class="metric-label">HTTP code ETag</div></div>
-        <div class="metric-item"><div class="metric-value">${avgBaseline.toFixed(3)}s</div><div class="metric-label">Temps moyen baseline</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${avgOptimized.toFixed(3)}s</div><div class="metric-label">Temps moyen optimisé</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${timeGain>0?'var(--green-400)':'var(--red-400)'}">⚡ ${timeGain}%</div><div class="metric-label">Gain temps réponse</div></div>
-        <div class="metric-item"><div class="metric-value">${gs.total}/${maxScore}</div><div class="metric-label">Score (${gs.grade})</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(totalTransfer)}</div><div class="metric-label">📦 Transfert total</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(avgTransfer)}</div><div class="metric-label">📊 Transfert moy. / ep</div></div>
+        <div class="metric-item"><div class="metric-value">${avgTime.toFixed(3)}s</div><div class="metric-label">⏱️ Temps moyen</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:${etag304===304?'var(--green-400)':'var(--red-400)'}">${etag304}</div><div class="metric-label">💾 HTTP code ETag</div></div>
+        <div class="metric-item"><div class="metric-value">${epCountMet}</div><div class="metric-label">🔍 Endpoints mesurés</div></div>
+        <div class="metric-item"><div class="metric-value">${gs.total}/${maxScore}</div><div class="metric-label">🌿 Score (${gs.grade})</div></div>
     `;
 
     // ─── Energy Summary card ───────────────────────────────────────
@@ -1160,38 +1321,49 @@ function renderReport(report) {
     energyCard.style.display = 'block';
     const eg = document.getElementById('energy-grid');
 
-    // Énergie globale : somme de tous les endpoints optimisés vs baseline (full naive × N)
-    const optKeysEnergy = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
-    let optEnergyNet = 0, optEnergySrv = 0, optEndpointCount = 0;
-    for (const k of optKeysEnergy) {
-        const ep = m.optimized?.[k];
-        if (ep) {
-            optEnergyNet += energyNetworkWh(ep.size_download || 0);
-            optEnergySrv += energyServerWh(ep.time_total || 0);
-            optEndpointCount++;
+    // Compute energy from ALL discovered endpoints (single API model)
+    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    let apiEnergyNet = 0, apiEnergySrv = 0, apiEndpointCount = 0, apiTotalBytes = 0;
+
+    if (disc && disc.length > 0) {
+        for (const ep of disc) {
+            apiEnergyNet += energyNetworkWh(ep.size_download || 0);
+            apiEnergySrv += energyServerWh(ep.time_total || 0);
+            apiTotalBytes += (ep.size_download || 0);
+            apiEndpointCount++;
+        }
+    } else {
+        // Legacy fallback: all measurements
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    apiEnergyNet += energyNetworkWh(ep.size_download || 0);
+                    apiEnergySrv += energyServerWh(ep.time_total || 0);
+                    apiTotalBytes += (ep.size_download || 0);
+                    apiEndpointCount++;
+                }
+            }
         }
     }
-    const optEnergyTotal = optEnergyNet + optEnergySrv;
+    const apiEnergyTotal = apiEnergyNet + apiEnergySrv;
+    const avgEnergyPerEp = apiEndpointCount > 0 ? apiEnergyTotal / apiEndpointCount : 0;
 
-    // Baseline : 1 appel full payload naïf (même dataset = optimized full)
-    const baselineFullSize = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-    const baselineFullTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
-    const baselineEnergyNet = energyNetworkWh(baselineFullSize);
-    const baselineEnergySrv = energyServerWh(baselineFullTime);
-    const baselineEnergyTotal = baselineEnergyNet + baselineEnergySrv;
-
-    const energyGainPct = baselineEnergyTotal > 0 ? Math.round((1 - optEnergyTotal / baselineEnergyTotal) * 100) : 0;
-    const energySaved = baselineEnergyTotal - optEnergyTotal;
+    // Projection
+    const reqDay = getReqPerDay();
+    const daysYear = getDaysPerYear();
+    const reqYear = reqDay * daysYear;
+    const energyPerDay = apiEnergyTotal * reqDay;
+    const energyPerYear = apiEnergyTotal * reqYear;
 
     eg.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyTotal)}</div><div class="metric-label">Énergie API naive</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyTotal)}</div><div class="metric-label">Énergie API optimisée</div></div>
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergyNet)}</div><div class="metric-label">Réseau (naive)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergyNet)}</div><div class="metric-label">Réseau (optimisé)</div></div>
-        <div class="metric-item"><div class="metric-value">${formatEnergy(baselineEnergySrv)}</div><div class="metric-label">Serveur (naive)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(optEnergySrv)}</div><div class="metric-label">Serveur (optimisé)</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${energyGainPct>0?'var(--green-400)':'var(--red-400)'}">⚡ ${energyGainPct}%</div><div class="metric-label">Gain énergie global</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatEnergy(energySaved)}</div><div class="metric-label">Énergie économisée</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergyTotal)}</div><div class="metric-label">⚡ Énergie totale API<br><small style="color:var(--gray-400)">${apiEndpointCount} endpoints</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergyNet)}</div><div class="metric-label">🌐 Réseau</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(apiEnergySrv)}</div><div class="metric-label">🖥️ Serveur</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(avgEnergyPerEp)}</div><div class="metric-label">📊 Moyenne / endpoint</div></div>
+        <div class="metric-item"><div class="metric-value">${formatBytes(apiTotalBytes)}</div><div class="metric-label">📦 Transfert total</div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(energyPerDay)}</div><div class="metric-label">📆 Énergie / jour<br><small style="color:var(--gray-400)">${reqDay.toLocaleString('fr-FR')} req/j</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatEnergy(energyPerYear)}</div><div class="metric-label">📅 Énergie / an<br><small style="color:var(--gray-400)">${reqYear.toLocaleString('fr-FR')} req/an</small></div></div>
+        <div class="metric-item"><div class="metric-value">${apiEndpointCount > 0 ? formatBytes(Math.round(apiTotalBytes / apiEndpointCount)) : '—'}</div><div class="metric-label">📊 Transfert moy. / ep</div></div>
     `;
 
     // ─── CO2 Emissions card ────────────────────────────────────────
@@ -1200,26 +1372,22 @@ function renderReport(report) {
     const co2g = document.getElementById('co2-grid');
     const co2Source = document.getElementById('co2-source-label');
 
-    const baselineCO2 = energyWhToCO2g(baselineEnergyTotal);
-    const optCO2 = energyWhToCO2g(optEnergyTotal);
-    const co2Saved = baselineCO2 - optCO2;
-    const co2GainPct = baselineCO2 > 0 ? Math.round((1 - optCO2 / baselineCO2) * 100) : 0;
+    const apiCO2 = energyWhToCO2g(apiEnergyTotal);
+    const avgCO2PerEp = apiEndpointCount > 0 ? apiCO2 / apiEndpointCount : 0;
 
     // Projection annuelle CO2
-    const reqDay = getReqPerDay();
-    const daysYear = getDaysPerYear();
-    const reqYear = reqDay * daysYear;
-    const co2SavedYear = co2Saved * reqYear;
+    const co2PerDay = apiCO2 * reqDay;
+    const co2PerYear = apiCO2 * reqYear;
 
     co2g.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${formatCO2(baselineCO2)}</div><div class="metric-label">CO₂ naive / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(optCO2)}</div><div class="metric-label">CO₂ optimisée / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2Saved)}</div><div class="metric-label">CO₂ économisé / appel</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:${co2GainPct>0?'var(--green-400)':'var(--red-400)'}">🌍 ${co2GainPct}%</div><div class="metric-label">Réduction CO₂</div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatCO2(co2SavedYear)}</div><div class="metric-label">CO₂ économisé / an<br><small style="color:var(--gray-400)">(${reqDay.toLocaleString('fr-FR')} req/j × ${daysYear}j)</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_CAR_G_PER_KM))} 🚗</div><div class="metric-label">Équiv. voiture<br><small style="color:var(--gray-400)">${CO2_CAR_G_PER_KM} gCO₂/km</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_PLANE_G_PER_KM))} ✈️</div><div class="metric-label">Équiv. avion<br><small style="color:var(--gray-400)">${CO2_PLANE_G_PER_KM} gCO₂/km</small></div></div>
-        <div class="metric-item"><div class="metric-value" style="color:var(--green-400)">${formatDistance(co2ToKm(co2SavedYear, CO2_TRAIN_G_PER_KM))} 🚄</div><div class="metric-label">Équiv. train<br><small style="color:var(--gray-400)">${CO2_TRAIN_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(apiCO2)}</div><div class="metric-label">🌍 CO₂ total API / appel</div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(avgCO2PerEp)}</div><div class="metric-label">📊 CO₂ moyen / endpoint</div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(co2PerDay)}</div><div class="metric-label">📆 CO₂ / jour<br><small style="color:var(--gray-400)">${reqDay.toLocaleString('fr-FR')} req/j</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatCO2(co2PerYear)}</div><div class="metric-label">📅 CO₂ / an<br><small style="color:var(--gray-400)">${reqYear.toLocaleString('fr-FR')} req/an</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_CAR_G_PER_KM))} 🚗</div><div class="metric-label">Équiv. voiture / an<br><small style="color:var(--gray-400)">${CO2_CAR_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_PLANE_G_PER_KM))} ✈️</div><div class="metric-label">Équiv. avion / an<br><small style="color:var(--gray-400)">${CO2_PLANE_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${formatDistance(co2ToKm(co2PerYear, CO2_TRAIN_G_PER_KM))} 🚄</div><div class="metric-label">Équiv. train / an<br><small style="color:var(--gray-400)">${CO2_TRAIN_G_PER_KM} gCO₂/km</small></div></div>
+        <div class="metric-item"><div class="metric-value">${apiEndpointCount}</div><div class="metric-label">🔍 Endpoints mesurés</div></div>
     `;
     co2Source.textContent = 'Source : Electricity Maps / AIE 2024 — ' + getSelectedCountryLabel();
 
@@ -1237,7 +1405,7 @@ function renderReport(report) {
 
     // ── Build rows dynamically from auto_discovery or fallback to legacy ──
     let rows = [];
-    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    // disc already declared above — reuse it
     if (disc && disc.length > 0) {
         // Dynamic rows from auto-discovered endpoints
         for (const ep of disc) {
@@ -1383,7 +1551,7 @@ function renderHistory() {
 // ─── Accordion ─────────────────────────────────────────────────
 function renderEnergyHistory() {
     const card = document.getElementById('energy-history-card');
-    const hasData = history.some(h => (h.energyWh || 0) > 0 || (h.naiveEnergyWh || 0) > 0);
+    const hasData = history.some(h => (h.energyWh || 0) > 0);
     if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
     card.style.display = 'block';
 
@@ -1403,9 +1571,8 @@ function renderEnergyHistory() {
     const plotH = H - pad.top - pad.bottom;
     ctx.clearRect(0, 0, W, H);
 
-    const naiveVals = history.map(h => h.naiveEnergyWh || 0);
     const energyVals = history.map(h => h.energyWh || 0);
-    const maxY = Math.max(...naiveVals, ...energyVals, 0.0001);
+    const maxY = Math.max(...energyVals, 0.0001);
     const n = history.length;
 
     // Grid + Y axis
@@ -1422,42 +1589,50 @@ function renderEnergyHistory() {
     ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
     ctx.fillText('Énergie (Wh)', 0, 0); ctx.restore();
 
-    function drawCurve(vals, color, dashed) {
-        ctx.setLineDash(dashed ? [6, 3] : []);
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
-        if (n === 1) {
-            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
-            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(vals[0].toFixed(4) + ' Wh', x, y - 12);
-        } else {
-            const stepX = plotW / (n - 1);
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
-                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText(vals[i].toFixed(4), x, y - 8);
-                }
-            }
-        }
-        ctx.setLineDash([]);
-    }
-
-    drawCurve(naiveVals, '#ef4444', true);
-    drawCurve(energyVals, '#22c55e', false);
-
-    // Dates
+    // Single curve — total API energy
+    const color = '#22c55e';
     if (n === 1) {
+        const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - energyVals[0] / maxY);
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
         ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+        ctx.fillText(energyVals[0].toFixed(4) + ' Wh', x, y - 12);
+        const epCount = history[0].endpointCount || '?';
+        ctx.fillText(`(${epCount} eps)`, x, y + 16);
+        ctx.fillText(history[0].timestamp.slice(0, 10), x, H - 8);
     } else {
         const stepX = plotW / (n - 1);
+
+        // Area fill
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top + plotH);
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(pad.left + stepX * (n - 1), pad.top + plotH);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(34,197,94,0.12)';
+        ctx.fill();
+
+        // Line
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Points + labels
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - energyVals[i] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(energyVals[i].toFixed(4), x, y - 8);
+            }
+        }
+
+        // Dates
         for (let i = 0; i < n; i++) {
             if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
                 ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
@@ -1469,7 +1644,7 @@ function renderEnergyHistory() {
 
 function renderCO2History() {
     const card = document.getElementById('co2-history-card');
-    const hasData = history.some(h => (h.co2g || 0) > 0 || (h.naiveCO2g || 0) > 0);
+    const hasData = history.some(h => (h.co2g || 0) > 0);
     if (history.length < 1 || !hasData) { card.style.display = 'none'; return; }
     card.style.display = 'block';
 
@@ -1489,9 +1664,8 @@ function renderCO2History() {
     const plotH = H - pad.top - pad.bottom;
     ctx.clearRect(0, 0, W, H);
 
-    const naiveCO2 = history.map(h => h.naiveCO2g || 0);
-    const optCO2 = history.map(h => h.co2g || 0);
-    const maxY = Math.max(...naiveCO2, ...optCO2, 0.0001);
+    const co2Vals = history.map(h => h.co2g || 0);
+    const maxY = Math.max(...co2Vals, 0.0001);
     const n = history.length;
 
     // Grid + Y axis
@@ -1508,42 +1682,48 @@ function renderCO2History() {
     ctx.translate(12, pad.top + plotH / 2); ctx.rotate(-Math.PI / 2);
     ctx.fillText('CO₂ (g)', 0, 0); ctx.restore();
 
-    function drawCurve(vals, color, dashed) {
-        ctx.setLineDash(dashed ? [6, 3] : []);
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
-        if (n === 1) {
-            const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - vals[0] / maxY);
-            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-            ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(vals[0].toFixed(5) + ' g', x, y - 12);
-        } else {
-            const stepX = plotW / (n - 1);
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-            for (let i = 0; i < n; i++) {
-                const x = pad.left + stepX * i, y = pad.top + plotH * (1 - vals[i] / maxY);
-                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
-                if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
-                    ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText(vals[i].toFixed(5), x, y - 8);
-                }
-            }
-        }
-        ctx.setLineDash([]);
-    }
-
-    drawCurve(naiveCO2, '#ef4444', true);
-    drawCurve(optCO2, '#3b82f6', false);
-
-    // Dates
+    // Single curve — total API CO₂
+    const color = '#3b82f6';
     if (n === 1) {
+        const x = pad.left + plotW / 2, y = pad.top + plotH * (1 - co2Vals[0] / maxY);
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
         ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(history[0].timestamp.slice(0, 10), pad.left + plotW / 2, H - 8);
+        ctx.fillText(co2Vals[0].toFixed(5) + ' g', x, y - 12);
+        ctx.fillText(history[0].timestamp.slice(0, 10), x, H - 8);
     } else {
         const stepX = plotW / (n - 1);
+
+        // Area fill
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top + plotH);
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(pad.left + stepX * (n - 1), pad.top + plotH);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(59,130,246,0.10)';
+        ctx.fill();
+
+        // Line
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Points + labels
+        for (let i = 0; i < n; i++) {
+            const x = pad.left + stepX * i, y = pad.top + plotH * (1 - co2Vals[i] / maxY);
+            ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+            if (i === 0 || i === n - 1 || i % Math.max(1, Math.floor(n / 5)) === 0) {
+                ctx.fillStyle = '#d1d5db'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(co2Vals[i].toFixed(5), x, y - 8);
+            }
+        }
+
+        // Dates
         for (let i = 0; i < n; i++) {
             if (i % Math.max(1, Math.floor(n / 6)) === 0 || i === n - 1) {
                 ctx.fillStyle = '#d1d5db'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
@@ -1558,8 +1738,9 @@ let suggestionsFilterPriority = 'all';
 
 function renderSuggestions(report) {
     const card = document.getElementById('suggestions-card');
+    card.style.display = 'block';
+
     const rrm = report.green_score?.rule_resource_mapping;
-    if (!rrm) { card.style.display = 'none'; return; }
 
     // Collect all suggestions across rules
     const ruleIcons = {
@@ -1578,29 +1759,57 @@ function renderSuggestions(report) {
     let allSuggestions = [];
     let rulesWithSuggestions = [];
 
-    for (const [ruleKey, ruleData] of Object.entries(rrm)) {
-        const suggs = ruleData.suggestions || [];
-        if (suggs.length === 0) continue;
-        rulesWithSuggestions.push({
-            key: ruleKey,
-            icon: ruleIcons[ruleKey] || '📌',
-            name: ruleNames[ruleKey] || ruleKey,
-            label: ruleData.label || ruleKey,
-            description: ruleData.description || '',
-            max_pts: ruleData.max_pts || 0,
-            score: ruleData.score || 0,
-            validated: ruleData.validated || false,
-            matched_count: ruleData.matched_count || 0,
-            candidate_count: ruleData.candidate_count || 0,
-            suggestions: suggs
-        });
-        for (const s of suggs) {
-            allSuggestions.push({ ...s, ruleKey });
+    if (rrm) {
+        for (const [ruleKey, ruleData] of Object.entries(rrm)) {
+            const suggs = ruleData.suggestions || [];
+            if (suggs.length === 0) continue;
+            rulesWithSuggestions.push({
+                key: ruleKey,
+                icon: ruleIcons[ruleKey] || '📌',
+                name: ruleNames[ruleKey] || ruleKey,
+                label: ruleData.label || ruleKey,
+                description: ruleData.description || '',
+                max_pts: ruleData.max_pts || 0,
+                score: ruleData.score || 0,
+                validated: ruleData.validated || false,
+                matched_count: ruleData.matched_count || 0,
+                candidate_count: ruleData.candidate_count || 0,
+                suggestions: suggs
+            });
+            for (const s of suggs) {
+                allSuggestions.push({ ...s, ruleKey });
+            }
         }
     }
 
-    if (allSuggestions.length === 0) { card.style.display = 'none'; return; }
-    card.style.display = 'block';
+    // Empty state: no suggestions — show congratulations
+    if (allSuggestions.length === 0) {
+        document.getElementById('suggestions-count-badge').textContent = '0';
+        const gs = report.green_score || {};
+        const currentScore = gs.total || 0;
+        const maxScore = gs.max || 100;
+        const pct = maxScore > 0 ? Math.round((currentScore / maxScore) * 100) : 0;
+        const isMax = currentScore >= maxScore;
+
+        document.getElementById('suggestions-summary-bar').innerHTML = `
+            <div class="suggestions-summary" style="justify-content:center;text-align:center;padding:24px 16px;">
+                <div>
+                    <div style="font-size:2.2rem;margin-bottom:8px;">${isMax ? '🏆' : '✅'}</div>
+                    <div style="font-size:1.05rem;font-weight:700;color:var(--green-400);margin-bottom:6px;">
+                        ${isMax ? 'Score parfait !' : 'Aucune suggestion d\'amélioration'}
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--gray-400);">
+                        ${isMax
+                          ? 'Toutes les règles Green API sont validées — bravo !'
+                          : `Score actuel : <strong style="color:var(--green-400)">${currentScore}/${maxScore}</strong> (${pct}%) — ${rrm ? 'toutes les règles analysées sont conformes.' : 'aucune analyse de règles disponible.'}`
+                        }
+                    </div>
+                </div>
+            </div>`;
+        document.getElementById('suggestions-filters').innerHTML = '';
+        document.getElementById('suggestions-list').innerHTML = '';
+        return;
+    }
 
     // Count badge
     document.getElementById('suggestions-count-badge').textContent = allSuggestions.length;
@@ -1658,10 +1867,12 @@ function renderSuggestions(report) {
     const listDiv = document.getElementById('suggestions-list');
     let html = '';
 
-    // Sort rules: failed first, then by max_pts descending
+    // Sort rules: failed first, then partial, then fully passed — by gap descending
     rulesWithSuggestions.sort((a, b) => {
-        if (a.validated !== b.validated) return a.validated ? 1 : -1;
-        return b.max_pts - a.max_pts;
+        const rankA = !a.validated ? 0 : (a.matched_count < a.candidate_count ? 1 : 2);
+        const rankB = !b.validated ? 0 : (b.matched_count < b.candidate_count ? 1 : 2);
+        if (rankA !== rankB) return rankA - rankB;
+        return (b.max_pts - b.score) - (a.max_pts - a.score);
     });
 
     for (const rule of rulesWithSuggestions) {
@@ -1671,8 +1882,9 @@ function renderSuggestions(report) {
         if (filteredSuggs.length === 0) continue;
 
         const ruleId = 'sugg-rule-' + rule.key;
-        const statusCls = rule.validated ? 'passed' : 'failed';
-        const statusLabel = rule.validated ? '✅ Validé' : '❌ Non validé';
+        const isPartial = rule.validated && rule.matched_count < rule.candidate_count;
+        const statusCls = !rule.validated ? 'failed' : isPartial ? 'partial' : 'passed';
+        const statusLabel = !rule.validated ? '❌ Non validé' : isPartial ? `⚠️ Partiel (${rule.matched_count}/${rule.candidate_count})` : '✅ Validé';
         const gapPts = Math.max(0, rule.max_pts - rule.score);
 
         html += `
@@ -1848,38 +2060,48 @@ function formatDistance(km) {
 function updateProjectionSummary() {
     const el = document.getElementById('projection-summary');
     if (!el || !currentReport) { if (el) el.textContent = '—'; return; }
-    const m = currentReport.measurements;
-    const bFull = m.optimized?.full_payload?.size_download || m.baseline?.full_payload?.size_download || 0;
-    const bTime = m.optimized?.full_payload?.time_total || m.baseline?.full_payload?.time_total || 0;
 
     const reqDay = getReqPerDay();
     const daysYear = getDaysPerYear();
     const reqYear = reqDay * daysYear;
 
-    // Énergie globale (somme de tous les endpoints optimisés vs baseline × N)
-    const optKeysProj = ['pagination','fields_filter','gzip_compression','etag_304','delta_changes','range_206'];
-    let optCount = 0, optSum = 0;
-    for (const k of optKeysProj) {
-        const ep = m.optimized?.[k];
-        if (ep) { optSum += energyTotalWh(ep.size_download || 0, ep.time_total || 0); optCount++; }
-    }
-    const eNaiveGlobal = energyTotalWh(bFull, bTime);
-    const eOptGlobal = optSum;
-    const eSavedGlobal = eNaiveGlobal - eOptGlobal;
+    // Compute energy from all discovered endpoints (single API model)
+    const disc = currentReport.auto_discovery?.discovered_endpoints;
+    const m = currentReport.measurements || {};
+    let eTotal = 0, epCount = 0, totalBytes = 0;
 
-    const naiveYear = eNaiveGlobal * reqYear;
-    const optYear = eOptGlobal * reqYear;
-    const savedYear = naiveYear - optYear;
+    if (disc && disc.length > 0) {
+        for (const ep of disc) {
+            eTotal += energyTotalWh(ep.size_download || 0, ep.time_total || 0);
+            totalBytes += (ep.size_download || 0);
+            epCount++;
+        }
+    } else {
+        for (const section of [m.optimized || {}, m.baseline || {}]) {
+            for (const [k, ep] of Object.entries(section)) {
+                if (ep && typeof ep === 'object' && (ep.size_download || ep.time_total)) {
+                    eTotal += energyTotalWh(ep.size_download || 0, ep.time_total || 0);
+                    totalBytes += (ep.size_download || 0);
+                    epCount++;
+                }
+            }
+        }
+    }
+
+    const eDay = eTotal * reqDay;
+    const eYear = eTotal * reqYear;
+    const co2Total = energyWhToCO2g(eTotal);
+    const co2Year = co2Total * reqYear;
 
     el.innerHTML = `
-        <div>⚡ Naive : <strong>${formatEnergy(eNaiveGlobal)}</strong></div>
-        <div>🌿 Optimisé : <strong style="color:var(--green-400)">${formatEnergy(eOptGlobal)}</strong></div>
-        <div>💡 Économie : <strong style="color:var(--green-400)">${formatEnergy(eSavedGlobal)}</strong></div>
+        <div>⚡ Énergie / appel : <strong>${formatEnergy(eTotal)}</strong></div>
+        <div>📦 Transfert : <strong>${formatBytes(totalBytes)}</strong> (${epCount} eps)</div>
+        <div>🌍 CO₂ / appel : <strong>${formatCO2(co2Total)}</strong></div>
         <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--gray-700);">
-            📆 Naive/an : <strong>${formatEnergy(naiveYear)}</strong>
+            📆 Énergie / jour : <strong>${formatEnergy(eDay)}</strong>
         </div>
-        <div>📆 Opt./an : <strong style="color:var(--green-400)">${formatEnergy(optYear)}</strong></div>
-        <div>💡 Économie/an : <strong style="color:var(--green-400)">${formatEnergy(savedYear)}</strong></div>
+        <div>📅 Énergie / an : <strong>${formatEnergy(eYear)}</strong></div>
+        <div>🌍 CO₂ / an : <strong>${formatCO2(co2Year)}</strong></div>
     `;
 }
 
@@ -2008,7 +2230,7 @@ function loadSampleData() {
         if (!history.find(x => x.timestamp === h.timestamp)) history.push(h);
     });
     history.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    localStorage.setItem(storageKeyFor(currentAppname), JSON.stringify(history));
 
     renderReport(sample);
 }
@@ -2016,13 +2238,33 @@ function loadSampleData() {
 // ─── Auto-load latest if served from same origin ───────────────
 window.addEventListener('DOMContentLoaded', () => {
     initEnergyPanel();
-    if (EMBEDDED_REPORT) {
-        addToHistory(EMBEDDED_REPORT);
-        renderReport(EMBEDDED_REPORT);
+
+    // Unwrap embedded data
+    const { appname: embeddedAppname, report: embeddedReport } = unwrapEnvelope(RAW_EMBEDDED);
+    if (embeddedAppname) {
+        currentAppname = embeddedAppname;
+        registerApp(currentAppname);
+    }
+    loadHistoryForApp(currentAppname);
+    refreshAppSelector();
+
+    if (embeddedReport) {
+        addToHistory(embeddedReport);
+        renderReport(embeddedReport);
     } else {
         fetch('../reports/latest-report.json')
             .then(r => { if (!r.ok) throw new Error('no report'); return r.json(); })
-            .then(report => { addToHistory(report); renderReport(report); })
+            .then(raw => {
+                const { appname, report } = unwrapEnvelope(raw);
+                if (appname && !currentAppname) {
+                    currentAppname = appname;
+                    registerApp(currentAppname);
+                    loadHistoryForApp(currentAppname);
+                    refreshAppSelector();
+                }
+                addToHistory(report);
+                renderReport(report);
+            })
             .catch(() => { /* no latest report, show empty state */ });
     }
     renderHistory();

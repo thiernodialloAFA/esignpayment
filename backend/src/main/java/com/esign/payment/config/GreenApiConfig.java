@@ -3,6 +3,7 @@ package com.esign.payment.config;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +25,13 @@ import java.io.IOException;
 public class GreenApiConfig {
 
     // ─── DE02/DE03: ETag filter → 304 Not Modified (+15 pts) ───
+    // Uses a HEAD-aware wrapper so that ShallowEtagHeaderFilter computes
+    // the ETag even for HEAD requests (it internally sees GET, then the
+    // servlet container strips the body for HEAD as usual).
     @Bean
-    public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {
-        FilterRegistrationBean<ShallowEtagHeaderFilter> reg = new FilterRegistrationBean<>();
-        reg.setFilter(new ShallowEtagHeaderFilter());
+    public FilterRegistrationBean<HeadAwareEtagFilter> etagFilter() {
+        FilterRegistrationBean<HeadAwareEtagFilter> reg = new FilterRegistrationBean<>();
+        reg.setFilter(new HeadAwareEtagFilter());
         reg.addUrlPatterns("/api/*");
         reg.setName("etagFilter");
         reg.setOrder(1);
@@ -62,6 +66,39 @@ public class GreenApiConfig {
             response.setHeader("X-RateLimit-Reset", String.valueOf(
                     System.currentTimeMillis() / 1000 + 60));
             filterChain.doFilter(request, response);
+        }
+    }
+
+    /**
+     * ETag filter that supports both GET and HEAD methods.
+     * <p>
+     * Spring's {@link ShallowEtagHeaderFilter} only generates ETags for GET requests
+     * because it checks {@code HttpMethod.GET.matches(request.getMethod())}.
+     * However, the Green Score Analyzer sends HEAD requests first to discover ETags.
+     * <p>
+     * This filter wraps HEAD requests as GET so that the inner
+     * {@link ShallowEtagHeaderFilter} computes the ETag. The servlet container
+     * automatically strips the response body for HEAD, keeping only the headers
+     * (including the ETag).
+     */
+    public static class HeadAwareEtagFilter extends ShallowEtagHeaderFilter {
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        FilterChain filterChain) throws ServletException, IOException {
+            if ("HEAD".equalsIgnoreCase(request.getMethod())) {
+                // Wrap the HEAD request as GET so ShallowEtagHeaderFilter computes the ETag
+                HttpServletRequest getWrapper = new HttpServletRequestWrapper(request) {
+                    @Override
+                    public String getMethod() {
+                        return "GET";
+                    }
+                };
+                super.doFilterInternal(getWrapper, response, filterChain);
+            } else {
+                super.doFilterInternal(request, response, filterChain);
+            }
         }
     }
 }

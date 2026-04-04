@@ -21,11 +21,20 @@ public class KeycloakUserService {
     /**
      * Gets the current authenticated user from the database,
      * creating or updating the user record from Keycloak JWT claims as needed.
+     * <p>
+     * When running under the "test" profile (no Keycloak), the SecurityContext
+     * may contain an anonymous token instead of a JWT.  In that case we fall
+     * back to the seeded test user ({@code keycloakId = "test-user"}).
      */
     @Transactional
     public User getCurrentUser() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return syncUser(jwt);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+            return syncUser(jwt);
+        }
+        // Fallback for test profile (no JWT) — return the seeded test user
+        return userRepository.findByKeycloakId("test-user")
+                .orElseThrow(() -> new RuntimeException("No authenticated user and no test user found"));
     }
 
     /**

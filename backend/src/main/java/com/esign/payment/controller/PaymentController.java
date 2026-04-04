@@ -81,11 +81,12 @@ public class PaymentController {
     @GetMapping("/changes")
     @Operation(summary = "Get payments changed since a given timestamp (delta sync)")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPaymentsChanges(
-            @Parameter(description = "ISO date-time (e.g. 2026-04-01T00:00:00)", required = true)
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime since,
+            @Parameter(description = "ISO date-time (e.g. 2026-04-01T00:00:00)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime since,
             @Parameter(description = "Comma-separated list of fields to include")
             @RequestParam(required = false) String fields) {
-        List<PaymentResponse> changes = paymentService.getPaymentsChangedSince(since);
+        LocalDateTime effectiveSince = since != null ? since : LocalDateTime.of(1970, 1, 1, 0, 0);
+        List<PaymentResponse> changes = paymentService.getPaymentsChangedSince(effectiveSince);
         return ResponseEntity.ok(ApiResponse.success(changes));
     }
 

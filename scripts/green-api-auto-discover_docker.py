@@ -848,15 +848,28 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
 
     # ═══════════════════════════════════════════════════════════════════
     # Finalize mapping: validated/score/counts + reverse index
+    # Proportional scoring: score = max_pts × matched / candidates
     # ═══════════════════════════════════════════════════════════════════
     for rule_key in GREEN_RULES:
-        _init_rule(rule_key)
+        _init_rule(rule_key)  # ensure entry even if no candidates
         rd = mapping[rule_key]
         matched = [c for c in rd["candidates"] if c["matched"]]
-        rd["validated"] = len(matched) > 0
-        rd["score"] = scores.get(rule_key, 0)
-        rd["matched_count"] = len(matched)
-        rd["candidate_count"] = len(rd["candidates"])
+        total_candidates = len(rd["candidates"])
+        matched_count = len(matched)
+
+        # Proportional scoring: score = max_pts × matched / candidates
+        max_pts = rd["max_pts"]
+        if total_candidates > 0:
+            proportional = round(max_pts * matched_count / total_candidates)
+        else:
+            proportional = 0
+
+        rd["validated"] = matched_count > 0
+        rd["score"] = proportional
+        rd["matched_count"] = matched_count
+        rd["candidate_count"] = total_candidates
+        # Override the flat scores dict with the proportional score
+        scores[rule_key] = proportional
 
     # ═══════════════════════════════════════════════════════════════════
     # Generate improvement suggestions for unvalidated rules
@@ -888,8 +901,16 @@ def analyze_green_rules(spec, endpoints, base_url, measurements, auth_headers):
 
 
 def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_eps):
-    """Populate ``suggestions`` for every **unvalidated** rule."""
+    """Populate ``suggestions`` for every rule that has unmatched endpoints.
 
+    With proportional scoring (score = max_pts × matched / candidates),
+    suggestions are generated for *partially* validated rules too — not only
+    fully unvalidated ones.  Each suggestion targets a specific API resource
+    and explains *what* to change and *how* (code-level guidance), with a
+    priority and impact note.
+    """
+
+    # Helpers — pick the N most relevant collection / single endpoints
     def _top_collections(n=3):
         return [e["path"] for e in collection_eps[:n]]
 
@@ -897,13 +918,24 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
         return [e["path"] for e in single_eps[:n]]
 
     for rule_key, rd in mapping.items():
-        if rd["validated"]:
+        unmatched = [c for c in rd["candidates"] if not c["matched"]]
+
+        # No unmatched endpoints → nothing to suggest (perfect score)
+        if not unmatched:
             rd["suggestions"] = []
             continue
 
         suggestions = []
-        unmatched = [c for c in rd["candidates"] if not c["matched"]]
 
+        # Compute potential gain: how many pts each additional endpoint is worth
+        max_pts = rd["max_pts"]
+        total_candidates = rd["candidate_count"]
+        current_score = rd["score"]
+        remaining_gap = max_pts - current_score
+        per_ep_gain = round(max_pts / total_candidates, 1) if total_candidates > 0 else 0
+        gain_label = f"+{per_ep_gain} pts/endpoint (total gap: {remaining_gap} pts)"
+
+        # ── DE11 — Pagination ─────────────────────────────────────────
         if rule_key == "DE11_pagination":
             real_collections = [
                 c for c in unmatched
@@ -914,7 +946,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add pagination parameters (page & size)",
                     "priority": "high",
-                    "impact": f"+{rd['max_pts']} pts — reduces payload size for large collections",
+                    "impact": f"{gain_label} — reduces payload size for large collections",
                     "how": (
                         "Spring Boot: Change return type from List<T> to Page<T> and add "
                         "@RequestParam defaultValue parameters:\n"
@@ -928,6 +960,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     ),
                 })
 
+        # ── DE08 — Field filtering ────────────────────────────────────
         elif rule_key == "DE08_fields":
             top_targets = [
                 c for c in unmatched
@@ -940,7 +973,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add a 'fields' query parameter for sparse fieldsets",
                     "priority": "high" if is_collection else "medium",
-                    "impact": f"+{rd['max_pts']} pts — lets clients request only needed fields, reducing payload",
+                    "impact": f"{gain_label} — lets clients request only needed fields, reducing payload",
                     "how": (
                         "Spring Boot: Add an optional @RequestParam and filter the DTO:\n"
                         "  @GetMapping\n"
@@ -955,12 +988,13 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     ),
                 })
 
+        # ── DE01 — Compression (gzip) ─────────────────────────────────
         elif rule_key == "DE01_compression":
             suggestions.append({
                 "target": "ALL endpoints (server-level)",
                 "action": "Enable gzip compression on the server",
                 "priority": "high",
-                "impact": f"+{rd['max_pts']} pts — typically 60-80% payload reduction",
+                "impact": f"{gain_label} — typically 60-80% payload reduction",
                 "how": (
                     "Option 1 — Spring Boot application.yml:\n"
                     "  server:\n"
@@ -977,13 +1011,14 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                 ),
             })
 
+        # ── DE02/DE03 — Cache ETag + 304 ──────────────────────────────
         elif rule_key == "DE02_DE03_cache":
             for c in unmatched[:5]:
                 suggestions.append({
                     "target": f"{c['method'].upper()} {c['path']}",
                     "action": "Add ETag support and If-None-Match → 304 Not Modified",
                     "priority": "high",
-                    "impact": f"+{rd['max_pts']} pts — avoids resending unchanged resources, saves bandwidth",
+                    "impact": f"{gain_label} — avoids resending unchanged resources, saves bandwidth",
                     "how": (
                         "Spring Boot: Use ShallowEtagHeaderFilter (zero-code) or manual ETags:\n\n"
                         "  Option A — Global filter (easiest):\n"
@@ -1001,13 +1036,14 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     ),
                 })
 
+        # ── DE06 — Delta / Changes ────────────────────────────────────
         elif rule_key == "DE06_delta":
             for path in _top_collections(3):
                 suggestions.append({
                     "target": f"GET {path}/changes  (new endpoint)",
                     "action": "Add a delta/changes endpoint with a 'since' parameter",
                     "priority": "medium",
-                    "impact": f"+{rd['max_pts']} pts — clients fetch only what changed since last sync",
+                    "impact": f"{gain_label} — clients fetch only what changed since last sync",
                     "how": (
                         "Spring Boot: Add a new endpoint that filters by updatedAt:\n"
                         "  @GetMapping(\"/changes\")\n"
@@ -1022,6 +1058,7 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     ),
                 })
 
+        # ── Range 206 — Partial Content ───────────────────────────────
         elif rule_key == "range_206":
             download_eps = [c for c in unmatched if "download" in c["path"].lower()]
             other_eps = [c for c in unmatched if "download" not in c["path"].lower()]
@@ -1045,17 +1082,19 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                         "      long start = parseStart(range);\n"
                         "      long end = parseEnd(range, resource.contentLength());\n"
                         "      return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)\n"
-                        "          .header(\"Content-Range\", ...)\n"
+                        "          .header(\"Content-Range\", \"bytes \" + start + \"-\" + end + \"/\" + resource.contentLength())\n"
                         "          .body(new InputStreamResource(rangedStream));\n"
                         "    }\n"
                         "    return ResponseEntity.ok(resource);\n"
-                        "  }"
+                        "  }\n\n"
+                        "Alternative: Use Spring's ResourceRegion support for automatic range handling."
                     ) if is_download else (
                         "For JSON endpoints, Range/206 is rarely useful.\n"
                         "Focus on the file download endpoint(s) instead."
                     ),
                 })
 
+        # ── AR02 — Binary format (CBOR / Protobuf) ───────────────────
         elif rule_key == "AR02_format_cbor":
             for path in _top_collections(2):
                 suggestions.append({
@@ -1072,10 +1111,14 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                         "       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n"
                         "       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n"
                         "     }\n"
-                        "  3. Clients send: Accept: application/cbor"
+                        "  3. Clients send: Accept: application/cbor\n\n"
+                        "Alternative (Protobuf):\n"
+                        "  Add spring-boot-starter-protobuf and define .proto schemas.\n"
+                        "  Register ProtobufHttpMessageConverter."
                     ),
                 })
 
+        # ── LO01 — Observability ──────────────────────────────────────
         elif rule_key == "LO01_observability":
             suggestions.append({
                 "target": "/actuator/health, /actuator/metrics",
@@ -1089,10 +1132,14 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                     "      web:\n"
                     "        exposure:\n"
                     "          include: health,info,metrics\n"
-                    "Add dependency: spring-boot-starter-actuator."
+                    "    endpoint:\n"
+                    "      health:\n"
+                    "        show-details: when-authorized\n\n"
+                    "Add dependency: spring-boot-starter-actuator (likely already present)."
                 ),
             })
 
+        # ── US07 — Rate Limiting ──────────────────────────────────────
         elif rule_key == "US07_rate_limit":
             suggestions.append({
                 "target": "ALL endpoints (server-level)",
@@ -1101,14 +1148,16 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
                 "impact": f"+{rd['max_pts']} pts — protects the API from abuse and signals limits to clients",
                 "how": (
                     "Option 1 — Spring Boot filter:\n"
-                    "  Add a OncePerRequestFilter that adds:\n"
+                    "  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n"
                     "    X-RateLimit-Limit: 100\n"
                     "    X-RateLimit-Remaining: 97\n"
                     "    X-RateLimit-Reset: 1620000000\n\n"
                     "Option 2 — Use Bucket4j + Spring Boot Starter:\n"
-                    "  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n\n"
+                    "  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n"
+                    "  Configure rate limits in application.yml per endpoint.\n\n"
                     "Option 3 — Nginx:\n"
                     "  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n"
+                    "  location /api/ { limit_req zone=api burst=20; }\n"
                     "  add_header X-RateLimit-Limit 100;"
                 ),
             })
@@ -1119,12 +1168,17 @@ def _generate_suggestions(mapping, collection_eps, single_eps, all_get_eps, all_
 # ─── Step 5: Build Dashboard-Compatible Report ────────────────────────────
 
 def load_previous_report(output_dir):
-    """Load the latest-report.json if it exists (for before/after comparison)."""
+    """Load the latest-report.json if it exists (for before/after comparison).
+    Handles both old flat format and new {appname, report} envelope."""
     latest = output_dir / "latest-report.json"
     if latest.is_file():
         try:
             with open(latest, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+            # Unwrap envelope if present
+            if "report" in data and "appname" in data:
+                return data["report"]
+            return data
         except Exception:
             pass
     return None
@@ -1248,6 +1302,7 @@ Examples:
   python green-api-auto-discover.py --target http://localhost:8081 --bearer MY_TOKEN
         """,
     )
+    parser.add_argument("--appname", default="", help="Application name for reports (default: root folder name)")
     parser.add_argument("--target", default="", help="Base URL of the running API (e.g. http://localhost:8081)")
     parser.add_argument("--swagger", default="", help="Path or URL to OpenAPI spec (auto-discovered if omitted)")
     parser.add_argument("--bearer", default="", help="Bearer token for authenticated APIs")
@@ -1269,6 +1324,9 @@ Examples:
     output_dir = Path(args.output_dir) if args.output_dir else root_dir / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Resolve appname: CLI > root folder name
+    appname = args.appname.strip() if args.appname else root_dir.name
+
     timestamp_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     timestamp_file = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
@@ -1289,6 +1347,7 @@ Examples:
     # ── Banner ──
     log("=" * 60)
     log("  Green API Auto-Discover & Analyzer")
+    log(f"  App: {appname}")
     log("  Devoxx France 2026 — Green Architecture")
     log("=" * 60)
 
@@ -1470,6 +1529,7 @@ Examples:
 
     # Save rule-resource mapping as a separate report file
     mapping_report = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score_summary": {
@@ -1515,14 +1575,20 @@ Examples:
             "issues": spectral_issues[:100],
         }
 
+    # Wrap report with appname envelope
+    wrapped_report = {
+        "appname": appname,
+        "report": dashboard_report,
+    }
+
     # Save reports
     report_file = output_dir / f"green-score-report-{timestamp_file}.json"
     latest_file = output_dir / "latest-report.json"
 
     with open(report_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
     with open(latest_file, "w", encoding="utf-8") as f:
-        json.dump(dashboard_report, f, indent=2)
+        json.dump(wrapped_report, f, indent=2)
 
     log(f"Report: {report_file}", "OK")
     log(f"Latest: {latest_file}", "OK")
@@ -1540,6 +1606,7 @@ Examples:
 
     # Analysis summary
     summary = {
+        "appname": appname,
         "timestamp": timestamp_str,
         "service_base_url": base_url,
         "green_score": green_score,
@@ -1581,6 +1648,7 @@ Examples:
     # ── Final Summary ──
     print()
     print("=" * 60)
+    print(f"  APP: {appname}")
     print(f"  GREEN SCORE: {green_score['total']}/{green_score['max']}   Grade: {green_score['grade']}")
     print(f"  Endpoints discovered: {len(endpoints)}")
     print(f"  Endpoints measured:   {len(measurements)}")

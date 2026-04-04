@@ -33,6 +33,12 @@
         "endpoints": [
           "/api/documents/{id}/download"
         ]
+      },
+      "x-server-etag-support": {
+        "scope": "all GET /api/* endpoints",
+        "filter": "ShallowEtagHeaderFilter",
+        "enabled": true,
+        "mechanism": "If-None-Match \u2192 304 Not Modified"
       }
     }
   ],
@@ -89,6 +95,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -111,6 +127,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -120,6 +143,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       },
@@ -516,6 +542,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -538,6 +574,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -547,6 +590,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       },
@@ -740,6 +786,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -762,6 +818,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -771,6 +834,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       },
@@ -1035,6 +1101,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1057,6 +1133,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1066,6 +1149,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       },
@@ -1356,6 +1442,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1378,6 +1474,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1387,6 +1490,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         },
         "security": []
@@ -1417,6 +1523,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1439,6 +1555,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1448,6 +1571,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1459,6 +1585,18 @@
         ],
         "summary": "Get Stripe publishable key",
         "operationId": "getPaymentConfig",
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1479,6 +1617,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1488,6 +1633,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1504,7 +1652,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -1517,6 +1665,16 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
             }
           }
         ],
@@ -1540,6 +1698,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1549,6 +1714,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1578,6 +1746,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1600,6 +1778,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1609,6 +1794,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       },
@@ -1687,6 +1875,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1700,6 +1898,13 @@
                   "enum": [
                     "bytes"
                   ]
+                }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
                 }
               },
               "Content-Encoding": {
@@ -1747,6 +1952,13 @@
                     "bytes"
                   ]
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1766,8 +1978,18 @@
                   "type": "string",
                   "example": "bytes */1234"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1784,7 +2006,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -1797,6 +2019,16 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
             }
           }
         ],
@@ -1820,6 +2052,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1829,6 +2068,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1849,6 +2091,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1871,6 +2123,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1880,6 +2139,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1900,6 +2162,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
+            }
           }
         ],
         "responses": {
@@ -1922,6 +2194,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1931,6 +2210,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -1947,7 +2229,7 @@
             "name": "since",
             "in": "query",
             "description": "ISO date-time (e.g. 2026-04-01T00:00:00)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"
@@ -1960,6 +2242,16 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "description": "Previous ETag value. If it matches, server returns 304.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "\"0a1b2c3d4e5f\""
             }
           }
         ],
@@ -1983,6 +2275,13 @@
                   "type": "string",
                   "example": "Accept-Encoding"
                 }
+              },
+              "ETag": {
+                "description": "Entity tag for cache validation (MD5 of response body)",
+                "schema": {
+                  "type": "string",
+                  "example": "\"0a1b2c3d4e5f\""
+                }
               }
             },
             "content": {
@@ -1992,6 +2291,9 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "Not Modified \u2014 returned when If-None-Match matches current ETag. No body is sent, saving bandwidth."
           }
         }
       }
@@ -2817,18 +3119,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -2951,18 +3253,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -3059,18 +3361,18 @@
             "type": "integer",
             "format": "int64"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "numberOfElements": {
             "type": "integer",
             "format": "int32"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
           },
           "size": {
             "type": "integer",

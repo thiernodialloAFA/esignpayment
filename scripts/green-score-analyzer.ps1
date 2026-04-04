@@ -6,12 +6,14 @@
 param(
     [int]$BaselinePort = 8080,
     [int]$OptimizedPort = 8081,
+    [string]$AppName = "",
     [switch]$Debug
 )
 
 $ErrorActionPreference = "Continue"
 $Baseline = "http://localhost:$BaselinePort"
 $Optimized = "http://localhost:$OptimizedPort"
+if (-not $AppName) { $AppName = (Get-Item (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))).Name }
 $Timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 $RootDir = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $ReportDir = Join-Path $RootDir "reports"
@@ -223,7 +225,12 @@ $report = @{
     }
 }
 
-$json = $report | ConvertTo-Json -Depth 5
+$wrapped = @{
+    appname = $AppName
+    report = $report
+}
+
+$json = $wrapped | ConvertTo-Json -Depth 6
 $json | Out-File -FilePath $ReportFile -Encoding utf8
 $json | Out-File -FilePath $LatestLink -Encoding utf8
 
@@ -256,6 +263,7 @@ if ($Debug) {
 
 Write-Host ""
 Write-Host "================================================================" -ForegroundColor Cyan
+Write-Host "  APP: $AppName" -ForegroundColor Green
 Write-Host "  GREEN SCORE: $total/100   Grade: $grade" -ForegroundColor Green
 Write-Host "  Report: $ReportFile" -ForegroundColor Green
 Write-Host "================================================================" -ForegroundColor Cyan

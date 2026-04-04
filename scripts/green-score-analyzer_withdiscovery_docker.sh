@@ -28,6 +28,7 @@ OPTIMIZED="http://optimized:${OPTIMIZED_PORT}"
 SWAGGER_URL=${SWAGGER_URL:-""}
 BEARER_TOKEN=${BEARER_TOKEN:-""}
 REPEAT=${REPEAT:-3}
+APPNAME=${APPNAME:-$(basename "$(cd "$(dirname "$0")/.." && pwd)")}
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%SZ)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -592,6 +593,7 @@ ENV_SPECTRAL_OUT="$SPECTRAL_OUT" \
 ENV_TIMESTAMP="$TIMESTAMP" \
 ENV_OPTIMIZED="$OPTIMIZED" \
 ENV_SWAGGER_URL="$SWAGGER_URL" \
+ENV_APPNAME="$APPNAME" \
 python3 -c "
 import json, sys, os
 
@@ -614,6 +616,7 @@ spectral_file = os.environ['ENV_SPECTRAL_OUT']
 timestamp = os.environ['ENV_TIMESTAMP']
 optimized_url = os.environ['ENV_OPTIMIZED']
 swagger_url = os.environ['ENV_SWAGGER_URL']
+appname = os.environ.get('ENV_APPNAME', 'unknown')
 
 try:
     spectral_issues = json.load(open(spectral_file, 'r'))
@@ -778,7 +781,12 @@ report = {
     },
 }
 
-print(json.dumps(report, indent=2))
+wrapped = {
+    'appname': appname,
+    'report': report,
+}
+
+print(json.dumps(wrapped, indent=2))
 " > "$REPORT_FILE"
 
 if [ "$DEBUG_MODE" = true ]; then
@@ -812,12 +820,13 @@ echo -e "${GREEN}📄 Report saved to: ${REPORT_FILE}${NC}"
 echo -e "${GREEN}📄 Latest report:   ${LATEST_LINK}${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-TOTAL=$(python3 -c "import sys,json;r=json.load(sys.stdin);print(r['green_score']['total'])" < "$REPORT_FILE")
-GRADE=$(python3 -c "import sys,json;r=json.load(sys.stdin);print(r['green_score']['grade'])" < "$REPORT_FILE")
-EP_DISC=$(python3 -c "import sys,json;r=json.load(sys.stdin);print(r.get('auto_discovery',{}).get('endpoints_discovered',0))" < "$REPORT_FILE")
+TOTAL=$(python3 -c "import sys,json;d=json.load(sys.stdin);r=d.get('report',d);print(r['green_score']['total'])" < "$REPORT_FILE")
+GRADE=$(python3 -c "import sys,json;d=json.load(sys.stdin);r=d.get('report',d);print(r['green_score']['grade'])" < "$REPORT_FILE")
+EP_DISC=$(python3 -c "import sys,json;d=json.load(sys.stdin);r=d.get('report',d);print(r.get('auto_discovery',{}).get('endpoints_discovered',0))" < "$REPORT_FILE")
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║  📦 APP: ${GREEN}${APPNAME}${CYAN}                                        ║${NC}"
 echo -e "${CYAN}║  🌿 GREEN SCORE:  ${GREEN}${TOTAL}/100${CYAN}   Grade: ${GREEN}${GRADE}${CYAN}               ║${NC}"
 echo -e "${CYAN}║  🔍 Endpoints discovered: ${GREEN}${EP_DISC}${CYAN}                              ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"

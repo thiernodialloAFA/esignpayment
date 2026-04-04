@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T09:00:01Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/account-applications/{id}/submit",
-    "url": "http://localhost:8080/api/account-applications/395c1085-2d76-4392-8c47-239ad5a5c09b/submit",
-    "http_code": 403,
-    "size_download": 99,
-    "time_total": 0.004574,
-    "speed_download": 21642,
-    "energy_network_wh": 5.5320560932159415e-06,
-    "energy_server_wh": 3.176388888888889e-05,
-    "energy_total_wh": 3.729594498210483e-05
+    "url": "http://localhost:8080/api/account-applications/46882be9-efbd-414d-9941-627d1151c174/submit",
+    "http_code": 200,
+    "size_download": 1949,
+    "time_total": 0.008794,
+    "speed_download": 221638,
+    "energy_network_wh": 0.00010890886187553406,
+    "energy_server_wh": 6.106944444444444e-05,
+    "energy_total_wh": 0.0001699783063199785
   }
 }

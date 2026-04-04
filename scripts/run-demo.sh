@@ -9,11 +9,23 @@ DATASET_SIZE=${DATASET_SIZE:-1000000}
 
 # Parse options
 DEBUG_FLAG=""
-for arg in "$@"; do
-  case "$arg" in
+APPNAME="${APPNAME:-}"
+args=("$@")
+i=0
+while [ $i -lt ${#args[@]} ]; do
+  case "${args[$i]}" in
     --debug) DEBUG_FLAG="--debug" ;;
+    --appname)
+      i=$((i + 1))
+      APPNAME="${args[$i]:-}"
+      ;;
   esac
+  i=$((i + 1))
 done
+
+# Default APPNAME = root folder basename
+APPNAME="${APPNAME:-$(basename "$ROOT")}"
+export APPNAME
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'

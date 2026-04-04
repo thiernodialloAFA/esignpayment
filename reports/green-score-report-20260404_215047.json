@@ -1,9 +1,9 @@
 {
   "appname": "esignpaym-api",
   "report": {
-    "timestamp": "2026-04-04T22:19:08Z",
+    "timestamp": "2026-04-04T21:50:47Z",
     "green_score": {
-      "total": 69,
+      "total": 65,
       "max": 100,
       "grade": "B",
       "breakdown": {
@@ -15,7 +15,7 @@
         "range_206": 10,
         "AR02_format_cbor": 0,
         "LO01_observability": 4,
-        "US07_rate_limit": 5
+        "US07_rate_limit": 1
       },
       "details": {
         "DE11_pagination": {
@@ -1010,20 +1010,20 @@
             {
               "method": "GET",
               "path": "/api/account-applications/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "PUT",
               "path": "/api/account-applications/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "DELETE",
               "path": "/api/account-applications/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
@@ -1058,20 +1058,20 @@
             {
               "method": "POST",
               "path": "/api/payments",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/payments/{id}/cancel",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/payments/confirm",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1082,26 +1082,26 @@
             {
               "method": "POST",
               "path": "/api/documents",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/documents/{id}/send",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/documents/{id}/resend",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/documents/{id}/live-sign/{signerId}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1112,32 +1112,32 @@
             {
               "method": "POST",
               "path": "/api/account-applications",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/account-applications/{id}/submit",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/account-applications/{id}/regenerate-contract",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/account-applications/{id}/kyc",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/account-applications/{id}/generate-contract",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1148,8 +1148,8 @@
             {
               "method": "GET",
               "path": "/api/payments/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1160,20 +1160,20 @@
             {
               "method": "GET",
               "path": "/api/payments/changes",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
               "path": "/api/documents/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "DELETE",
               "path": "/api/documents/{id}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1184,14 +1184,14 @@
             {
               "method": "GET",
               "path": "/api/documents/changes",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
               "path": "/api/auth/me",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1202,19 +1202,19 @@
             {
               "method": "GET",
               "path": "/api/account-applications/changes",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "DELETE",
               "path": "/api/account-applications/{id}/kyc/{kycId}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             }
           ],
           "validated": true,
-          "score": 5,
-          "matched_count": 32,
+          "score": 1,
+          "matched_count": 9,
           "candidate_count": 34,
           "suggestions": [
             {
@@ -1494,16 +1494,16 @@
       },
       "optimized": {
         "delta_changes": {
-          "http_code": 200,
-          "size_download": 1335,
-          "time_total": 0.005262,
-          "speed_download": 253697
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.005429,
+          "speed_download": 12892
         },
         "full_payload": {
           "http_code": 200,
-          "size_download": 8083,
-          "time_total": 0.00921,
-          "speed_download": 877644
+          "size_download": 1342,
+          "time_total": 0.0352,
+          "speed_download": 38125
         }
       }
     },
@@ -1513,202 +1513,202 @@
       "endpoints_measured": 33,
       "all_measurements": {
         "get:/api/account-applications/{id}": {
-          "http_code": 200,
-          "size_download": 917,
-          "time_total": 0.01218,
-          "speed_download": 75289
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.010682,
+          "speed_download": 9267
         },
         "put:/api/account-applications/{id}": {
-          "http_code": 200,
-          "size_download": 938,
-          "time_total": 0.026554,
-          "speed_download": 35324
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.025584,
+          "speed_download": 3869
         },
         "delete:/api/account-applications/{id}": {
-          "http_code": 200,
-          "size_download": 60,
-          "time_total": 0.014051,
-          "speed_download": 4270
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.004955,
+          "speed_download": 19979
         },
         "post:/api/sign/{token}": {
           "http_code": 200,
-          "size_download": 1343,
-          "time_total": 0.030165,
-          "speed_download": 44521
+          "size_download": 1342,
+          "time_total": 0.0352,
+          "speed_download": 38125
         },
         "post:/api/sign/{token}/verify-otp": {
           "http_code": 200,
           "size_download": 117,
-          "time_total": 0.007123,
-          "speed_download": 16426
+          "time_total": 0.007303,
+          "speed_download": 16020
         },
         "post:/api/sign/{token}/send-otp": {
           "http_code": 200,
           "size_download": 135,
-          "time_total": 0.006969,
-          "speed_download": 19371
+          "time_total": 0.012477,
+          "speed_download": 10819
         },
         "get:/api/payments": {
           "http_code": 200,
-          "size_download": 1324,
-          "time_total": 0.007222,
-          "speed_download": 183335
+          "size_download": 356,
+          "time_total": 0.011643,
+          "speed_download": 30575
         },
         "post:/api/payments": {
-          "http_code": 201,
-          "size_download": 492,
-          "time_total": 0.049703,
-          "speed_download": 9898
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.083265,
+          "speed_download": 840
         },
         "post:/api/payments/{id}/cancel": {
-          "http_code": 200,
-          "size_download": 373,
-          "time_total": 0.007267,
-          "speed_download": 51330
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.008606,
+          "speed_download": 11038
         },
         "post:/api/payments/confirm": {
-          "http_code": 200,
-          "size_download": 384,
-          "time_total": 0.008981,
-          "speed_download": 42755
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.009642,
+          "speed_download": 9853
         },
         "get:/api/documents": {
           "http_code": 200,
-          "size_download": 5560,
-          "time_total": 0.007605,
-          "speed_download": 731115
+          "size_download": 356,
+          "time_total": 0.006103,
+          "speed_download": 58333
         },
         "post:/api/documents": {
-          "http_code": 201,
-          "size_download": 758,
-          "time_total": 0.012957,
-          "speed_download": 58503
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.014203,
+          "speed_download": 4928
         },
         "post:/api/documents/{id}/send": {
-          "http_code": 200,
-          "size_download": 752,
-          "time_total": 0.00809,
-          "speed_download": 92952
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.00547,
+          "speed_download": 17549
         },
         "post:/api/documents/{id}/resend": {
-          "http_code": 200,
-          "size_download": 772,
-          "time_total": 0.007194,
-          "speed_download": 107307
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004626,
+          "speed_download": 20751
         },
         "post:/api/documents/{id}/live-sign/{signerId}": {
-          "http_code": 200,
-          "size_download": 768,
-          "time_total": 0.311664,
-          "speed_download": 2464
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.005469,
+          "speed_download": 17554
         },
         "get:/api/account-applications": {
           "http_code": 200,
-          "size_download": 6275,
-          "time_total": 0.010123,
-          "speed_download": 619869
+          "size_download": 356,
+          "time_total": 0.00912,
+          "speed_download": 39036
         },
         "post:/api/account-applications": {
-          "http_code": 201,
-          "size_download": 931,
-          "time_total": 0.010609,
-          "speed_download": 87753
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012477,
+          "speed_download": 5610
         },
         "post:/api/account-applications/{id}/submit": {
-          "http_code": 200,
-          "size_download": 1949,
-          "time_total": 0.008794,
-          "speed_download": 221638
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.005867,
+          "speed_download": 16872
         },
         "post:/api/account-applications/{id}/regenerate-contract": {
-          "http_code": 200,
-          "size_download": 1318,
-          "time_total": 0.016543,
-          "speed_download": 79668
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.010363,
+          "speed_download": 9553
         },
         "post:/api/account-applications/{id}/kyc": {
-          "http_code": 201,
-          "size_download": 363,
-          "time_total": 0.008503,
-          "speed_download": 42691
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.020689,
+          "speed_download": 4785
         },
         "post:/api/account-applications/{id}/generate-contract": {
-          "http_code": 200,
-          "size_download": 1143,
-          "time_total": 0.011311,
-          "speed_download": 101048
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.357046,
+          "speed_download": 196
         },
         "get:/api/sign/verify/{token}": {
           "http_code": 200,
           "size_download": 229,
-          "time_total": 0.003028,
-          "speed_download": 75636
+          "time_total": 0.005513,
+          "speed_download": 41538
         },
         "get:/api/payments/{id}": {
-          "http_code": 200,
-          "size_download": 359,
-          "time_total": 0.002747,
-          "speed_download": 130699
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.007956,
+          "speed_download": 11941
         },
         "get:/api/payments/config": {
           "http_code": 200,
           "size_download": 79,
-          "time_total": 0.001926,
-          "speed_download": 41027
+          "time_total": 0.004366,
+          "speed_download": 18095
         },
         "get:/api/payments/changes": {
-          "http_code": 200,
-          "size_download": 1335,
-          "time_total": 0.005262,
-          "speed_download": 253697
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.005429,
+          "speed_download": 12892
         },
         "get:/api/documents/{id}": {
-          "http_code": 200,
-          "size_download": 723,
-          "time_total": 0.003337,
-          "speed_download": 216686
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.005109,
+          "speed_download": 18791
         },
         "delete:/api/documents/{id}": {
-          "http_code": 200,
-          "size_download": 70,
-          "time_total": 0.003959,
-          "speed_download": 17679
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004665,
+          "speed_download": 20577
         },
         "get:/api/documents/{id}/download": {
-          "http_code": 404,
-          "size_download": 106,
-          "time_total": 0.003553,
-          "speed_download": 29834
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004774,
+          "speed_download": 20107
         },
         "get:/api/documents/changes": {
-          "http_code": 200,
-          "size_download": 5998,
-          "time_total": 0.00595,
-          "speed_download": 1007999
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.004921,
+          "speed_download": 14224
         },
         "get:/api/auth/me": {
-          "http_code": 200,
-          "size_download": 209,
-          "time_total": 0.002586,
-          "speed_download": 80833
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.008369,
+          "speed_download": 8364
         },
         "get:/api/account-types": {
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.009055,
-          "speed_download": 61736
+          "time_total": 0.007766,
+          "speed_download": 71978
         },
         "get:/api/account-applications/changes": {
-          "http_code": 200,
-          "size_download": 8083,
-          "time_total": 0.00921,
-          "speed_download": 877644
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.004539,
+          "speed_download": 15422
         },
         "delete:/api/account-applications/{id}/kyc/{kycId}": {
-          "http_code": 200,
-          "size_download": 61,
-          "time_total": 0.006441,
-          "speed_download": 9470
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.006285,
+          "speed_download": 15750
         }
       },
       "discovered_endpoints": [
@@ -1720,10 +1720,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 917,
-          "time_total": 0.01218,
-          "speed_download": 75289
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.010682,
+          "speed_download": 9267
         },
         {
           "method": "PUT",
@@ -1733,10 +1733,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 938,
-          "time_total": 0.026554,
-          "speed_download": 35324
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.025584,
+          "speed_download": 3869
         },
         {
           "method": "DELETE",
@@ -1746,10 +1746,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 60,
-          "time_total": 0.014051,
-          "speed_download": 4270
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.004955,
+          "speed_download": 19979
         },
         {
           "method": "POST",
@@ -1760,9 +1760,9 @@
             "Documents"
           ],
           "http_code": 200,
-          "size_download": 1343,
-          "time_total": 0.030165,
-          "speed_download": 44521
+          "size_download": 1342,
+          "time_total": 0.0352,
+          "speed_download": 38125
         },
         {
           "method": "POST",
@@ -1774,8 +1774,8 @@
           ],
           "http_code": 200,
           "size_download": 117,
-          "time_total": 0.007123,
-          "speed_download": 16426
+          "time_total": 0.007303,
+          "speed_download": 16020
         },
         {
           "method": "POST",
@@ -1787,8 +1787,8 @@
           ],
           "http_code": 200,
           "size_download": 135,
-          "time_total": 0.006969,
-          "speed_download": 19371
+          "time_total": 0.012477,
+          "speed_download": 10819
         },
         {
           "method": "GET",
@@ -1799,9 +1799,9 @@
             "Payments"
           ],
           "http_code": 200,
-          "size_download": 1324,
-          "time_total": 0.007222,
-          "speed_download": 183335
+          "size_download": 356,
+          "time_total": 0.011643,
+          "speed_download": 30575
         },
         {
           "method": "POST",
@@ -1811,10 +1811,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 201,
-          "size_download": 492,
-          "time_total": 0.049703,
-          "speed_download": 9898
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.083265,
+          "speed_download": 840
         },
         {
           "method": "POST",
@@ -1824,10 +1824,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 200,
-          "size_download": 373,
-          "time_total": 0.007267,
-          "speed_download": 51330
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.008606,
+          "speed_download": 11038
         },
         {
           "method": "POST",
@@ -1837,10 +1837,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 200,
-          "size_download": 384,
-          "time_total": 0.008981,
-          "speed_download": 42755
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.009642,
+          "speed_download": 9853
         },
         {
           "method": "GET",
@@ -1851,9 +1851,9 @@
             "Documents"
           ],
           "http_code": 200,
-          "size_download": 5560,
-          "time_total": 0.007605,
-          "speed_download": 731115
+          "size_download": 356,
+          "time_total": 0.006103,
+          "speed_download": 58333
         },
         {
           "method": "POST",
@@ -1863,10 +1863,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 201,
-          "size_download": 758,
-          "time_total": 0.012957,
-          "speed_download": 58503
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.014203,
+          "speed_download": 4928
         },
         {
           "method": "POST",
@@ -1876,10 +1876,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 752,
-          "time_total": 0.00809,
-          "speed_download": 92952
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.00547,
+          "speed_download": 17549
         },
         {
           "method": "POST",
@@ -1889,10 +1889,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 772,
-          "time_total": 0.007194,
-          "speed_download": 107307
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004626,
+          "speed_download": 20751
         },
         {
           "method": "POST",
@@ -1902,10 +1902,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 768,
-          "time_total": 0.311664,
-          "speed_download": 2464
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.005469,
+          "speed_download": 17554
         },
         {
           "method": "GET",
@@ -1916,9 +1916,9 @@
             "Account Applications"
           ],
           "http_code": 200,
-          "size_download": 6275,
-          "time_total": 0.010123,
-          "speed_download": 619869
+          "size_download": 356,
+          "time_total": 0.00912,
+          "speed_download": 39036
         },
         {
           "method": "POST",
@@ -1928,10 +1928,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 201,
-          "size_download": 931,
-          "time_total": 0.010609,
-          "speed_download": 87753
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012477,
+          "speed_download": 5610
         },
         {
           "method": "POST",
@@ -1941,10 +1941,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 1949,
-          "time_total": 0.008794,
-          "speed_download": 221638
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.005867,
+          "speed_download": 16872
         },
         {
           "method": "POST",
@@ -1954,10 +1954,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 1318,
-          "time_total": 0.016543,
-          "speed_download": 79668
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.010363,
+          "speed_download": 9553
         },
         {
           "method": "POST",
@@ -1967,10 +1967,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 201,
-          "size_download": 363,
-          "time_total": 0.008503,
-          "speed_download": 42691
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.020689,
+          "speed_download": 4785
         },
         {
           "method": "POST",
@@ -1980,10 +1980,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 1143,
-          "time_total": 0.011311,
-          "speed_download": 101048
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.357046,
+          "speed_download": 196
         },
         {
           "method": "GET",
@@ -1995,8 +1995,8 @@
           ],
           "http_code": 200,
           "size_download": 229,
-          "time_total": 0.003028,
-          "speed_download": 75636
+          "time_total": 0.005513,
+          "speed_download": 41538
         },
         {
           "method": "GET",
@@ -2006,10 +2006,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 200,
-          "size_download": 359,
-          "time_total": 0.002747,
-          "speed_download": 130699
+          "http_code": 403,
+          "size_download": 95,
+          "time_total": 0.007956,
+          "speed_download": 11941
         },
         {
           "method": "GET",
@@ -2021,8 +2021,8 @@
           ],
           "http_code": 200,
           "size_download": 79,
-          "time_total": 0.001926,
-          "speed_download": 41027
+          "time_total": 0.004366,
+          "speed_download": 18095
         },
         {
           "method": "GET",
@@ -2032,10 +2032,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 200,
-          "size_download": 1335,
-          "time_total": 0.005262,
-          "speed_download": 253697
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.005429,
+          "speed_download": 12892
         },
         {
           "method": "GET",
@@ -2045,10 +2045,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 723,
-          "time_total": 0.003337,
-          "speed_download": 216686
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.005109,
+          "speed_download": 18791
         },
         {
           "method": "DELETE",
@@ -2058,10 +2058,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 70,
-          "time_total": 0.003959,
-          "speed_download": 17679
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004665,
+          "speed_download": 20577
         },
         {
           "method": "GET",
@@ -2071,10 +2071,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 404,
-          "size_download": 106,
-          "time_total": 0.003553,
-          "speed_download": 29834
+          "http_code": 403,
+          "size_download": 96,
+          "time_total": 0.004774,
+          "speed_download": 20107
         },
         {
           "method": "GET",
@@ -2084,10 +2084,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 5998,
-          "time_total": 0.00595,
-          "speed_download": 1007999
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.004921,
+          "speed_download": 14224
         },
         {
           "method": "GET",
@@ -2097,10 +2097,10 @@
           "tags": [
             "Authentication"
           ],
-          "http_code": 200,
-          "size_download": 209,
-          "time_total": 0.002586,
-          "speed_download": 80833
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.008369,
+          "speed_download": 8364
         },
         {
           "method": "GET",
@@ -2112,8 +2112,8 @@
           ],
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.009055,
-          "speed_download": 61736
+          "time_total": 0.007766,
+          "speed_download": 71978
         },
         {
           "method": "GET",
@@ -2123,10 +2123,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 8083,
-          "time_total": 0.00921,
-          "speed_download": 877644
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.004539,
+          "speed_download": 15422
         },
         {
           "method": "DELETE",
@@ -2136,10 +2136,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 200,
-          "size_download": 61,
-          "time_total": 0.006441,
-          "speed_download": 9470
+          "http_code": 403,
+          "size_download": 99,
+          "time_total": 0.006285,
+          "speed_download": 15750
         }
       ]
     }

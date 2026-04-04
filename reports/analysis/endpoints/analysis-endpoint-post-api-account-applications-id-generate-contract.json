@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T09:00:01Z",
+  "timestamp": "2026-04-04T22:19:08Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/account-applications/{id}/generate-contract",
-    "url": "http://localhost:8080/api/account-applications/2d40c3a9-384f-448b-a210-66dbe0e70747/generate-contract",
-    "http_code": 500,
-    "size_download": 70,
-    "time_total": 0.32691,
-    "speed_download": 214,
-    "energy_network_wh": 3.91155481338501e-06,
-    "energy_server_wh": 0.002270208333333333,
-    "energy_total_wh": 0.002274119888146718
+    "url": "http://localhost:8080/api/account-applications/594e9db2-06ea-4677-952d-b78a27cd5fc7/generate-contract",
+    "http_code": 200,
+    "size_download": 1143,
+    "time_total": 0.011311,
+    "speed_download": 101048,
+    "energy_network_wh": 6.387010216712952e-05,
+    "energy_server_wh": 7.85486111111111e-05,
+    "energy_total_wh": 0.00014241871327824062
   }
 }
