@@ -2,7 +2,7 @@ name: "🌿 Esign Green API Score CI"
 
 on:
   push:
-    branches: [main, master, develop, feat/devoxx]
+    branches: [main, master, develop, feat/devoxx, feat/devoxx-creedengo]
   pull_request:
     branches: [main, master]
 
@@ -766,7 +766,7 @@ jobs:
   deploy-pages:
     name: "🌐 Deploy Dashboard to GitHub Pages"
     needs: [green-score, creedengo]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feat/devoxx')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feat/devoxx' || github.ref == 'refs/heads/feat/devoxx-creedengo')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
