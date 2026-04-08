@@ -28,13 +28,8 @@ from base64 import b64encode
 
 
 # ── Scoring model ──
-SEVERITY_PENALTIES = {
-    "BLOCKER": 15,
-    "CRITICAL": 8,
-    "MAJOR": 4,
-    "MINOR": 1,
-    "INFO": 0.5,
-}
+# Score = (1 - rules_violated / total_rules) * 100
+# Example: 6 violated out of 17 → (1 - 6/17) * 100 ≈ 65
 
 GRADE_THRESHOLDS = [
     (95, "A+"),
@@ -98,14 +93,17 @@ def _api_get(base_url: str, path: str, params: dict = None,
     return {}
 
 
-def compute_score(issues: list[dict]) -> tuple[int, str]:
-    """Compute Creedengo score (0-100) and grade from issue list."""
-    penalty = 0.0
-    for issue in issues:
-        severity = issue.get("severity", "INFO")
-        penalty += SEVERITY_PENALTIES.get(severity, 0.5)
+def compute_score(rules_violated: int, total_rules: int) -> tuple[int, str]:
+    """Compute Creedengo score (0-100) and grade from violated/total rules ratio.
 
-    score = max(0, round(100 - penalty))
+    Formula: (1 - rules_violated / total_rules) * 100
+    Example: 6 violated out of 17 → (1 - 6/17) * 100 ≈ 64.71 → 65
+    """
+    if total_rules <= 0:
+        score = 100 if rules_violated == 0 else 0
+    else:
+        score = max(0, round((1 - rules_violated / total_rules) * 100))
+
     grade = "E"
     for threshold, g in GRADE_THRESHOLDS:
         if score >= threshold:
@@ -387,8 +385,11 @@ def extract_results(sonar_url: str, project_key: str,
     # ── Build SonarQube-general data (context, separate section) ──
     sq_issues, sq_sev, sq_rules, sq_files, sq_effort = _build_issue_data(sonar_only_issues_raw)
 
-    # ── Compute score based on CREEDENGO issues only ──
-    score, grade = compute_score(cr_issues)
+    # ── Compute score based on CREEDENGO rules ratio ──
+    # Formula: (1 - rules_violated / total_rules) * 100
+    total_creedengo_rules = len(rules_meta)
+    violated_creedengo_rules = len(cr_rules)
+    score, grade = compute_score(violated_creedengo_rules, total_creedengo_rules)
 
     # ── Build category summary (Creedengo only) ──
     category_summary = {}

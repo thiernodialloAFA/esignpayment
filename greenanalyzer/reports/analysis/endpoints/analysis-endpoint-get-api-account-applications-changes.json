@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-08T21:56:39Z",
+  "timestamp": "2026-04-08T22:26:00Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "get",
     "path": "/api/account-applications/changes",
     "url": "http://localhost:8080/api/account-applications/changes",
     "http_code": 200,
-    "size_download": 8084,
-    "time_total": 0.012863,
-    "speed_download": 628492,
-    "energy_network_wh": 0.00045172870159149165,
-    "energy_server_wh": 8.932638888888888e-05,
-    "energy_total_wh": 0.0005410550904803805
+    "size_download": 8085,
+    "time_total": 0.013752,
+    "speed_download": 587915,
+    "energy_network_wh": 0.0004517845809459686,
+    "energy_server_wh": 9.549999999999999e-05,
+    "energy_total_wh": 0.0005472845809459685
   }
 }

@@ -13,9 +13,6 @@
       "url": "/",
       "description": "ESignPay API Server \u2014 gzip compression enabled on all endpoints",
       "x-server-compression": {
-        "algorithms": [
-          "gzip"
-        ],
         "mime-types": [
           "application/json",
           "application/xml",
@@ -25,20 +22,23 @@
           "application/cbor"
         ],
         "enabled": true,
-        "min-response-size": "256 bytes"
+        "min-response-size": "256 bytes",
+        "algorithms": [
+          "gzip"
+        ]
       },
       "x-server-range-support": {
-        "enabled": true,
         "unit": "bytes",
         "endpoints": [
           "/api/documents/{id}/download"
-        ]
+        ],
+        "enabled": true
       },
       "x-server-etag-support": {
-        "scope": "all GET /api/* endpoints",
         "filter": "ShallowEtagHeaderFilter",
         "enabled": true,
-        "mechanism": "If-None-Match \u2192 304 Not Modified"
+        "mechanism": "If-None-Match \u2192 304 Not Modified",
+        "scope": "all GET /api/* endpoints"
       }
     }
   ],
@@ -3139,15 +3139,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"
@@ -3273,15 +3273,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"
@@ -3381,15 +3381,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"

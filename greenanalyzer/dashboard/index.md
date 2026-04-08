@@ -4,7 +4,7 @@
 >
 > **Devoxx France 2026 — Green Architecture : moins de gras, plus d'impact !**
 
-📅 *Dernière analyse : 2026-04-08T21:56:39Z*
+📅 *Dernière analyse : 2026-04-08T22:26:00Z*
 
 ---
 
@@ -28,48 +28,48 @@
 
 | Méthode | Endpoint | Taille | Temps | HTTP |
 |:-------:|----------|-------:|------:|-----:|
-| GET | `/api/account-applications/{id}` | 916 B | 0.030s | 200 |
-| PUT | `/api/account-applications/{id}` | 940 B | 0.067s | 200 |
-| DELETE | `/api/account-applications/{id}` | 60 B | 0.020s | 200 |
-| POST | `/api/sign/{token}` | 1.3 KB | 0.053s | 200 |
-| POST | `/api/sign/{token}/verify-otp` | 117 B | 0.012s | 200 |
-| POST | `/api/sign/{token}/send-otp` | 135 B | 0.012s | 200 |
-| GET | `/api/payments` | 1.3 KB | 0.014s | 200 |
-| POST | `/api/payments` | 498 B | 0.067s | 201 |
+| GET | `/api/account-applications/{id}` | 917 B | 0.037s | 200 |
+| PUT | `/api/account-applications/{id}` | 941 B | 0.055s | 200 |
+| DELETE | `/api/account-applications/{id}` | 60 B | 0.018s | 200 |
+| POST | `/api/sign/{token}` | 1.3 KB | 0.058s | 200 |
+| POST | `/api/sign/{token}/verify-otp` | 117 B | 0.013s | 200 |
+| POST | `/api/sign/{token}/send-otp` | 135 B | 0.017s | 200 |
+| GET | `/api/payments` | 1.3 KB | 0.017s | 200 |
+| POST | `/api/payments` | 498 B | 0.162s | 201 |
 | POST | `/api/payments/{id}/cancel` | 373 B | 0.010s | 200 |
-| POST | `/api/payments/confirm` | 384 B | 0.030s | 200 |
-| GET | `/api/documents` | 5.6 KB | 0.015s | 200 |
-| POST | `/api/documents` | 765 B | 0.021s | 201 |
-| POST | `/api/documents/{id}/send` | 750 B | 0.009s | 200 |
-| POST | `/api/documents/{id}/resend` | 771 B | 0.009s | 200 |
-| POST | `/api/documents/{id}/live-sign/{signerId}` | 773 B | 0.451s | 200 |
-| GET | `/api/account-applications` | 6.3 KB | 0.018s | 200 |
-| POST | `/api/account-applications` | 940 B | 0.025s | 201 |
-| POST | `/api/account-applications/{id}/submit` | 2.0 KB | 0.015s | 200 |
-| POST | `/api/account-applications/{id}/regenerate-contract` | 1.3 KB | 0.036s | 200 |
-| POST | `/api/account-applications/{id}/kyc` | 366 B | 0.016s | 201 |
+| POST | `/api/payments/confirm` | 384 B | 0.013s | 200 |
+| GET | `/api/documents` | 5.6 KB | 0.013s | 200 |
+| POST | `/api/documents` | 767 B | 0.036s | 201 |
+| POST | `/api/documents/{id}/send` | 752 B | 0.018s | 200 |
+| POST | `/api/documents/{id}/resend` | 772 B | 0.013s | 200 |
+| POST | `/api/documents/{id}/live-sign/{signerId}` | 774 B | 0.402s | 200 |
+| GET | `/api/account-applications` | 6.3 KB | 0.016s | 200 |
+| POST | `/api/account-applications` | 940 B | 0.019s | 201 |
+| POST | `/api/account-applications/{id}/submit` | 2.0 KB | 0.018s | 200 |
+| POST | `/api/account-applications/{id}/regenerate-contract` | 1.3 KB | 0.043s | 200 |
+| POST | `/api/account-applications/{id}/kyc` | 365 B | 0.015s | 201 |
 | POST | `/api/account-applications/{id}/generate-contract` | 1.1 KB | 0.030s | 200 |
-| GET | `/api/sign/verify/{token}` | 229 B | 0.008s | 200 |
-| GET | `/api/payments/{id}` | 359 B | 0.006s | 200 |
+| GET | `/api/sign/verify/{token}` | 229 B | 0.010s | 200 |
+| GET | `/api/payments/{id}` | 359 B | 0.010s | 200 |
 | GET | `/api/payments/config` | 79 B | 0.004s | 200 |
 | GET | `/api/payments/changes` | 1.3 KB | 0.011s | 200 |
-| GET | `/api/documents/{id}` | 722 B | 0.006s | 200 |
+| GET | `/api/documents/{id}` | 723 B | 0.006s | 200 |
 | DELETE | `/api/documents/{id}` | 70 B | 0.008s | 200 |
-| GET | `/api/documents/{id}/download` | 106 B | 0.010s | 404 |
-| GET | `/api/documents/changes` | 6.0 KB | 0.009s | 200 |
-| GET | `/api/auth/me` | 208 B | 0.005s | 200 |
-| GET | `/api/account-types` | 559 B | 0.008s | 200 |
-| GET | `/api/account-applications/changes` | 8.1 KB | 0.013s | 200 |
-| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 61 B | 0.010s | 200 |
+| GET | `/api/documents/{id}/download` | 106 B | 0.009s | 404 |
+| GET | `/api/documents/changes` | 6.0 KB | 0.010s | 200 |
+| GET | `/api/auth/me` | 209 B | 0.008s | 200 |
+| GET | `/api/account-types` | 559 B | 0.007s | 200 |
+| GET | `/api/account-applications/changes` | 8.1 KB | 0.014s | 200 |
+| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 61 B | 0.009s | 200 |
 
 ### 🔑 Métriques clés
 
 - **Endpoints mesurés** : 33
-- **Transfert total** : 44.5 KB
-- **Transfert moyen / endpoint** : 1.3 KB
-- **Temps moyen** : 0.032s
-- **⚡ Énergie totale / appel** : 0.0098 Wh
-- **🌍 CO₂ / appel** : 0.00052 g (France — 53 gCO₂/kWh)
+- **Transfert total** : 44.6 KB
+- **Transfert moyen / endpoint** : 1.4 KB
+- **Temps moyen** : 0.034s
+- **⚡ Énergie totale / appel** : 0.0103 Wh
+- **🌍 CO₂ / appel** : 0.00055 g (France — 53 gCO₂/kWh)
 
 ### 💡 Suggestions d'amélioration
 
@@ -213,7 +213,7 @@ Option 3 — Nginx:
 
 ---
 
-## 🌱 Creedengo Éco-Design : **0/100** — Grade **E** 🔴
+## 🌱 Creedengo Éco-Design : **89/100** — Grade **A** 🟢
 
 > Analyse statique de l'éco-conception du code source via [Creedengo](https://github.com/green-code-initiative) / SonarQube
 
@@ -236,6 +236,7 @@ Option 3 — Nginx:
 
 - **Issues écodesign** : 963
 - **Règles écodesign violées** : 6 / 57 analysées
+- **Formule du score** : (1 − 6/57) × 100 = **89/100**
 - **Effort de remédiation** : 81h00min
 
 - **Lignes de code** : 4,991
@@ -309,7 +310,7 @@ Option 3 — Nginx:
 
 - **Effort de remédiation SonarQube** : 32h12min
 
-📅 *2026-04-08T21:58:43Z*
+📅 *2026-04-08T22:30:33Z*
 
 ---
 

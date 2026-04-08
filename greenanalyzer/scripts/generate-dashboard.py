@@ -111,8 +111,11 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
         a("")
 
     a(f"- **Issues écodesign** : {issues}")
-    a(f"- **Règles écodesign violées** : {creedengo.get('rules_violated', 0)} / "
-      f"{creedengo.get('all_creedengo_rules', 0)} analysées")
+    rules_violated = creedengo.get('rules_violated', 0)
+    all_rules = creedengo.get('all_creedengo_rules', 0)
+    a(f"- **Règles écodesign violées** : {rules_violated} / "
+      f"{all_rules} analysées")
+    a(f"- **Formule du score** : (1 − {rules_violated}/{all_rules}) × 100 = **{total}/100**")
     if score.get("total_effort"):
         a(f"- **Effort de remédiation** : {score['total_effort']}")
     a("")

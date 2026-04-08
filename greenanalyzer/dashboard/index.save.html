@@ -1272,13 +1272,19 @@ function renderCreedengoReport(report) {
     // ── Metrics card ──
     const measures = report.measures || {};
     const metricsGrid = document.getElementById('creedengo-metrics-grid');
+    const violated = report.rules_violated || 0;
+    const allRules = report.all_creedengo_rules || 0;
+    const formulaStr = allRules > 0
+        ? `(1 − ${violated}/${allRules}) × 100 = ${total}`
+        : '—';
     metricsGrid.innerHTML = `
         <div class="metric-item"><div class="metric-value">${score.issues_count || 0}</div><div class="metric-label">Issues écodesign</div></div>
-        <div class="metric-item"><div class="metric-value">${report.rules_violated || 0}</div><div class="metric-label">Règles écodesign violées</div></div>
-        <div class="metric-item"><div class="metric-value">${report.all_creedengo_rules || '—'}</div><div class="metric-label">Règles Creedengo analysées</div></div>
+        <div class="metric-item"><div class="metric-value">${violated}</div><div class="metric-label">Règles écodesign violées</div></div>
+        <div class="metric-item"><div class="metric-value">${allRules || '—'}</div><div class="metric-label">Règles Creedengo analysées</div></div>
         <div class="metric-item"><div class="metric-value">${(measures.ncloc || 0).toLocaleString('fr-FR')}</div><div class="metric-label">Lignes de code</div></div>
         <div class="metric-item"><div class="metric-value">${score.total_effort || '—'}</div><div class="metric-label">Effort écodesign</div></div>
         <div class="metric-item"><div class="metric-value" style="color:${pct >= 70 ? 'var(--green-400)' : 'var(--yellow-400)'}">${total}/100</div><div class="metric-label">Score éco-design</div></div>
+        <div class="metric-item"><div class="metric-value" style="font-size:0.85rem;color:var(--gray-300)">${formulaStr}</div><div class="metric-label">Formule : (1 − violées/total) × 100</div></div>
         <div class="metric-item"><div class="metric-value" style="color:var(--gray-400)">${(report.sonar_issues || {}).issues_count || 0}</div><div class="metric-label">Issues SonarQube (hors écodesign)</div></div>
     `;
 
