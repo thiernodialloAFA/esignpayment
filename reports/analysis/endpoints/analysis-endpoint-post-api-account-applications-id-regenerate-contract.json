@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-08T15:53:16Z",
+  "timestamp": "2026-04-08T17:27:31Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
@@ -7,10 +7,10 @@
     "url": "http://localhost:8080/api/account-applications/1/regenerate-contract",
     "http_code": 500,
     "size_download": 70,
-    "time_total": 0.019507,
-    "speed_download": 3588,
+    "time_total": 0.01353,
+    "speed_download": 5173,
     "energy_network_wh": 3.91155481338501e-06,
-    "energy_server_wh": 0.00013546527777777778,
-    "energy_total_wh": 0.0001393768325911628
+    "energy_server_wh": 9.395833333333333e-05,
+    "energy_total_wh": 9.786988814671834e-05
   }
 }

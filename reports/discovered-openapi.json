@@ -3139,15 +3139,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"
@@ -3167,14 +3167,14 @@
           "unpaged": {
             "type": "boolean"
           },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
           "paged": {
             "type": "boolean"
           },
           "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageNumber": {
             "type": "integer",
             "format": "int32"
           }
@@ -3273,15 +3273,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"
@@ -3381,15 +3381,15 @@
           "pageable": {
             "$ref": "#/components/schemas/PageableObject"
           },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "first": {
             "type": "boolean"
           },
           "last": {
             "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
           },
           "empty": {
             "type": "boolean"

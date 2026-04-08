@@ -1,7 +1,7 @@
 {
   "appname": "esignpay",
   "report": {
-    "timestamp": "2026-04-08T13:10:17Z",
+    "timestamp": "2026-04-08T17:27:31Z",
     "green_score": {
       "total": 65,
       "max": 100,
@@ -1496,14 +1496,14 @@
         "delta_changes": {
           "http_code": 200,
           "size_download": 339,
-          "time_total": 0.056104,
-          "speed_download": 6042
+          "time_total": 0.046566,
+          "speed_download": 7279
         },
         "full_payload": {
           "http_code": 200,
           "size_download": 10427,
-          "time_total": 0.075329,
-          "speed_download": 138420
+          "time_total": 0.05751,
+          "speed_download": 181306
         }
       }
     },
@@ -1515,206 +1515,206 @@
         "get:/api/account-applications/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.024492,
-          "speed_download": 2858
+          "time_total": 0.028884,
+          "speed_download": 2423
         },
         "put:/api/account-applications/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.01226,
-          "speed_download": 5709
+          "time_total": 0.015803,
+          "speed_download": 4429
         },
         "delete:/api/account-applications/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.009027,
-          "speed_download": 7754
+          "time_total": 0.011359,
+          "speed_download": 6162
         },
         "post:/api/webhooks/stripe": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.012383,
-          "speed_download": 5652
+          "time_total": 0.014715,
+          "speed_download": 4757
         },
         "post:/api/sign/{token}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.014683,
-          "speed_download": 4767
+          "time_total": 0.021576,
+          "speed_download": 3244
         },
         "post:/api/sign/{token}/verify-otp": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011108,
-          "speed_download": 6302
+          "time_total": 0.019184,
+          "speed_download": 3648
         },
         "post:/api/sign/{token}/send-otp": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011277,
-          "speed_download": 6207
+          "time_total": 0.013892,
+          "speed_download": 5038
         },
         "get:/api/payments": {
           "http_code": 200,
           "size_download": 655,
-          "time_total": 0.351183,
-          "speed_download": 1865
+          "time_total": 0.310552,
+          "speed_download": 2109
         },
         "post:/api/payments": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.027641,
-          "speed_download": 2532
+          "time_total": 0.016938,
+          "speed_download": 4132
         },
         "post:/api/payments/{id}/cancel": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.024803,
-          "speed_download": 2822
+          "time_total": 0.028133,
+          "speed_download": 2488
         },
         "post:/api/payments/confirm": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.016933,
-          "speed_download": 4133
+          "time_total": 0.019246,
+          "speed_download": 3637
         },
         "get:/api/documents": {
           "http_code": 200,
           "size_download": 3185,
-          "time_total": 0.060133,
-          "speed_download": 52966
+          "time_total": 0.053479,
+          "speed_download": 59556
         },
         "post:/api/documents": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.020556,
-          "speed_download": 3405
+          "time_total": 0.014046,
+          "speed_download": 4983
         },
         "post:/api/documents/{id}/send": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.026293,
-          "speed_download": 2662
+          "time_total": 0.011455,
+          "speed_download": 6110
         },
         "post:/api/documents/{id}/resend": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.04039,
-          "speed_download": 1733
+          "time_total": 0.015232,
+          "speed_download": 4595
         },
         "post:/api/documents/{id}/live-sign/{signerId}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.019204,
-          "speed_download": 3645
+          "time_total": 0.014687,
+          "speed_download": 4766
         },
         "get:/api/account-applications": {
           "http_code": 200,
           "size_download": 10427,
-          "time_total": 0.075329,
-          "speed_download": 138420
+          "time_total": 0.05751,
+          "speed_download": 181306
         },
         "post:/api/account-applications": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010727,
-          "speed_download": 6525
+          "time_total": 0.015807,
+          "speed_download": 4428
         },
         "post:/api/account-applications/{id}/submit": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.020699,
-          "speed_download": 3381
+          "time_total": 0.013248,
+          "speed_download": 5284
         },
         "post:/api/account-applications/{id}/regenerate-contract": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.012865,
-          "speed_download": 5441
+          "time_total": 0.01353,
+          "speed_download": 5173
         },
         "post:/api/account-applications/{id}/kyc": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010897,
-          "speed_download": 6423
+          "time_total": 0.016279,
+          "speed_download": 4299
         },
         "post:/api/account-applications/{id}/generate-contract": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010308,
-          "speed_download": 6791
+          "time_total": 0.013454,
+          "speed_download": 5202
         },
         "get:/api/sign/verify/{token}": {
           "http_code": 404,
           "size_download": 76,
-          "time_total": 0.02175,
-          "speed_download": 3494
+          "time_total": 0.017606,
+          "speed_download": 4316
         },
         "get:/api/payments/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.017452,
-          "speed_download": 4011
+          "time_total": 0.021026,
+          "speed_download": 3329
         },
         "get:/api/payments/config": {
           "http_code": 200,
           "size_download": 167,
-          "time_total": 0.016013,
-          "speed_download": 10428
+          "time_total": 0.038866,
+          "speed_download": 4296
         },
         "get:/api/payments/changes": {
           "http_code": 200,
           "size_download": 339,
-          "time_total": 0.056104,
-          "speed_download": 6042
+          "time_total": 0.046566,
+          "speed_download": 7279
         },
         "get:/api/documents/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.017792,
-          "speed_download": 3934
+          "time_total": 0.016219,
+          "speed_download": 4315
         },
         "delete:/api/documents/{id}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.015467,
-          "speed_download": 4525
+          "time_total": 0.011993,
+          "speed_download": 5836
         },
         "get:/api/documents/{id}/download": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.018018,
-          "speed_download": 3885
+          "time_total": 0.012039,
+          "speed_download": 5814
         },
         "get:/api/documents/changes": {
           "http_code": 200,
           "size_download": 2869,
-          "time_total": 0.028359,
-          "speed_download": 101168
+          "time_total": 0.027449,
+          "speed_download": 104519
         },
         "get:/api/auth/me": {
           "http_code": 200,
           "size_download": 208,
-          "time_total": 0.025789,
-          "speed_download": 8065
+          "time_total": 0.020435,
+          "speed_download": 10178
         },
         "get:/api/account-types": {
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.023882,
-          "speed_download": 23406
+          "time_total": 0.020001,
+          "speed_download": 27948
         },
         "get:/api/account-applications/changes": {
           "http_code": 200,
           "size_download": 10111,
-          "time_total": 0.041978,
-          "speed_download": 240864
+          "time_total": 0.036349,
+          "speed_download": 278165
         },
         "delete:/api/account-applications/{id}/kyc/{kycId}": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.086387,
-          "speed_download": 810
+          "time_total": 0.011647,
+          "speed_download": 6009
         }
       },
       "discovered_endpoints": [
@@ -1728,8 +1728,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.024492,
-          "speed_download": 2858
+          "time_total": 0.028884,
+          "speed_download": 2423
         },
         {
           "method": "PUT",
@@ -1741,8 +1741,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.01226,
-          "speed_download": 5709
+          "time_total": 0.015803,
+          "speed_download": 4429
         },
         {
           "method": "DELETE",
@@ -1754,8 +1754,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.009027,
-          "speed_download": 7754
+          "time_total": 0.011359,
+          "speed_download": 6162
         },
         {
           "method": "POST",
@@ -1767,8 +1767,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.012383,
-          "speed_download": 5652
+          "time_total": 0.014715,
+          "speed_download": 4757
         },
         {
           "method": "POST",
@@ -1780,8 +1780,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.014683,
-          "speed_download": 4767
+          "time_total": 0.021576,
+          "speed_download": 3244
         },
         {
           "method": "POST",
@@ -1793,8 +1793,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011108,
-          "speed_download": 6302
+          "time_total": 0.019184,
+          "speed_download": 3648
         },
         {
           "method": "POST",
@@ -1806,8 +1806,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011277,
-          "speed_download": 6207
+          "time_total": 0.013892,
+          "speed_download": 5038
         },
         {
           "method": "GET",
@@ -1819,8 +1819,8 @@
           ],
           "http_code": 200,
           "size_download": 655,
-          "time_total": 0.351183,
-          "speed_download": 1865
+          "time_total": 0.310552,
+          "speed_download": 2109
         },
         {
           "method": "POST",
@@ -1832,8 +1832,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.027641,
-          "speed_download": 2532
+          "time_total": 0.016938,
+          "speed_download": 4132
         },
         {
           "method": "POST",
@@ -1845,8 +1845,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.024803,
-          "speed_download": 2822
+          "time_total": 0.028133,
+          "speed_download": 2488
         },
         {
           "method": "POST",
@@ -1858,8 +1858,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.016933,
-          "speed_download": 4133
+          "time_total": 0.019246,
+          "speed_download": 3637
         },
         {
           "method": "GET",
@@ -1871,8 +1871,8 @@
           ],
           "http_code": 200,
           "size_download": 3185,
-          "time_total": 0.060133,
-          "speed_download": 52966
+          "time_total": 0.053479,
+          "speed_download": 59556
         },
         {
           "method": "POST",
@@ -1884,8 +1884,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.020556,
-          "speed_download": 3405
+          "time_total": 0.014046,
+          "speed_download": 4983
         },
         {
           "method": "POST",
@@ -1897,8 +1897,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.026293,
-          "speed_download": 2662
+          "time_total": 0.011455,
+          "speed_download": 6110
         },
         {
           "method": "POST",
@@ -1910,8 +1910,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.04039,
-          "speed_download": 1733
+          "time_total": 0.015232,
+          "speed_download": 4595
         },
         {
           "method": "POST",
@@ -1923,8 +1923,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.019204,
-          "speed_download": 3645
+          "time_total": 0.014687,
+          "speed_download": 4766
         },
         {
           "method": "GET",
@@ -1936,8 +1936,8 @@
           ],
           "http_code": 200,
           "size_download": 10427,
-          "time_total": 0.075329,
-          "speed_download": 138420
+          "time_total": 0.05751,
+          "speed_download": 181306
         },
         {
           "method": "POST",
@@ -1949,8 +1949,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010727,
-          "speed_download": 6525
+          "time_total": 0.015807,
+          "speed_download": 4428
         },
         {
           "method": "POST",
@@ -1962,8 +1962,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.020699,
-          "speed_download": 3381
+          "time_total": 0.013248,
+          "speed_download": 5284
         },
         {
           "method": "POST",
@@ -1975,8 +1975,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.012865,
-          "speed_download": 5441
+          "time_total": 0.01353,
+          "speed_download": 5173
         },
         {
           "method": "POST",
@@ -1988,8 +1988,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010897,
-          "speed_download": 6423
+          "time_total": 0.016279,
+          "speed_download": 4299
         },
         {
           "method": "POST",
@@ -2001,8 +2001,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.010308,
-          "speed_download": 6791
+          "time_total": 0.013454,
+          "speed_download": 5202
         },
         {
           "method": "GET",
@@ -2014,8 +2014,8 @@
           ],
           "http_code": 404,
           "size_download": 76,
-          "time_total": 0.02175,
-          "speed_download": 3494
+          "time_total": 0.017606,
+          "speed_download": 4316
         },
         {
           "method": "GET",
@@ -2027,8 +2027,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.017452,
-          "speed_download": 4011
+          "time_total": 0.021026,
+          "speed_download": 3329
         },
         {
           "method": "GET",
@@ -2040,8 +2040,8 @@
           ],
           "http_code": 200,
           "size_download": 167,
-          "time_total": 0.016013,
-          "speed_download": 10428
+          "time_total": 0.038866,
+          "speed_download": 4296
         },
         {
           "method": "GET",
@@ -2053,8 +2053,8 @@
           ],
           "http_code": 200,
           "size_download": 339,
-          "time_total": 0.056104,
-          "speed_download": 6042
+          "time_total": 0.046566,
+          "speed_download": 7279
         },
         {
           "method": "GET",
@@ -2066,8 +2066,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.017792,
-          "speed_download": 3934
+          "time_total": 0.016219,
+          "speed_download": 4315
         },
         {
           "method": "DELETE",
@@ -2079,8 +2079,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.015467,
-          "speed_download": 4525
+          "time_total": 0.011993,
+          "speed_download": 5836
         },
         {
           "method": "GET",
@@ -2092,8 +2092,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.018018,
-          "speed_download": 3885
+          "time_total": 0.012039,
+          "speed_download": 5814
         },
         {
           "method": "GET",
@@ -2105,8 +2105,8 @@
           ],
           "http_code": 200,
           "size_download": 2869,
-          "time_total": 0.028359,
-          "speed_download": 101168
+          "time_total": 0.027449,
+          "speed_download": 104519
         },
         {
           "method": "GET",
@@ -2118,8 +2118,8 @@
           ],
           "http_code": 200,
           "size_download": 208,
-          "time_total": 0.025789,
-          "speed_download": 8065
+          "time_total": 0.020435,
+          "speed_download": 10178
         },
         {
           "method": "GET",
@@ -2131,8 +2131,8 @@
           ],
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.023882,
-          "speed_download": 23406
+          "time_total": 0.020001,
+          "speed_download": 27948
         },
         {
           "method": "GET",
@@ -2144,8 +2144,8 @@
           ],
           "http_code": 200,
           "size_download": 10111,
-          "time_total": 0.041978,
-          "speed_download": 240864
+          "time_total": 0.036349,
+          "speed_download": 278165
         },
         {
           "method": "DELETE",
@@ -2157,8 +2157,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.086387,
-          "speed_download": 810
+          "time_total": 0.011647,
+          "speed_download": 6009
         }
       ]
     }

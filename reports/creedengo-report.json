@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-08T15:55:43Z",
+  "timestamp": "2026-04-08T17:33:14Z",
   "appname": "esignpay",
   "project": "esign-payment-backend",
   "language": "java",
@@ -249,8 +249,8 @@
       ]
     },
     {
-      "key": "java:S1444",
-      "name": "S1444",
+      "key": "java:S1104",
+      "name": "S1104",
       "severity": "MINOR",
       "type": "CODE_SMELL",
       "description": "",
@@ -261,8 +261,8 @@
       ]
     },
     {
-      "key": "java:S1104",
-      "name": "S1104",
+      "key": "java:S1444",
+      "name": "S1444",
       "severity": "MINOR",
       "type": "CODE_SMELL",
       "description": "",
@@ -546,6 +546,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make TEST_USER_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 49,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static TEST_USER_ID\" field final",
@@ -557,9 +566,9 @@
     {
       "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make TEST_USER_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make APP_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 49,
+      "line": 52,
       "effort": "10min",
       "type": "CODE_SMELL"
     },
@@ -582,15 +591,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 52,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static APP_DRAFT_ID\" field final",
@@ -609,15 +609,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S3008",
-      "severity": "MINOR",
-      "message": "Rename this field \"APP_SUBMITTABLE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 53,
-      "effort": "2min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make APP_SUBMITTABLE_ID a static final constant or non-public and provide accessors if needed.",
@@ -627,20 +618,11 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_KYC_VERIFIED_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 54,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
-      "message": "Rename this field \"APP_KYC_VERIFIED_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
+      "message": "Rename this field \"APP_SUBMITTABLE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 54,
+      "line": 53,
       "effort": "2min",
       "type": "CODE_SMELL"
     },
@@ -654,12 +636,30 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
+      "rule": "java:S3008",
       "severity": "MINOR",
-      "message": "Make this \"public static APP_CONTRACT_PENDING_ID\" field final",
+      "message": "Rename this field \"APP_KYC_VERIFIED_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 54,
+      "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make APP_KYC_VERIFIED_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 54,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make APP_CONTRACT_PENDING_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 55,
-      "effort": "20min",
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -672,12 +672,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
+      "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make APP_CONTRACT_PENDING_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make this \"public static APP_CONTRACT_PENDING_ID\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 55,
-      "effort": "10min",
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static APP_FOR_DELETE_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 56,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -699,12 +708,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
+      "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make this \"public static APP_FOR_DELETE_ID\" field final",
+      "message": "Make APP_FOR_KYC_UPLOAD_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 56,
-      "effort": "20min",
+      "line": 57,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -723,15 +732,6 @@
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 57,
       "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_FOR_KYC_UPLOAD_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 57,
-      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -762,21 +762,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static KYC_DELETABLE_APP_ID\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 61,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"KYC_DELETABLE_APP_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 61,
       "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static KYC_DELETABLE_APP_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 61,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -789,12 +789,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
+      "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make DOC_READ_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make this \"public static DOC_READ_ID\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 64,
-      "effort": "10min",
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -807,20 +807,11 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static DOC_READ_ID\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 64,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make DOC_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make DOC_READ_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 65,
+      "line": 64,
       "effort": "10min",
       "type": "CODE_SMELL"
     },
@@ -834,6 +825,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make DOC_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 65,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"DOC_DRAFT_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
@@ -843,12 +843,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S3008",
+      "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Rename this field \"DOC_PENDING_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
+      "message": "Make this \"public static DOC_PENDING_ID\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 66,
-      "effort": "2min",
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -861,12 +861,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
+      "rule": "java:S3008",
       "severity": "MINOR",
-      "message": "Make this \"public static DOC_PENDING_ID\" field final",
+      "message": "Rename this field \"DOC_PENDING_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 66,
-      "effort": "20min",
+      "effort": "2min",
       "type": "CODE_SMELL"
     },
     {
@@ -906,21 +906,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S3008",
-      "severity": "MINOR",
-      "message": "Rename this field \"DOC_FOR_DELETE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 68,
-      "effort": "2min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make DOC_FOR_DELETE_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 68,
       "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S3008",
+      "severity": "MINOR",
+      "message": "Rename this field \"DOC_FOR_DELETE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 68,
+      "effort": "2min",
       "type": "CODE_SMELL"
     },
     {
@@ -933,21 +933,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make SIGNER_FOR_LIVE_SIGN_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 71,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"SIGNER_FOR_LIVE_SIGN_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 71,
       "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make SIGNER_FOR_LIVE_SIGN_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 71,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -987,15 +987,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make TOKEN_SEND_OTP a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 75,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static TOKEN_SEND_OTP\" field final",
@@ -1007,9 +998,9 @@
     {
       "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make TOKEN_VERIFY_OTP a static final constant or non-public and provide accessors if needed.",
+      "message": "Make TOKEN_SEND_OTP a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 76,
+      "line": 75,
       "effort": "10min",
       "type": "CODE_SMELL"
     },
@@ -1023,21 +1014,21 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make TOKEN_VERIFY_OTP a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 76,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"TOKEN_VERIFY_OTP\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 76,
       "effort": "2min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static TOKEN_SIGN\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 77,
-      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1050,12 +1041,30 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static TOKEN_SIGN\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 77,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"TOKEN_SIGN\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 77,
       "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static PAYMENT_READ_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 80,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1068,15 +1077,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make PAYMENT_READ_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 80,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S125",
       "severity": "MAJOR",
       "message": "This block of commented-out lines of code should be removed.",
@@ -1086,12 +1086,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
+      "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make this \"public static PAYMENT_READ_ID\" field final",
+      "message": "Make PAYMENT_READ_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 80,
-      "effort": "20min",
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -1122,6 +1122,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make PAYMENT_CANCEL_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 82,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static PAYMENT_CANCEL_ID\" field final",
@@ -1140,12 +1149,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
+      "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make PAYMENT_CANCEL_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make this \"public static ACCOUNT_TYPE_CODE\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 82,
-      "effort": "10min",
+      "line": 85,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S3008",
+      "severity": "MINOR",
+      "message": "Rename this field \"ACCOUNT_TYPE_CODE\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 85,
+      "effort": "2min",
       "type": "CODE_SMELL"
     },
     {
@@ -1158,30 +1176,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static ACCOUNT_TYPE_CODE\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 85,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make ACCOUNT_TYPE_CODE a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 85,
       "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S3008",
-      "severity": "MINOR",
-      "message": "Rename this field \"ACCOUNT_TYPE_CODE\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 85,
-      "effort": "2min",
       "type": "CODE_SMELL"
     },
     {
@@ -1473,21 +1473,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1130",
-      "severity": "MINOR",
-      "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
-      "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
-      "line": 34,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S112",
       "severity": "MAJOR",
       "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
       "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
       "line": 34,
       "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1130",
+      "severity": "MINOR",
+      "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
+      "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
+      "line": 34,
+      "effort": "5min",
       "type": "CODE_SMELL"
     },
     {
@@ -1536,21 +1536,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
-      "line": 37,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1130",
       "severity": "MINOR",
       "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
       "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
       "line": 37,
       "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S112",
+      "severity": "MAJOR",
+      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
+      "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
+      "line": 37,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1635,21 +1635,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S3776",
-      "severity": "CRITICAL",
-      "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
-      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
-      "line": 51,
-      "effort": "8min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S6541",
       "severity": "INFO",
       "message": "A \"Brain Method\" was detected. Refactor it to reduce at least one of the following metrics: LOC from 130 to 64, Complexity from 18 to 14, Nesting Level from 4 to 2, Number of Variables from 17 to 6.",
       "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
       "line": 51,
       "effort": "0min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S3776",
+      "severity": "CRITICAL",
+      "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
+      "line": 51,
+      "effort": "8min",
       "type": "CODE_SMELL"
     },
     {
@@ -1949,6 +1949,14 @@
       {
         "name": "scripts",
         "path": "scripts",
+        "language": "python",
+        "framework": "",
+        "framework_version": "",
+        "language_version": ""
+      },
+      {
+        "name": "unused",
+        "path": "scripts/unused",
         "language": "python",
         "framework": "",
         "framework_version": "",

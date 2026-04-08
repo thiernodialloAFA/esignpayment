@@ -4,7 +4,7 @@
 >
 > **Devoxx France 2026 — Green Architecture : moins de gras, plus d'impact !**
 
-📅 *Dernière analyse : 2026-04-08T15:53:16Z*
+📅 *Dernière analyse : 2026-04-08T17:27:31Z*
 
 ---
 
@@ -28,49 +28,49 @@
 
 | Méthode | Endpoint | Taille | Temps | HTTP |
 |:-------:|----------|-------:|------:|-----:|
-| GET | `/api/account-applications/{id}` | 70 B | 0.024s | 500 |
-| PUT | `/api/account-applications/{id}` | 70 B | 0.011s | 500 |
-| DELETE | `/api/account-applications/{id}` | 70 B | 0.014s | 500 |
-| POST | `/api/webhooks/stripe` | 70 B | 0.016s | 500 |
-| POST | `/api/sign/{token}` | 70 B | 0.016s | 500 |
-| POST | `/api/sign/{token}/verify-otp` | 70 B | 0.025s | 500 |
-| POST | `/api/sign/{token}/send-otp` | 70 B | 0.025s | 500 |
-| GET | `/api/payments` | 655 B | 0.299s | 200 |
-| POST | `/api/payments` | 70 B | 0.016s | 500 |
-| POST | `/api/payments/{id}/cancel` | 70 B | 0.011s | 500 |
-| POST | `/api/payments/confirm` | 70 B | 0.013s | 500 |
-| GET | `/api/documents` | 3.2 KB | 0.048s | 200 |
-| POST | `/api/documents` | 70 B | 0.011s | 500 |
-| POST | `/api/documents/{id}/send` | 70 B | 0.012s | 500 |
-| POST | `/api/documents/{id}/resend` | 70 B | 0.014s | 500 |
-| POST | `/api/documents/{id}/live-sign/{signerId}` | 70 B | 0.013s | 500 |
-| GET | `/api/account-applications` | 10.4 KB | 0.065s | 200 |
-| POST | `/api/account-applications` | 70 B | 0.011s | 500 |
-| POST | `/api/account-applications/{id}/submit` | 70 B | 0.016s | 500 |
-| POST | `/api/account-applications/{id}/regenerate-contract` | 70 B | 0.020s | 500 |
-| POST | `/api/account-applications/{id}/kyc` | 70 B | 0.013s | 500 |
-| POST | `/api/account-applications/{id}/generate-contract` | 70 B | 0.008s | 500 |
-| GET | `/api/sign/verify/{token}` | 76 B | 0.014s | 404 |
-| GET | `/api/payments/{id}` | 70 B | 0.013s | 500 |
-| GET | `/api/payments/config` | 167 B | 0.012s | 200 |
-| GET | `/api/payments/changes` | 339 B | 0.025s | 200 |
-| GET | `/api/documents/{id}` | 70 B | 0.013s | 500 |
-| DELETE | `/api/documents/{id}` | 70 B | 0.021s | 500 |
-| GET | `/api/documents/{id}/download` | 70 B | 0.010s | 500 |
-| GET | `/api/documents/changes` | 2.9 KB | 0.028s | 200 |
-| GET | `/api/auth/me` | 208 B | 0.023s | 200 |
-| GET | `/api/account-types` | 559 B | 0.027s | 200 |
-| GET | `/api/account-applications/changes` | 10.1 KB | 0.062s | 200 |
-| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 70 B | 0.019s | 500 |
+| GET | `/api/account-applications/{id}` | 70 B | 0.029s | 500 |
+| PUT | `/api/account-applications/{id}` | 70 B | 0.016s | 500 |
+| DELETE | `/api/account-applications/{id}` | 70 B | 0.011s | 500 |
+| POST | `/api/webhooks/stripe` | 70 B | 0.015s | 500 |
+| POST | `/api/sign/{token}` | 70 B | 0.022s | 500 |
+| POST | `/api/sign/{token}/verify-otp` | 70 B | 0.019s | 500 |
+| POST | `/api/sign/{token}/send-otp` | 70 B | 0.014s | 500 |
+| GET | `/api/payments` | 655 B | 0.311s | 200 |
+| POST | `/api/payments` | 70 B | 0.017s | 500 |
+| POST | `/api/payments/{id}/cancel` | 70 B | 0.028s | 500 |
+| POST | `/api/payments/confirm` | 70 B | 0.019s | 500 |
+| GET | `/api/documents` | 3.2 KB | 0.053s | 200 |
+| POST | `/api/documents` | 70 B | 0.014s | 500 |
+| POST | `/api/documents/{id}/send` | 70 B | 0.011s | 500 |
+| POST | `/api/documents/{id}/resend` | 70 B | 0.015s | 500 |
+| POST | `/api/documents/{id}/live-sign/{signerId}` | 70 B | 0.015s | 500 |
+| GET | `/api/account-applications` | 10.4 KB | 0.058s | 200 |
+| POST | `/api/account-applications` | 70 B | 0.016s | 500 |
+| POST | `/api/account-applications/{id}/submit` | 70 B | 0.013s | 500 |
+| POST | `/api/account-applications/{id}/regenerate-contract` | 70 B | 0.014s | 500 |
+| POST | `/api/account-applications/{id}/kyc` | 70 B | 0.016s | 500 |
+| POST | `/api/account-applications/{id}/generate-contract` | 70 B | 0.013s | 500 |
+| GET | `/api/sign/verify/{token}` | 76 B | 0.018s | 404 |
+| GET | `/api/payments/{id}` | 70 B | 0.021s | 500 |
+| GET | `/api/payments/config` | 167 B | 0.039s | 200 |
+| GET | `/api/payments/changes` | 339 B | 0.047s | 200 |
+| GET | `/api/documents/{id}` | 70 B | 0.016s | 500 |
+| DELETE | `/api/documents/{id}` | 70 B | 0.012s | 500 |
+| GET | `/api/documents/{id}/download` | 70 B | 0.012s | 500 |
+| GET | `/api/documents/changes` | 2.9 KB | 0.027s | 200 |
+| GET | `/api/auth/me` | 208 B | 0.020s | 200 |
+| GET | `/api/account-types` | 559 B | 0.020s | 200 |
+| GET | `/api/account-applications/changes` | 10.1 KB | 0.036s | 200 |
+| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 70 B | 0.012s | 500 |
 
 ### 🔑 Métriques clés
 
 - **Endpoints mesurés** : 34
 - **Transfert total** : 30.3 KB
 - **Transfert moyen / endpoint** : 890 B
-- **Temps moyen** : 0.028s
-- **⚡ Énergie totale / appel** : 0.0084 Wh
-- **🌍 CO₂ / appel** : 0.00045 g (France — 53 gCO₂/kWh)
+- **Temps moyen** : 0.030s
+- **⚡ Énergie totale / appel** : 0.0088 Wh
+- **🌍 CO₂ / appel** : 0.00046 g (France — 53 gCO₂/kWh)
 
 ### 💡 Suggestions d'amélioration
 
@@ -256,8 +256,8 @@ Add dependency: spring-boot-starter-actuator (likely already present).
 | 🟡 MAJOR | **S1141** — S1141 | 1 | general |
 | 🟡 MAJOR | **S2142** — S2142 | 1 | general |
 | ⚪ MINOR | **S3008** — S3008 | 23 | general |
-| ⚪ MINOR | **S1444** — S1444 | 23 | general |
 | ⚪ MINOR | **S1104** — S1104 | 23 | general |
+| ⚪ MINOR | **S1444** — S1444 | 23 | general |
 | ⚪ MINOR | **S1481** — S1481 | 5 | general |
 | ⚪ MINOR | **S1130** — S1130 | 2 | general |
 | | *… et 4 autres* | | |
@@ -278,7 +278,7 @@ Add dependency: spring-boot-starter-actuator (likely already present).
 | `config/TestProfileStubsConfig.java` | 3 |
 | *… et 10 autres* | |
 
-📅 *2026-04-08T15:55:43Z*
+📅 *2026-04-08T17:33:14Z*
 
 ---
 
