@@ -17,6 +17,7 @@
 #    bash scripts/creedengo-analyzer.sh                  # auto-detect
 #    bash scripts/creedengo-analyzer.sh --debug
 #    bash scripts/creedengo-analyzer.sh --skip-build
+#    bash scripts/creedengo-analyzer.sh --force-cleanup  # destroy containers/volumes/images post-build
 #    bash scripts/creedengo-analyzer.sh --lang java      # force language
 #    CREEDENGO_VERSION=1.7.0 bash scripts/creedengo-analyzer.sh
 ###############################################################################
@@ -52,12 +53,14 @@ DEBUG_MODE=false
 SKIP_BUILD=false
 FORCE_LANG=""
 NO_CLEANUP=false
+FORCE_CLEANUP=false
 ARGS=("$@")
 for ((i=0; i<${#ARGS[@]}; i++)); do
   case "${ARGS[$i]}" in
     --debug) DEBUG_MODE=true ;;
     --skip-build) SKIP_BUILD=true ;;
     --no-cleanup) NO_CLEANUP=true ;;
+    --force-cleanup) FORCE_CLEANUP=true ;;
     --lang=*) FORCE_LANG="${ARGS[$i]#--lang=}" ;;
     --lang)
       if [ $((i+1)) -lt ${#ARGS[@]} ]; then
@@ -362,6 +365,23 @@ cleanup() {
   for cid in $($CONTAINER_RT ps -aq --filter "name=creedengo-sonar" 2>/dev/null); do
     $CONTAINER_RT rm -f "$cid" 2>/dev/null || true
   done
+  if [ "$FORCE_CLEANUP" = true ]; then
+    echo -e "  ${CYAN}🔥 Force-cleanup: removing ALL SonarQube containers, volumes & images${NC}"
+    # Kill+remove any container using the sonar port
+    for cid in $($CONTAINER_RT ps -aq --filter "publish=${SONAR_PORT}" 2>/dev/null); do
+      $CONTAINER_RT rm -f "$cid" 2>/dev/null || true
+    done
+    # Remove dangling volumes from ephemeral sonar containers
+    $CONTAINER_RT volume ls -q --filter "dangling=true" 2>/dev/null | while read -r vol; do
+      $CONTAINER_RT volume rm "$vol" 2>/dev/null || true
+    done
+    # Remove the SonarQube image to free disk space (CI)
+    $CONTAINER_RT rmi "$SONAR_IMAGE" 2>/dev/null || true
+    # Prune stopped containers and unused images
+    $CONTAINER_RT container prune -f 2>/dev/null || true
+    $CONTAINER_RT image prune -f 2>/dev/null || true
+    echo -e "  ${GREEN}✓ Force-cleanup complete — all SonarQube resources destroyed${NC}"
+  fi
 }
 if [ "$NO_CLEANUP" = true ]; then
   echo -e "  ${CYAN}ℹ️  --no-cleanup : le container SonarQube ne sera PAS supprimé à la fin${NC}"

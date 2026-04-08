@@ -239,245 +239,13 @@ jobs:
       - name: Compile backend (for sonar binaries)
         run: mvn -q -DskipTests -f backend/pom.xml compile
 
-      - name: Auto-detect stack & download plugins
+      - name: Run Creedengo Analyzer (same script as local)
+        env:
+          SONAR_PORT: "9100"
+          APPNAME: ${{ github.event.repository.name || 'esignpayment' }}
         run: |
-          CREEDENGO_VERSION="1.7.0"
-
-          echo "🔍 Detecting project stack..."
-          DETECT_JSON=$(python3 scripts/creedengo-detect-stack.py . --json)
-          echo "$DETECT_JSON" | python3 -c "
-          import sys, json
-          d = json.load(sys.stdin)
-          print(f'  Languages:  {d[\"languages\"]}')
-          print(f'  Primary:    {d[\"primary_language\"]} ({d[\"primary_framework\"]})')
-          print(f'  Plugins:    {d[\"creedengo_plugins\"]}')
-          print(f'  Scanner:    {d[\"sonar_scanner\"]}')
-          "
-
-          PLUGINS=$(echo "$DETECT_JSON" | python3 -c "import sys,json; print(','.join(json.load(sys.stdin)['creedengo_plugins']))")
-          echo "DETECTED_PLUGINS=$PLUGINS" >> $GITHUB_ENV
-          echo "DETECT_JSON<<DETECT_EOF" >> $GITHUB_ENV
-          echo "$DETECT_JSON" >> $GITHUB_ENV
-          echo "DETECT_EOF" >> $GITHUB_ENV
-
-          # Download plugins
-          PLUGIN_DIR=".creedengo/plugins"
-          mkdir -p "$PLUGIN_DIR"
-          IFS=',' read -ra PLUGIN_ARRAY <<< "$PLUGINS"
-          for pk in "${PLUGIN_ARRAY[@]}"; do
-            echo "  📥 Downloading creedengo-${pk}..."
-            JAR="$PLUGIN_DIR/creedengo-${pk}-plugin-${CREEDENGO_VERSION}.jar"
-            DOWNLOADED=false
-            for url in \
-              "https://github.com/green-code-initiative/creedengo-${pk}/releases/download/${CREEDENGO_VERSION}/creedengo-${pk}-plugin-${CREEDENGO_VERSION}.jar" \
-              "https://github.com/green-code-initiative/creedengo-${pk}/releases/download/v${CREEDENGO_VERSION}/creedengo-${pk}-plugin-${CREEDENGO_VERSION}.jar" \
-              "https://github.com/green-code-initiative/ecoCode-${pk}/releases/download/${CREEDENGO_VERSION}/ecocode-${pk}-plugin-${CREEDENGO_VERSION}.jar"; do
-              if curl -fsSL -o "$JAR" "$url" 2>/dev/null; then
-                DOWNLOADED=true
-                echo "  ✅ ${pk}: downloaded"
-                break
-              fi
-            done
-            [ "$DOWNLOADED" = false ] && echo "  ⚠️ ${pk}: could not download" && rm -f "$JAR"
-          done
-
-          ls -la "$PLUGIN_DIR"/ || true
-
-          # Check if at least one plugin was downloaded
-          if [ -z "$(ls "$PLUGIN_DIR"/*.jar 2>/dev/null)" ]; then
-            echo "⚠️ No plugins downloaded — generating empty report"
-            mkdir -p reports
-            echo '{"creedengo_score":{"total":100,"max":100,"grade":"A+","issues_count":0,"severity_breakdown":{},"total_effort":"0min","total_effort_minutes":0},"rules_summary":[],"categories":[],"top_files":[],"issues":[],"all_creedengo_rules":0,"rules_violated":0,"timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","language":"java","analyzer":"creedengo","project":"esign-payment-backend"}' > reports/creedengo-report.json
-            echo "CREEDENGO_SKIP=true" >> $GITHUB_ENV
-          fi
-
-      - name: Start SonarQube with Creedengo
-        if: env.CREEDENGO_SKIP != 'true'
-        run: |
-          SONAR_PORT=9100
-          docker run -d \
-            --name creedengo-sonar \
-            -p ${SONAR_PORT}:9000 \
-            -v "$(pwd)/.creedengo/plugins:/opt/sonarqube/extensions/plugins:ro" \
-            -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
-            -e SONAR_SEARCH_JAVAADDITIONALOPTS="-Dnode.store.allow_mmap=false" \
-            sonarqube:lts-community
-
-          echo "⏳ Waiting for SonarQube to start..."
-          for i in $(seq 1 120); do
-            STATUS=$(curl -s "http://localhost:${SONAR_PORT}/api/system/status" 2>/dev/null \
-              | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || echo "")
-            if [ "$STATUS" = "UP" ]; then
-              echo "✅ SonarQube is ready ($((i*2))s)"
-              break
-            fi
-            if [ "$i" -eq 120 ]; then
-              echo "❌ SonarQube failed to start"
-              docker logs creedengo-sonar 2>&1 | tail -40
-              exit 1
-            fi
-            sleep 2
-          done
-
-      - name: Configure SonarQube & activate rules
-        if: env.CREEDENGO_SKIP != 'true'
-        run: |
-          SONAR_URL="http://localhost:9100"
-          SONAR_PASS="creedengo2026"
-
-          # Change default password
-          curl -s -o /dev/null -u admin:admin -X POST \
-            "${SONAR_URL}/api/users/change_password" \
-            -d "login=admin&previousPassword=admin&password=${SONAR_PASS}" 2>/dev/null || true
-
-          # Test auth
-          if ! curl -s -u "admin:${SONAR_PASS}" "${SONAR_URL}/api/system/status" 2>/dev/null | grep -q "UP"; then
-            SONAR_PASS="admin"
-          fi
-
-          # Generate token
-          TOKEN=$(curl -s -u "admin:${SONAR_PASS}" -X POST \
-            "${SONAR_URL}/api/user_tokens/generate" \
-            -d "name=ci-scan-$(date +%s)" 2>/dev/null \
-            | python3 -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null || echo "")
-
-          if [ -n "$TOKEN" ]; then
-            echo "SONAR_TOKEN=$TOKEN" >> $GITHUB_ENV
-            AUTH_FLAG="-u ${TOKEN}:"
-          else
-            echo "SONAR_USER=admin" >> $GITHUB_ENV
-            echo "SONAR_PASSWORD=$SONAR_PASS" >> $GITHUB_ENV
-            AUTH_FLAG="-u admin:${SONAR_PASS}"
-          fi
-
-          sleep 3
-
-          # Activate Creedengo rules for all detected language repos
-          echo "$DETECT_JSON" | python3 -c "
-          import sys, json
-          d = json.load(sys.stdin)
-          plugins = d.get('creedengo_plugins', [])
-          catalog = {
-              'java':       {'repo': 'creedengo-java',       'lang': 'java'},
-              'python':     {'repo': 'creedengo-python',     'lang': 'py'},
-              'javascript': {'repo': 'creedengo-javascript', 'lang': 'js'},
-              'csharp':     {'repo': 'creedengo-csharp',     'lang': 'cs'},
-          }
-          repos, langs = [], []
-          for pk in plugins:
-              info = catalog.get(pk, {})
-              if info:
-                  repos.append(info['repo'])
-                  langs.append(info['lang'])
-          print(','.join(repos))
-          print(','.join(langs))
-          " > /tmp/repos_langs.txt
-
-          ALL_REPOS=$(sed -n '1p' /tmp/repos_langs.txt)
-          ALL_LANGS=$(sed -n '2p' /tmp/repos_langs.txt)
-          echo "ALL_SONAR_REPOS=$ALL_REPOS" >> $GITHUB_ENV
-          echo "ALL_SONAR_LANGS=$ALL_LANGS" >> $GITHUB_ENV
-
-          IFS=',' read -ra REPOS <<< "$ALL_REPOS"
-          IFS=',' read -ra LANGS <<< "$ALL_LANGS"
-          for i in "${!REPOS[@]}"; do
-            repo="${REPOS[$i]}"; lang="${LANGS[$i]}"
-            [ -z "$repo" ] && continue
-            PK=$(curl -s $AUTH_FLAG \
-              "${SONAR_URL}/api/qualityprofiles/search?language=${lang}&defaults=true" 2>/dev/null \
-              | python3 -c "import sys,json; ps=json.load(sys.stdin).get('profiles',[]); print(ps[0]['key'] if ps else '')" 2>/dev/null || echo "")
-            if [ -n "$PK" ]; then
-              curl -s -o /dev/null $AUTH_FLAG -X POST \
-                "${SONAR_URL}/api/qualityprofiles/activate_rules" \
-                -d "targetKey=${PK}&repositories=${repo}" 2>/dev/null || true
-              echo "✅ ${repo} rules activated (lang: ${lang})"
-            fi
-          done
-
-      - name: Run SonarQube analysis
-        if: env.CREEDENGO_SKIP != 'true'
-        run: |
-          cd backend
-          SONAR_AUTH=""
-          if [ -n "${SONAR_TOKEN:-}" ]; then
-            SONAR_AUTH="-Dsonar.token=${SONAR_TOKEN}"
-          else
-            SONAR_AUTH="-Dsonar.login=${SONAR_USER:-admin} -Dsonar.password=${SONAR_PASSWORD:-admin}"
-          fi
-
-          # Auto-detect Java version from detection
-          JAVA_VER=$(echo "$DETECT_JSON" | python3 -c "
-          import sys, json
-          for m in json.load(sys.stdin)['modules']:
-              if m['language'] == 'java' and m['language_version']:
-                  print(m['language_version']); break
-          " 2>/dev/null || echo "21")
-
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
-            -Dsonar.host.url=http://localhost:9100 \
-            $SONAR_AUTH \
-            -Dsonar.projectKey=esign-payment-backend \
-            -Dsonar.projectName="ESign Payment Backend" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.sources=src/main/java \
-            -Dsonar.java.source=${JAVA_VER} \
-            -Dsonar.sourceEncoding=UTF-8 \
-            -DskipTests 2>&1 | grep -E "ANALYSIS SUCCESSFUL|ERROR|WARN|Sensor creedengo|Creedengo" || true
-
-      - name: Wait for analysis completion
-        if: env.CREEDENGO_SKIP != 'true'
-        run: |
-          AUTH_FLAG=""
-          if [ -n "${SONAR_TOKEN:-}" ]; then AUTH_FLAG="-u ${SONAR_TOKEN}:"; else AUTH_FLAG="-u ${SONAR_USER:-admin}:${SONAR_PASSWORD:-admin}"; fi
-
-          for i in $(seq 1 60); do
-            CE_STATUS=$(curl -s $AUTH_FLAG \
-              "http://localhost:9100/api/ce/component?component=esign-payment-backend" 2>/dev/null \
-              | python3 -c "import sys,json; print(json.load(sys.stdin).get('current',{}).get('status','PENDING'))" 2>/dev/null || echo "PENDING")
-            if [ "$CE_STATUS" = "SUCCESS" ]; then
-              echo "✅ Analysis complete"
-              break
-            elif [ "$CE_STATUS" = "FAILED" ]; then
-              echo "❌ Analysis failed"
-              exit 1
-            fi
-            sleep 2
-          done
-
-      - name: Extract Creedengo results
-        if: env.CREEDENGO_SKIP != 'true'
-        run: |
-          mkdir -p reports
-
-          PRIMARY_LANG=$(echo "$DETECT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['primary_language'])" 2>/dev/null || echo "java")
-
-          EXTRACT_ARGS="--sonar-url http://localhost:9100 --project-key esign-payment-backend --output reports/creedengo-report.json --appname ${{ github.event.repository.name || 'esignpayment' }} --language ${PRIMARY_LANG} --sonar-repos ${ALL_SONAR_REPOS:-creedengo-java}"
-          if [ -n "${SONAR_TOKEN:-}" ]; then
-            EXTRACT_ARGS="$EXTRACT_ARGS --sonar-token ${SONAR_TOKEN}"
-          else
-            EXTRACT_ARGS="$EXTRACT_ARGS --sonar-user ${SONAR_USER:-admin} --sonar-password ${SONAR_PASSWORD:-admin}"
-          fi
-          python3 scripts/creedengo-extract-results.py $EXTRACT_ARGS
-
-          # Embed detection metadata
-          python3 -c "
-          import json, os
-          detect_json = os.environ.get('DETECT_JSON', '{}')
-          detect = json.loads(detect_json) if detect_json else {}
-          report = json.load(open('reports/creedengo-report.json'))
-          if detect:
-              report['detection'] = {
-                  'languages': detect.get('languages', []),
-                  'primary_language': detect.get('primary_language', ''),
-                  'primary_framework': detect.get('primary_framework', ''),
-                  'plugins_used': detect.get('creedengo_plugins', []),
-                  'modules': [{'name':m['name'],'path':m['path'],'language':m['language'],
-                               'framework':m.get('framework',''),'framework_version':m.get('framework_version',''),
-                               'language_version':m.get('language_version','')} for m in detect.get('modules',[])],
-              }
-              json.dump(report, open('reports/creedengo-report.json','w'), indent=2, ensure_ascii=False)
-              print('✅ Detection metadata embedded')
-          " || true
+          chmod +x scripts/creedengo-analyzer.sh scripts/_container-runtime.sh
+          bash scripts/creedengo-analyzer.sh --skip-build --force-cleanup
 
       - name: Assertions — Creedengo
         run: |
@@ -517,9 +285,22 @@ jobs:
           name: creedengo-report
           path: reports/creedengo-report.json
 
-      - name: Stop SonarQube
+      - name: Cleanup SonarQube (safety net — force destroy all)
         if: always()
-        run: docker rm -f creedengo-sonar 2>/dev/null || true
+        run: |
+          echo "🔥 Force-destroying ALL SonarQube/Creedengo Docker resources..."
+          # 1) Kill+remove all creedengo-sonar containers
+          docker ps -aq --filter "name=creedengo-sonar" 2>/dev/null | xargs -r docker rm -f 2>/dev/null || true
+          # 2) Kill+remove any container on the sonar port
+          docker ps -aq --filter "publish=9100" 2>/dev/null | xargs -r docker rm -f 2>/dev/null || true
+          # 3) Remove dangling volumes
+          docker volume ls -q --filter "dangling=true" 2>/dev/null | xargs -r docker volume rm 2>/dev/null || true
+          # 4) Remove sonarqube images to free CI disk space
+          docker images -q "sonarqube" 2>/dev/null | xargs -r docker rmi -f 2>/dev/null || true
+          # 5) Final prune: stopped containers + unused images
+          docker container prune -f 2>/dev/null || true
+          docker image prune -f 2>/dev/null || true
+          echo "✅ All SonarQube resources destroyed"
 
   spectral-lint:
     name: "🔬 Spectral OpenAPI Lint"
@@ -765,7 +546,7 @@ jobs:
 
   deploy-pages:
     name: "🌐 Deploy Dashboard to GitHub Pages"
-    needs: [green-score, creedengo]
+    needs: [green-score, creedengo, spectral-lint, auto-discover, summary]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feat/devoxx' || github.ref == 'refs/heads/feat/devoxx-creedengo')
     runs-on: ubuntu-latest
     environment:
