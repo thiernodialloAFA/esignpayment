@@ -13,11 +13,6 @@
       "url": "/",
       "description": "ESignPay API Server \u2014 gzip compression enabled on all endpoints",
       "x-server-compression": {
-        "algorithms": [
-          "gzip"
-        ],
-        "min-response-size": "256 bytes",
-        "enabled": true,
         "mime-types": [
           "application/json",
           "application/xml",
@@ -25,20 +20,25 @@
           "text/plain",
           "application/hal+json",
           "application/cbor"
+        ],
+        "enabled": true,
+        "min-response-size": "256 bytes",
+        "algorithms": [
+          "gzip"
         ]
       },
       "x-server-range-support": {
         "unit": "bytes",
-        "enabled": true,
         "endpoints": [
           "/api/documents/{id}/download"
-        ]
+        ],
+        "enabled": true
       },
       "x-server-etag-support": {
-        "scope": "all GET /api/* endpoints",
-        "mechanism": "If-None-Match \u2192 304 Not Modified",
+        "filter": "ShallowEtagHeaderFilter",
         "enabled": true,
-        "filter": "ShallowEtagHeaderFilter"
+        "mechanism": "If-None-Match \u2192 304 Not Modified",
+        "scope": "all GET /api/* endpoints"
       }
     }
   ],

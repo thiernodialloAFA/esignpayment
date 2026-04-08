@@ -48,7 +48,11 @@ def _fmt_bytes(n: int) -> str:
 
 
 def generate_creedengo_markdown(creedengo: dict) -> str:
-    """Return a Markdown section for the Creedengo eco-design analysis."""
+    """Return a Markdown section for the Creedengo eco-design analysis.
+
+    The recap (severity breakdown) is focalized on Creedengo/ecodesign rules ONLY,
+    not all SonarQube rules. General SonarQube issues are shown in a separate section.
+    """
     lines: list[str] = []
     a = lines.append
 
@@ -59,6 +63,9 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
     bd = score.get("severity_breakdown", {})
     emoji = "🟢" if total >= 85 else "🟡" if total >= 70 else "🔴"
 
+    sev_icons = {"BLOCKER": "🔴", "CRITICAL": "🟠", "MAJOR": "🟡", "MINOR": "⚪", "INFO": "🔵"}
+    sev_labels_fr = {"BLOCKER": "Bloquant", "CRITICAL": "Critique", "MAJOR": "Majeur", "MINOR": "Mineur", "INFO": "Info"}
+
     a("")
     a("---")
     a("")
@@ -66,6 +73,10 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
     a("")
     a(f"> Analyse statique de l'éco-conception du code source via "
       f"[Creedengo](https://github.com/green-code-initiative) / SonarQube")
+    a("")
+    a("> ⚠️ **Seules les règles Creedengo/écodesign sont comptabilisées** "
+      f"dans le score et le récapitulatif ci-dessous. "
+      f"Les règles SonarQube générales sont listées séparément.")
     a("")
 
     # Detection metadata
@@ -80,20 +91,31 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
         a(f"- **Plugins Creedengo** : {plugins}")
         a("")
 
-    # Severity breakdown
-    sev_icons = {"BLOCKER": "🔴", "CRITICAL": "🟠", "MAJOR": "🟡", "MINOR": "⚪", "INFO": "🔵"}
-    sev_parts = []
-    for sev, icon in sev_icons.items():
+    # ── Severity breakdown — CREEDENGO RULES ONLY ──
+    a("### 📊 Récapitulatif — Règles Creedengo écodesign uniquement")
+    a("")
+    a("| Sévérité | Nombre |")
+    a("|:--------:|-------:|")
+    total_issues_recap = 0
+    for sev in ["BLOCKER", "CRITICAL", "MAJOR", "MINOR", "INFO"]:
         count = bd.get(sev, 0)
-        if count > 0:
-            sev_parts.append(f"{icon} {sev}: {count}")
-    if sev_parts:
-        a(" | ".join(sev_parts))
+        total_issues_recap += count
+        icon = sev_icons.get(sev, "⚪")
+        label = sev_labels_fr.get(sev, sev)
+        a(f"| {icon} **{label}** | {count} |")
+    a(f"| **Total** | **{total_issues_recap}** |")
+    a("")
+
+    if total_issues_recap == 0:
+        a("> ✅ **Aucune violation de règle Creedengo/écodesign détectée !** Bravo 🎉")
         a("")
 
-    a(f"- **Issues** : {issues}")
-    a(f"- **Règles violées** : {creedengo.get('rules_violated', 0)} / "
-      f"{creedengo.get('all_creedengo_rules', 0)} analysées")
+    a(f"- **Issues écodesign** : {issues}")
+    rules_violated = creedengo.get('rules_violated', 0)
+    all_rules = creedengo.get('all_creedengo_rules', 0)
+    a(f"- **Règles écodesign violées** : {rules_violated} / "
+      f"{all_rules} analysées")
+    a(f"- **Formule du score** : (1 − {rules_violated}/{all_rules}) × 100 = **{total}/100**")
     if score.get("total_effort"):
         a(f"- **Effort de remédiation** : {score['total_effort']}")
     a("")
@@ -105,7 +127,7 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
         a(f"- **Lignes de code** : {ncloc:,}")
         a("")
 
-    # Categories
+    # Categories (Creedengo only)
     categories = creedengo.get("categories", [])
     if categories:
         a("### 🏷️ Catégories éco-design")
@@ -116,7 +138,7 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
             a(f"| {cat.get('label', cat.get('key', '?'))} | {cat['issues_count']} | {cat['rules_count']} |")
         a("")
 
-    # Rules summary (top 20)
+    # Rules summary — Creedengo only (top 20)
     rules = creedengo.get("rules_summary", [])
     if rules:
         a("### 📋 Règles Creedengo violées")
@@ -132,10 +154,10 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
             a(f"| | *… et {len(rules) - 20} autres* | | |")
         a("")
 
-    # Top files
+    # Top files (Creedengo only)
     top_files = creedengo.get("top_files", [])
     if top_files:
-        a("### 📁 Fichiers les plus impactés")
+        a("### 📁 Fichiers les plus impactés (écodesign)")
         a("")
         a("| Fichier | Issues |")
         a("|---------|-------:|")
@@ -145,6 +167,48 @@ def generate_creedengo_markdown(creedengo: dict) -> str:
         if len(top_files) > 10:
             a(f"| *… et {len(top_files) - 10} autres* | |")
         a("")
+
+    # ═══════════════════════════════════════════════════════════════
+    # ── General SonarQube issues (separate section, for context) ──
+    # ═══════════════════════════════════════════════════════════════
+    sonar = creedengo.get("sonar_issues", {})
+    sq_count = sonar.get("issues_count", 0)
+    if sq_count > 0:
+        sq_bd = sonar.get("severity_breakdown", {})
+        a("---")
+        a("")
+        a(f"### 🔧 Issues SonarQube générales (hors écodesign) — {sq_count} issues")
+        a("")
+        a("> Ces issues proviennent des règles SonarQube standard (qualité de code, "
+          f"bugs, sécurité). Elles ne sont **pas** comptabilisées dans le score Creedengo.")
+        a("")
+        a("| Sévérité | Nombre |")
+        a("|:--------:|-------:|")
+        for sev in ["BLOCKER", "CRITICAL", "MAJOR", "MINOR", "INFO"]:
+            count = sq_bd.get(sev, 0)
+            if count > 0:
+                icon = sev_icons.get(sev, "⚪")
+                label = sev_labels_fr.get(sev, sev)
+                a(f"| {icon} {label} | {count} |")
+        a(f"| **Total** | **{sq_count}** |")
+        a("")
+
+        sq_rules = sonar.get("rules_summary", [])
+        if sq_rules:
+            a("| Sévérité | Règle | Issues |")
+            a("|:--------:|-------|-------:|")
+            for rule in sq_rules[:15]:
+                sev = rule.get("severity", "INFO")
+                icon = sev_icons.get(sev, "⚪")
+                short_key = rule["key"].split(":")[-1] if ":" in rule["key"] else rule["key"]
+                a(f"| {icon} {sev} | **{short_key}** — {rule['name']} | {rule['count']} |")
+            if len(sq_rules) > 15:
+                a(f"| | *… et {len(sq_rules) - 15} autres* | |")
+            a("")
+
+        if sonar.get("total_effort"):
+            a(f"- **Effort de remédiation SonarQube** : {sonar['total_effort']}")
+            a("")
 
     a(f"📅 *{creedengo.get('timestamp', '')}*")
     a("")

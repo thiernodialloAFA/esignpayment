@@ -33,7 +33,11 @@ source "$ROOT/scripts/_container-runtime.sh"
 export PODMAN_COMPOSE_WARNING_LOGS=false
 
 # Force kill + remove all existing containers
-$CONTAINER_COMPOSE down --remove-orphans --timeout 5 2>/dev/null || true
+# Use test profile overlay: H2 in-memory DB, stubs for Stripe/Twilio/Email,
+# GreenScoreTestController provides scenario data for the analyzer.
+COMPOSE_CMD="$CONTAINER_COMPOSE -f ../docker-compose.yml -f ../docker-compose.test.yml"
+
+$COMPOSE_CMD down --remove-orphans --timeout 5 2>/dev/null || true
 $CONTAINER_RT rm -f $($CONTAINER_RT ps -aq) 2>/dev/null || true
 
 echo "⏳ Attente de 15s pour laisser les ports se libérer..."
@@ -42,10 +46,10 @@ echo "⏳ Attention nous allons ouvrir un terminal à coté pour lancer le compo
 
 if [[ "$(uname -s)" == Darwin ]]; then
   # macOS : ouvrir un nouveau Terminal.app via osascript
-  osascript -e "tell application \"Terminal\" to do script \"cd '$ROOT' && $CONTAINER_COMPOSE up --build --force-recreate \""
+  osascript -e "tell application \"Terminal\" to do script \"cd '$ROOT' && $COMPOSE_CMD up --build --force-recreate backend frontend\""
 else
   # Windows (Git Bash / mintty) : ouvrir un nouveau terminal mintty
-  mintty --title "Container Compose" -e bash -c "cd '$ROOT' && $CONTAINER_COMPOSE up --build --force-recreate; read -p 'Appuyez sur Entrée pour fermer...'" &
+  mintty --title "Container Compose" -e bash -c "cd '$ROOT' && $COMPOSE_CMD up --build --force-recreate backend frontend; read -p 'Appuyez sur Entrée pour fermer...'" &
 fi
 
 echo "⏳ Attente du démarrage des services 20s..."

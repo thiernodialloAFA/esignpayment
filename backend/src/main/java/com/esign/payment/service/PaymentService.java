@@ -1,5 +1,6 @@
 package com.esign.payment.service;
 
+import com.esign.payment.config.ServiceException;
 import com.esign.payment.dto.request.CreatePaymentRequest;
 import com.esign.payment.dto.response.PaymentResponse;
 import com.esign.payment.model.Payment;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +67,7 @@ public class PaymentService {
             return toPaymentResponse(payment, paymentIntent.getClientSecret());
         } catch (StripeException e) {
             log.error("Failed to create Stripe PaymentIntent: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to initiate payment: " + e.getMessage(), e);
+            throw new ServiceException(HttpStatus.BAD_GATEWAY, "Failed to initiate payment: " + e.getMessage(), e);
         }
     }
 
@@ -93,7 +95,7 @@ public class PaymentService {
             return toPaymentResponse(payment);
         } catch (StripeException e) {
             log.error("Failed to confirm payment: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to confirm payment: " + e.getMessage(), e);
+            throw new ServiceException(HttpStatus.BAD_GATEWAY, "Failed to confirm payment: " + e.getMessage(), e);
         }
     }
 

@@ -34,11 +34,13 @@ source "$GREEN_DIR/scripts/_container-runtime.sh"
 export PODMAN_COMPOSE_WARNING_LOGS=false
 
 # (Optionnel) Décommenter pour lancer compose depuis ce script :
-# $CONTAINER_COMPOSE down --remove-orphans --timeout 5 2>/dev/null || true
+# Use test profile overlay for Green Score: H2, stubs, GreenScoreTestController
+# COMPOSE_CMD="$CONTAINER_COMPOSE -f docker-compose.yml -f docker-compose.test.yml"
+# $COMPOSE_CMD down --remove-orphans --timeout 5 2>/dev/null || true
 # if [[ "$(uname -s)" == Darwin ]]; then
-#   osascript -e "tell application \"Terminal\" to do script \"cd '$ROOT' && $CONTAINER_COMPOSE up --build --force-recreate --remove-orphans\""
+#   osascript -e "tell application \"Terminal\" to do script \"cd '$ROOT' && $COMPOSE_CMD up --build --force-recreate backend frontend\""
 # else
-#   mintty --title "Container Compose" -e bash -c "cd '$ROOT' && $CONTAINER_COMPOSE up --build --force-recreate --remove-orphans; read -p 'Appuyez sur Entrée pour fermer...'" &
+#   mintty --title "Container Compose" -e bash -c "cd '$ROOT' && $COMPOSE_CMD up --build --force-recreate backend frontend; read -p 'Appuyez sur Entrée pour fermer...'" &
 # fi
 
 echo "⏳ Attente du démarrage des services 20s..."

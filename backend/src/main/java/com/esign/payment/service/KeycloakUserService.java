@@ -1,9 +1,11 @@
 package com.esign.payment.service;
 
+import com.esign.payment.config.ServiceException;
 import com.esign.payment.model.User;
 import com.esign.payment.model.enums.UserRole;
 import com.esign.payment.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,8 @@ public class KeycloakUserService {
         }
         // Fallback for test profile (no JWT) — return the seeded test user
         return userRepository.findByKeycloakId("test-user")
-                .orElseThrow(() -> new RuntimeException("No authenticated user and no test user found"));
+                .orElseThrow(() -> new ServiceException(HttpStatus.UNAUTHORIZED,
+                        "No authenticated user found. Please log in."));
     }
 
     /**

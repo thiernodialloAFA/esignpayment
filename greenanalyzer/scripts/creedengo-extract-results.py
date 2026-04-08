@@ -28,13 +28,8 @@ from base64 import b64encode
 
 
 # ── Scoring model ──
-SEVERITY_PENALTIES = {
-    "BLOCKER": 15,
-    "CRITICAL": 8,
-    "MAJOR": 4,
-    "MINOR": 1,
-    "INFO": 0.5,
-}
+# Score = (1 - rules_violated / total_rules) * 100
+# Example: 6 violated out of 17 → (1 - 6/17) * 100 ≈ 65
 
 GRADE_THRESHOLDS = [
     (95, "A+"),
@@ -98,14 +93,17 @@ def _api_get(base_url: str, path: str, params: dict = None,
     return {}
 
 
-def compute_score(issues: list[dict]) -> tuple[int, str]:
-    """Compute Creedengo score (0-100) and grade from issue list."""
-    penalty = 0.0
-    for issue in issues:
-        severity = issue.get("severity", "INFO")
-        penalty += SEVERITY_PENALTIES.get(severity, 0.5)
+def compute_score(rules_violated: int, total_rules: int) -> tuple[int, str]:
+    """Compute Creedengo score (0-100) and grade from violated/total rules ratio.
 
-    score = max(0, round(100 - penalty))
+    Formula: (1 - rules_violated / total_rules) * 100
+    Example: 6 violated out of 17 → (1 - 6/17) * 100 ≈ 64.71 → 65
+    """
+    if total_rules <= 0:
+        score = 100 if rules_violated == 0 else 0
+    else:
+        score = max(0, round((1 - rules_violated / total_rules) * 100))
+
     grade = "E"
     for threshold, g in GRADE_THRESHOLDS:
         if score >= threshold:
@@ -130,6 +128,36 @@ def categorize_rule(rule_key: str, rule_name: str, rule_desc: str) -> str:
     return "general"
 
 
+def _is_creedengo_rule(rule_key: str, repo_list: list[str]) -> bool:
+    """Return True if the rule key belongs to a Creedengo/ecoCode repository."""
+    creedengo_prefixes = tuple(f"{r}:" for r in repo_list)
+    ecocode_prefixes = tuple(f"ecocode-{r.replace('creedengo-', '')}:" for r in repo_list)
+    return rule_key.startswith(creedengo_prefixes + ecocode_prefixes)
+
+
+def _parse_effort(effort: str) -> int:
+    """Parse SonarQube effort string ('5min', '1h', '1h30min') to minutes."""
+    if not effort:
+        return 0
+    mins = 0
+    if "h" in effort:
+        parts = effort.split("h")
+        mins += int(parts[0]) * 60
+        rest = parts[1].replace("min", "").strip()
+        if rest:
+            mins += int(rest)
+    elif "min" in effort:
+        mins += int(effort.replace("min", "").strip())
+    return mins
+
+
+def _effort_str(total_minutes: int) -> str:
+    """Format total minutes as human-readable effort string."""
+    if total_minutes >= 60:
+        return f"{total_minutes // 60}h{total_minutes % 60:02d}min"
+    return f"{total_minutes}min"
+
+
 def extract_results(sonar_url: str, project_key: str,
                     token: str = "", user: str = "", password: str = "",
                     appname: str = "", language: str = "java",
@@ -140,25 +168,20 @@ def extract_results(sonar_url: str, project_key: str,
     auth = dict(token=token, user=user, password=password)
 
     # ── Wait for CE task to be fully complete before extracting ──
-    # NOTE: /api/ce/activity is more reliable than /api/ce/component
-    # which often returns 403 with project-level tokens.
     print("  ⏳ Checking analysis task status...")
     ce_timeout = 300
     ce_elapsed = 0
     while ce_elapsed < ce_timeout:
-        # Try /api/ce/activity first (more permissive endpoint)
         ce_data = _api_get(sonar_url, "/api/ce/activity",
                            {"component": project_key, "ps": "1"}, **auth)
         tasks = ce_data.get("tasks", [])
         if tasks:
             ce_status = tasks[0].get("status", "PENDING")
         else:
-            # Fallback: try /api/ce/component (may work with admin creds)
             ce_data2 = _api_get(sonar_url, "/api/ce/component",
                                 {"component": project_key}, **auth)
             ce_status = ce_data2.get("current", {}).get("status", "") if ce_data2 else ""
             if not ce_status:
-                # No task at all — analysis may not have been submitted
                 ce_status = "NO_TASK"
         if ce_status == "SUCCESS":
             print(f"  ✅ Analysis task complete ({ce_elapsed}s)")
@@ -175,7 +198,6 @@ def extract_results(sonar_url: str, project_key: str,
             print(f"  ⚠ No analysis task found — analysis may not have been submitted")
             break
         else:
-            # Unknown status or no task found — might be first run or already done
             print(f"  ⚠ CE status: {ce_status} — proceeding with extraction")
             break
     if ce_elapsed >= ce_timeout:
@@ -184,12 +206,9 @@ def extract_results(sonar_url: str, project_key: str,
     # Determine which repositories to query (multi-language support)
     repo_list = [r.strip() for r in sonar_repos.split(",") if r.strip()] if sonar_repos else [f"creedengo-{language}"]
 
-    # ── Step 1: Fetch all rule KEYS from each repository first ──
-    # The /api/issues/search endpoint's "rules" parameter expects actual rule keys
-    # (e.g., "creedengo-java:EC1"), NOT repository names ("creedengo-java").
-    # Passing a repository name directly causes HTTP 400.
-    print("  📋 Fetching rule keys from repositories...")
-    repo_rule_keys: dict[str, list[str]] = {}  # repo -> [rule_key, ...]
+    # ── Step 1: Fetch all rule KEYS from each Creedengo repository ──
+    print("  📋 Fetching Creedengo rule keys from repositories...")
+    repo_rule_keys: dict[str, list[str]] = {}
     for repo in repo_list:
         rules_data = _api_get(sonar_url, "/api/rules/search", {
             "repositories": repo,
@@ -204,15 +223,13 @@ def extract_results(sonar_url: str, project_key: str,
 
     # ── Step 2: Fetch Creedengo issues using actual rule keys ──
     print("  📋 Fetching Creedengo issues...")
-    all_issues = []
+    creedengo_issues_raw = []
     for repo in repo_list:
         rule_keys = repo_rule_keys.get(repo, [])
         if not rule_keys:
-            # No rules for this repo — try querying without filter then filter client-side
-            print(f"    {repo}: no rules to query — will search all issues")
+            print(f"    {repo}: no rules to query")
             continue
 
-        # SonarQube limits the "rules" parameter length — batch in groups of 20
         batch_size = 20
         for i in range(0, len(rule_keys), batch_size):
             batch = rule_keys[i:i + batch_size]
@@ -226,60 +243,65 @@ def extract_results(sonar_url: str, project_key: str,
                     "p": page,
                     "resolved": "false",
                 }, **auth)
-
                 issues_page = data.get("issues", [])
-                all_issues.extend(issues_page)
-
+                creedengo_issues_raw.extend(issues_page)
                 total = data.get("total", 0)
                 if len(issues_page) == 0 or page * 500 >= total:
                     break
                 page += 1
 
-        repo_issue_count = sum(1 for iss in all_issues if iss.get("rule", "").startswith(f"{repo}:"))
+        repo_issue_count = sum(1 for iss in creedengo_issues_raw if iss.get("rule", "").startswith(f"{repo}:"))
         if repo_issue_count > 0:
             print(f"    {repo}: {repo_issue_count} issues")
 
-    print(f"  Found {len(all_issues)} Creedengo issues total")
+    print(f"  Found {len(creedengo_issues_raw)} Creedengo-specific issues")
 
-    # If no creedengo-specific issues found, also try fetching ALL project issues
-    # and filter client-side for any creedengo/ecocode rules
-    if not all_issues:
-        print("  📋 No creedengo-specific issues via rules filter. Trying broader search...")
-        page = 1
-        broader_issues = []
-        while True:
-            data = _api_get(sonar_url, "/api/issues/search", {
-                "componentKeys": project_key,
-                "ps": 500,
-                "p": page,
-                "resolved": "false",
-            }, **auth)
-            page_issues = data.get("issues", [])
-            broader_issues.extend(page_issues)
-            total = data.get("total", 0)
-            if not page_issues or page * 500 >= total:
-                break
-            page += 1
+    # ── Step 2b: Also fetch ALL project issues (for the general SonarQube context) ──
+    print("  📋 Fetching all project issues (for general SonarQube context)...")
+    all_project_issues_raw = []
+    page = 1
+    while True:
+        data = _api_get(sonar_url, "/api/issues/search", {
+            "componentKeys": project_key,
+            "ps": 500,
+            "p": page,
+            "resolved": "false",
+        }, **auth)
+        page_issues = data.get("issues", [])
+        all_project_issues_raw.extend(page_issues)
+        total = data.get("total", 0)
+        if not page_issues or page * 500 >= total:
+            break
+        page += 1
+    print(f"  Found {len(all_project_issues_raw)} total project issues")
 
-        # Filter for creedengo/ecocode rules
+    # ── Step 2c: If no creedengo-specific issues found via rule keys, try broad filter ──
+    if not creedengo_issues_raw:
+        print("  📋 No Creedengo issues via rule filter. Filtering broad results...")
         creedengo_prefixes = tuple(f"{r}:" for r in repo_list)
         ecocode_prefixes = tuple(f"ecocode-{r.replace('creedengo-', '')}:" for r in repo_list)
         all_prefixes = creedengo_prefixes + ecocode_prefixes
-        creedengo_issues = [i for i in broader_issues if i.get("rule", "").startswith(all_prefixes)]
-
-        if creedengo_issues:
-            all_issues = creedengo_issues
-            print(f"  Found {len(all_issues)} creedengo issues from broad search")
+        creedengo_issues_raw = [
+            i for i in all_project_issues_raw
+            if i.get("rule", "").startswith(all_prefixes)
+        ]
+        if creedengo_issues_raw:
+            print(f"  Found {len(creedengo_issues_raw)} Creedengo issues from broad search")
         else:
-            # Use all issues as fallback (general code quality)
-            all_issues = broader_issues
-            print(f"  Found {len(all_issues)} total project issues (no creedengo-specific)")
+            print(f"  ⚠ No Creedengo/ecodesign rule violations found (0 issues)")
 
-    # ── Fetch Creedengo rules metadata (reuse from step 1 if already fetched) ──
+    # ── Separate general SonarQube issues (non-Creedengo) ──
+    creedengo_rule_keys_set = {i.get("rule", "") for i in creedengo_issues_raw}
+    sonar_only_issues_raw = [
+        i for i in all_project_issues_raw
+        if not _is_creedengo_rule(i.get("rule", ""), repo_list)
+    ]
+    print(f"  Separated: {len(creedengo_issues_raw)} Creedengo | {len(sonar_only_issues_raw)} SonarQube general")
+
+    # ── Fetch Creedengo rules metadata ──
     print("  📋 Fetching rule definitions...")
     rules_meta = {}
     for repo in repo_list:
-        # We already fetched rules above — but we need the full metadata
         rules_data = _api_get(sonar_url, "/api/rules/search", {
             "repositories": repo,
             "ps": 500,
@@ -308,63 +330,70 @@ def extract_results(sonar_url: str, project_key: str,
     for m in measures_data.get("component", {}).get("measures", []):
         measures[m["metric"]] = m.get("value", "0")
 
-    # ── Build structured issues list ──
-    issues_list = []
-    severity_counts = {"BLOCKER": 0, "CRITICAL": 0, "MAJOR": 0, "MINOR": 0, "INFO": 0}
-    rules_count: dict[str, dict] = {}
+    # ═══════════════════════════════════════════════════════════════
+    # Helper: build structured issue list + aggregations from raw issues
+    # ═══════════════════════════════════════════════════════════════
+    def _build_issue_data(raw_issues: list[dict]) -> tuple:
+        """Returns (issues_list, severity_counts, rules_agg, files_count, effort_min)."""
+        issues_out = []
+        sev = {"BLOCKER": 0, "CRITICAL": 0, "MAJOR": 0, "MINOR": 0, "INFO": 0}
+        rules_agg: dict[str, dict] = {}
+        files_cnt: dict[str, int] = {}
+        effort = 0
 
-    for issue in all_issues:
-        rule_key = issue.get("rule", "")
-        severity = issue.get("severity", "INFO")
-        component = issue.get("component", "")
-        # Remove project prefix from component path
-        file_path = component.replace(f"{project_key}:", "")
+        for issue in raw_issues:
+            rule_key = issue.get("rule", "")
+            severity = issue.get("severity", "INFO")
+            component = issue.get("component", "")
+            file_path = component.replace(f"{project_key}:", "")
 
-        issue_entry = {
-            "rule": rule_key,
-            "severity": severity,
-            "message": issue.get("message", ""),
-            "file": file_path,
-            "line": issue.get("line", 0),
-            "effort": issue.get("effort", ""),
-            "type": issue.get("type", "CODE_SMELL"),
-        }
-        issues_list.append(issue_entry)
-
-        severity_counts[severity] = severity_counts.get(severity, 0) + 1
-
-        # Aggregate by rule
-        if rule_key not in rules_count:
-            meta = rules_meta.get(rule_key, {})
-            rules_count[rule_key] = {
-                "key": rule_key,
-                "name": meta.get("name", rule_key.split(":")[-1] if ":" in rule_key else rule_key),
+            entry = {
+                "rule": rule_key,
                 "severity": severity,
+                "message": issue.get("message", ""),
+                "file": file_path,
+                "line": issue.get("line", 0),
+                "effort": issue.get("effort", ""),
                 "type": issue.get("type", "CODE_SMELL"),
-                "description": meta.get("htmlDesc", "")[:300],
-                "category": categorize_rule(rule_key,
-                                            meta.get("name", ""),
-                                            meta.get("htmlDesc", "")),
-                "count": 0,
-                "files": [],
             }
-        rules_count[rule_key]["count"] += 1
-        if file_path not in rules_count[rule_key]["files"]:
-            rules_count[rule_key]["files"].append(file_path)
+            issues_out.append(entry)
+            sev[severity] = sev.get(severity, 0) + 1
+            files_cnt[file_path] = files_cnt.get(file_path, 0) + 1
+            effort += _parse_effort(entry["effort"])
 
-    # ── Compute score ──
-    score, grade = compute_score(issues_list)
+            if rule_key not in rules_agg:
+                meta = rules_meta.get(rule_key, {})
+                rules_agg[rule_key] = {
+                    "key": rule_key,
+                    "name": meta.get("name", rule_key.split(":")[-1] if ":" in rule_key else rule_key),
+                    "severity": severity,
+                    "type": issue.get("type", "CODE_SMELL"),
+                    "description": meta.get("htmlDesc", "")[:300],
+                    "category": categorize_rule(rule_key, meta.get("name", ""), meta.get("htmlDesc", "")),
+                    "count": 0,
+                    "files": [],
+                }
+            rules_agg[rule_key]["count"] += 1
+            if file_path not in rules_agg[rule_key]["files"]:
+                rules_agg[rule_key]["files"].append(file_path)
 
-    # ── Build files summary (top files by issue count) ──
-    files_count: dict[str, int] = {}
-    for issue in issues_list:
-        f = issue["file"]
-        files_count[f] = files_count.get(f, 0) + 1
-    top_files = sorted(files_count.items(), key=lambda x: -x[1])[:20]
+        return issues_out, sev, rules_agg, files_cnt, effort
 
-    # ── Build category summary ──
+    # ── Build Creedengo-only data (for main score & recap) ──
+    cr_issues, cr_sev, cr_rules, cr_files, cr_effort = _build_issue_data(creedengo_issues_raw)
+
+    # ── Build SonarQube-general data (context, separate section) ──
+    sq_issues, sq_sev, sq_rules, sq_files, sq_effort = _build_issue_data(sonar_only_issues_raw)
+
+    # ── Compute score based on CREEDENGO rules ratio ──
+    # Formula: (1 - rules_violated / total_rules) * 100
+    total_creedengo_rules = len(rules_meta)
+    violated_creedengo_rules = len(cr_rules)
+    score, grade = compute_score(violated_creedengo_rules, total_creedengo_rules)
+
+    # ── Build category summary (Creedengo only) ──
     category_summary = {}
-    for rule_data in rules_count.values():
+    for rule_data in cr_rules.values():
         cat = rule_data["category"]
         if cat not in category_summary:
             category_summary[cat] = {
@@ -376,28 +405,8 @@ def extract_results(sonar_url: str, project_key: str,
         category_summary[cat]["issues_count"] += rule_data["count"]
         category_summary[cat]["rules_count"] += 1
 
-    # ── Total effort ──
-    total_effort_min = 0
-    for issue in issues_list:
-        effort = issue.get("effort", "")
-        if effort:
-            # Parse "5min", "1h", "1h30min" etc
-            mins = 0
-            if "h" in effort:
-                parts = effort.split("h")
-                mins += int(parts[0]) * 60
-                rest = parts[1].replace("min", "").strip()
-                if rest:
-                    mins += int(rest)
-            elif "min" in effort:
-                mins += int(effort.replace("min", "").strip())
-            total_effort_min += mins
-
-    effort_str = ""
-    if total_effort_min >= 60:
-        effort_str = f"{total_effort_min // 60}h{total_effort_min % 60:02d}min"
-    else:
-        effort_str = f"{total_effort_min}min"
+    # ── Top files (Creedengo only) ──
+    cr_top_files = sorted(cr_files.items(), key=lambda x: -x[1])[:20]
 
     # ── Assemble report ──
     report = {
@@ -408,14 +417,15 @@ def extract_results(sonar_url: str, project_key: str,
         "analyzer": "creedengo",
         "analyzer_version": "SonarQube + Creedengo Plugin",
         "repos_analyzed": repo_list,
+        # ── Main score: Creedengo/ecodesign rules ONLY ──
         "creedengo_score": {
             "total": score,
             "max": 100,
             "grade": grade,
-            "issues_count": len(issues_list),
-            "severity_breakdown": severity_counts,
-            "total_effort": effort_str,
-            "total_effort_minutes": total_effort_min,
+            "issues_count": len(cr_issues),
+            "severity_breakdown": cr_sev,
+            "total_effort": _effort_str(cr_effort),
+            "total_effort_minutes": cr_effort,
         },
         "measures": {
             "ncloc": int(measures.get("ncloc", 0)),
@@ -425,8 +435,9 @@ def extract_results(sonar_url: str, project_key: str,
             "complexity": int(measures.get("complexity", 0)),
             "cognitive_complexity": int(measures.get("cognitive_complexity", 0)),
         },
+        # ── Creedengo rules only ──
         "rules_summary": sorted(
-            list(rules_count.values()),
+            list(cr_rules.values()),
             key=lambda r: (
                 {"BLOCKER": 0, "CRITICAL": 1, "MAJOR": 2, "MINOR": 3, "INFO": 4}.get(r["severity"], 5),
                 -r["count"],
@@ -436,10 +447,26 @@ def extract_results(sonar_url: str, project_key: str,
             list(category_summary.values()),
             key=lambda c: -c["issues_count"],
         ),
-        "top_files": [{"file": f, "count": c} for f, c in top_files],
-        "issues": issues_list[:200],  # Cap at 200 for report size
+        "top_files": [{"file": f, "count": c} for f, c in cr_top_files],
+        "issues": cr_issues[:200],
         "all_creedengo_rules": len(rules_meta),
-        "rules_violated": len(rules_count),
+        "rules_violated": len(cr_rules),
+        # ── General SonarQube issues (separate section, for context) ──
+        "sonar_issues": {
+            "issues_count": len(sq_issues),
+            "severity_breakdown": sq_sev,
+            "total_effort": _effort_str(sq_effort),
+            "total_effort_minutes": sq_effort,
+            "rules_summary": sorted(
+                list(sq_rules.values()),
+                key=lambda r: (
+                    {"BLOCKER": 0, "CRITICAL": 1, "MAJOR": 2, "MINOR": 3, "INFO": 4}.get(r["severity"], 5),
+                    -r["count"],
+                ),
+            ),
+            "top_files": [{"file": f, "count": c} for f, c in sorted(sq_files.items(), key=lambda x: -x[1])[:20]],
+            "issues": sq_issues[:200],
+        },
     }
 
     return report
