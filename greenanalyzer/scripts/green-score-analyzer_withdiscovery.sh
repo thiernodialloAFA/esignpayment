@@ -49,8 +49,9 @@ KEYCLOAK_USER=${KEYCLOAK_USER:-"admin@test.com"}
 KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD:-"password"}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUTPUT_DIR="${ROOT_DIR}/reports"
+GREEN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$GREEN_DIR/.." && pwd)"
+OUTPUT_DIR="${GREEN_DIR}/reports"
 AUTODISCOVER_PY="${SCRIPT_DIR}/green-api-auto-discover.py"
 
 # ── Colors ──
@@ -203,15 +204,15 @@ if [ ! -f "$LATEST_REPORT" ]; then
 fi
 
 # Generate badge
-if [ -f "$ROOT_DIR/scripts/generate-badge.sh" ]; then
+if [ -f "$GREEN_DIR/scripts/generate-badge.sh" ]; then
   echo -e "${YELLOW}━━━ 🏷️  Generating Badge ━━━${NC}"
-  bash "$ROOT_DIR/scripts/generate-badge.sh" "$LATEST_REPORT" "$ROOT_DIR/badges/green-score.svg" || true
+  bash "$GREEN_DIR/scripts/generate-badge.sh" "$LATEST_REPORT" "$GREEN_DIR/badges/green-score.svg" || true
 fi
 
 # Generate dashboard
-if [ -f "$ROOT_DIR/scripts/generate-dashboard.sh" ]; then
+if [ -f "$GREEN_DIR/scripts/generate-dashboard.sh" ]; then
   echo -e "${YELLOW}━━━ 📊 Generating Dashboard ━━━${NC}"
-  bash "$ROOT_DIR/scripts/generate-dashboard.sh" "$LATEST_REPORT" "$ROOT_DIR/dashboard/index.save.html" "$ROOT_DIR/dashboard/index.html" || true
+  bash "$GREEN_DIR/scripts/generate-dashboard.sh" "$LATEST_REPORT" "$GREEN_DIR/dashboard/index.save.html" "$GREEN_DIR/dashboard/index.html" || true
 fi
 
 # ── Display summary ──
@@ -255,4 +256,4 @@ for ep in disc.get('discovered_endpoints', [])[:20]:
 " 2>/dev/null || true
 fi
 
-echo -e "Open the dashboard: ${YELLOW}open dashboard/index.html${NC}"
+echo -e "Open the dashboard: ${YELLOW}open greenanalyzer/dashboard/index.html${NC}"

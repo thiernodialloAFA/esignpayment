@@ -23,11 +23,12 @@
 ###############################################################################
 set -uo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+GREEN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # ── Detect container runtime (Docker/Podman) ──
-source "$ROOT/scripts/_container-runtime.sh"
+source "$GREEN_DIR/scripts/_container-runtime.sh"
 
 # ── Configuration (env-overridable) ──
 # NOTE: Creedengo plugins v2.x require SonarQube 10.6+ (Plugin API >= 13.0)
@@ -38,7 +39,7 @@ SONAR_PORT=${SONAR_PORT:-9100}
 SONAR_IMAGE=${SONAR_IMAGE:-"sonarqube:community"}
 CREEDENGO_VERSION=${CREEDENGO_VERSION:-"2.1.2"}
 CONTAINER_NAME="creedengo-sonar-$$"
-REPORTS_DIR="$ROOT/reports"
+REPORTS_DIR="$GREEN_DIR/reports"
 APPNAME=${APPNAME:-$(basename "$ROOT")}
 
 # ── Colors ──
@@ -180,8 +181,8 @@ fi
 #         - Backup directory for offline use
 #         - csharp is skipped (NuGet analyzer, no SonarQube JAR published)
 ###############################################################################
-PLUGIN_DIR="$ROOT/.creedengo/plugins"
-BACKUP_DIR="$ROOT/.creedengo/backup"
+PLUGIN_DIR="$GREEN_DIR/.creedengo/plugins"
+BACKUP_DIR="$GREEN_DIR/.creedengo/backup"
 mkdir -p "$PLUGIN_DIR" "$BACKUP_DIR"
 
 # ── Purge corrupted JARs (no Plugin-Key in manifest) on startup ──
@@ -386,7 +387,7 @@ cleanup() {
 if [ "$NO_CLEANUP" = true ]; then
   echo -e "  ${CYAN}ℹ️  --no-cleanup : le container SonarQube ne sera PAS supprimé à la fin${NC}"
   # Export container name so the caller (start.sh) can clean up later
-  echo "$CONTAINER_NAME" > "$ROOT/.creedengo/.sonar-container-name"
+  echo "$CONTAINER_NAME" > "$GREEN_DIR/.creedengo/.sonar-container-name"
 else
   trap cleanup EXIT
 fi
@@ -966,10 +967,10 @@ json.dump(report, open('$REPORTS_DIR/creedengo-report.json','w'), indent=2, ensu
 CREEDENGO_REPORT="$REPORTS_DIR/creedengo-report.json"
 GREEN_REPORT="$REPORTS_DIR/latest-report.json"
 
-if [ -f "$ROOT/scripts/generate-dashboard.sh" ] && [ -f "$CREEDENGO_REPORT" ]; then
+if [ -f "$GREEN_DIR/scripts/generate-dashboard.sh" ] && [ -f "$CREEDENGO_REPORT" ]; then
   echo -e "${YELLOW}━━━ 📊 Updating Dashboard ━━━${NC}"
-  bash "$ROOT/scripts/generate-dashboard.sh" "${GREEN_REPORT}" \
-    "$ROOT/dashboard/index.save.html" "$ROOT/dashboard/index.html" "${CREEDENGO_REPORT}" || true
+  bash "$GREEN_DIR/scripts/generate-dashboard.sh" "${GREEN_REPORT}" \
+    "$GREEN_DIR/dashboard/index.save.html" "$GREEN_DIR/dashboard/index.html" "${CREEDENGO_REPORT}" || true
 fi
 
 ###############################################################################
@@ -1011,5 +1012,5 @@ else
   echo -e "${RED}❌ Creedengo report not generated${NC}"
 fi
 echo ""
-echo -e "Open the dashboard: ${YELLOW}open dashboard/index.html${NC}"
+echo -e "Open the dashboard: ${YELLOW}open greenanalyzer/dashboard/index.html${NC}"
 
