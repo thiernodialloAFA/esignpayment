@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-08T19:57:27Z",
+  "timestamp": "2026-04-08T21:56:39Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
     "path": "/api/account-applications/{id}/kyc",
-    "url": "http://localhost:8080/api/account-applications/ff7a1819-046d-455c-85b8-d6d7e30b1e3a/kyc",
+    "url": "http://localhost:8080/api/account-applications/39d1dcbd-72c2-47eb-b4d0-5186f3e28094/kyc",
     "http_code": 201,
     "size_download": 366,
-    "time_total": 0.015166,
-    "speed_download": 24132,
+    "time_total": 0.016144,
+    "speed_download": 22670,
     "energy_network_wh": 2.0451843738555908e-05,
-    "energy_server_wh": 0.00010531944444444445,
-    "energy_total_wh": 0.00012577128818300036
+    "energy_server_wh": 0.0001121111111111111,
+    "energy_total_wh": 0.00013256295484966702
   }
 }

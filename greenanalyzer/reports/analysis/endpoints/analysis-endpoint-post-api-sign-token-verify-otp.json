@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-08T19:57:27Z",
+  "timestamp": "2026-04-08T21:56:39Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
@@ -7,10 +7,10 @@
     "url": "http://localhost:8080/api/sign/test-token-verify-otp/verify-otp",
     "http_code": 200,
     "size_download": 117,
-    "time_total": 0.013669,
-    "speed_download": 8559,
+    "time_total": 0.012395,
+    "speed_download": 9439,
     "energy_network_wh": 6.537884473800659e-06,
-    "energy_server_wh": 9.492361111111111e-05,
-    "energy_total_wh": 0.00010146149558491177
+    "energy_server_wh": 8.607638888888889e-05,
+    "energy_total_wh": 9.261427336268954e-05
   }
 }

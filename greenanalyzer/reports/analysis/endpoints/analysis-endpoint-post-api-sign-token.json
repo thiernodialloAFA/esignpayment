@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-08T19:57:27Z",
+  "timestamp": "2026-04-08T21:56:39Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "post",
@@ -7,10 +7,10 @@
     "url": "http://localhost:8080/api/sign/test-token-sign",
     "http_code": 200,
     "size_download": 1346,
-    "time_total": 0.044188,
-    "speed_download": 30461,
+    "time_total": 0.052524,
+    "speed_download": 25626,
     "energy_network_wh": 7.521361112594603e-05,
-    "energy_server_wh": 0.0003068611111111111,
-    "energy_total_wh": 0.00038207472223705715
+    "energy_server_wh": 0.00036475,
+    "energy_total_wh": 0.00043996361112594605
   }
 }

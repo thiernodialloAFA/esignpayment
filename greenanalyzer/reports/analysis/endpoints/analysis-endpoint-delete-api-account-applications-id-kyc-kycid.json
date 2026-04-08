@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-08T19:57:27Z",
+  "timestamp": "2026-04-08T21:56:39Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "delete",
     "path": "/api/account-applications/{id}/kyc/{kycId}",
-    "url": "http://localhost:8080/api/account-applications/94b1ee71-0ea8-40f7-8a62-f2509f083d1c/kyc/f497104b-9949-4bee-983a-e06a30a71a3e",
+    "url": "http://localhost:8080/api/account-applications/cb76973f-ca0a-4f91-bcce-4374e1e7678d/kyc/09be1746-84c1-4662-ac92-f4fe0a3b1dd1",
     "http_code": 200,
     "size_download": 61,
-    "time_total": 0.008581,
-    "speed_download": 7108,
+    "time_total": 0.009513,
+    "speed_download": 6412,
     "energy_network_wh": 3.408640623092651e-06,
-    "energy_server_wh": 5.959027777777777e-05,
-    "energy_total_wh": 6.299891840087042e-05
+    "energy_server_wh": 6.60625e-05,
+    "energy_total_wh": 6.947114062309265e-05
   }
 }

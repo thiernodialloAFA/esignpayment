@@ -4,7 +4,7 @@
 >
 > **Devoxx France 2026 — Green Architecture : moins de gras, plus d'impact !**
 
-📅 *Dernière analyse : 2026-04-08T19:57:27Z*
+📅 *Dernière analyse : 2026-04-08T21:56:39Z*
 
 ---
 
@@ -28,48 +28,48 @@
 
 | Méthode | Endpoint | Taille | Temps | HTTP |
 |:-------:|----------|-------:|------:|-----:|
-| GET | `/api/account-applications/{id}` | 917 B | 0.026s | 200 |
-| PUT | `/api/account-applications/{id}` | 941 B | 0.050s | 200 |
-| DELETE | `/api/account-applications/{id}` | 60 B | 0.026s | 200 |
-| POST | `/api/sign/{token}` | 1.3 KB | 0.044s | 200 |
-| POST | `/api/sign/{token}/verify-otp` | 117 B | 0.014s | 200 |
-| POST | `/api/sign/{token}/send-otp` | 135 B | 0.011s | 200 |
-| GET | `/api/payments` | 1.3 KB | 0.012s | 200 |
-| POST | `/api/payments` | 498 B | 0.071s | 201 |
-| POST | `/api/payments/{id}/cancel` | 372 B | 0.013s | 200 |
-| POST | `/api/payments/confirm` | 384 B | 0.021s | 200 |
-| GET | `/api/documents` | 5.6 KB | 0.011s | 200 |
-| POST | `/api/documents` | 767 B | 0.019s | 201 |
-| POST | `/api/documents/{id}/send` | 752 B | 0.011s | 200 |
-| POST | `/api/documents/{id}/resend` | 770 B | 0.008s | 200 |
-| POST | `/api/documents/{id}/live-sign/{signerId}` | 774 B | 0.324s | 200 |
-| GET | `/api/account-applications` | 6.3 KB | 0.019s | 200 |
-| POST | `/api/account-applications` | 940 B | 0.015s | 201 |
-| POST | `/api/account-applications/{id}/submit` | 2.0 KB | 0.014s | 200 |
-| POST | `/api/account-applications/{id}/regenerate-contract` | 1.3 KB | 0.041s | 200 |
-| POST | `/api/account-applications/{id}/kyc` | 366 B | 0.015s | 201 |
-| POST | `/api/account-applications/{id}/generate-contract` | 1.1 KB | 0.035s | 200 |
-| GET | `/api/sign/verify/{token}` | 229 B | 0.007s | 200 |
+| GET | `/api/account-applications/{id}` | 916 B | 0.030s | 200 |
+| PUT | `/api/account-applications/{id}` | 940 B | 0.067s | 200 |
+| DELETE | `/api/account-applications/{id}` | 60 B | 0.020s | 200 |
+| POST | `/api/sign/{token}` | 1.3 KB | 0.053s | 200 |
+| POST | `/api/sign/{token}/verify-otp` | 117 B | 0.012s | 200 |
+| POST | `/api/sign/{token}/send-otp` | 135 B | 0.012s | 200 |
+| GET | `/api/payments` | 1.3 KB | 0.014s | 200 |
+| POST | `/api/payments` | 498 B | 0.067s | 201 |
+| POST | `/api/payments/{id}/cancel` | 373 B | 0.010s | 200 |
+| POST | `/api/payments/confirm` | 384 B | 0.030s | 200 |
+| GET | `/api/documents` | 5.6 KB | 0.015s | 200 |
+| POST | `/api/documents` | 765 B | 0.021s | 201 |
+| POST | `/api/documents/{id}/send` | 750 B | 0.009s | 200 |
+| POST | `/api/documents/{id}/resend` | 771 B | 0.009s | 200 |
+| POST | `/api/documents/{id}/live-sign/{signerId}` | 773 B | 0.451s | 200 |
+| GET | `/api/account-applications` | 6.3 KB | 0.018s | 200 |
+| POST | `/api/account-applications` | 940 B | 0.025s | 201 |
+| POST | `/api/account-applications/{id}/submit` | 2.0 KB | 0.015s | 200 |
+| POST | `/api/account-applications/{id}/regenerate-contract` | 1.3 KB | 0.036s | 200 |
+| POST | `/api/account-applications/{id}/kyc` | 366 B | 0.016s | 201 |
+| POST | `/api/account-applications/{id}/generate-contract` | 1.1 KB | 0.030s | 200 |
+| GET | `/api/sign/verify/{token}` | 229 B | 0.008s | 200 |
 | GET | `/api/payments/{id}` | 359 B | 0.006s | 200 |
-| GET | `/api/payments/config` | 79 B | 0.007s | 200 |
-| GET | `/api/payments/changes` | 1.3 KB | 0.010s | 200 |
-| GET | `/api/documents/{id}` | 721 B | 0.007s | 200 |
-| DELETE | `/api/documents/{id}` | 70 B | 0.011s | 200 |
-| GET | `/api/documents/{id}/download` | 106 B | 0.007s | 404 |
+| GET | `/api/payments/config` | 79 B | 0.004s | 200 |
+| GET | `/api/payments/changes` | 1.3 KB | 0.011s | 200 |
+| GET | `/api/documents/{id}` | 722 B | 0.006s | 200 |
+| DELETE | `/api/documents/{id}` | 70 B | 0.008s | 200 |
+| GET | `/api/documents/{id}/download` | 106 B | 0.010s | 404 |
 | GET | `/api/documents/changes` | 6.0 KB | 0.009s | 200 |
-| GET | `/api/auth/me` | 209 B | 0.006s | 200 |
-| GET | `/api/account-types` | 559 B | 0.007s | 200 |
-| GET | `/api/account-applications/changes` | 8.1 KB | 0.016s | 200 |
-| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 61 B | 0.009s | 200 |
+| GET | `/api/auth/me` | 208 B | 0.005s | 200 |
+| GET | `/api/account-types` | 559 B | 0.008s | 200 |
+| GET | `/api/account-applications/changes` | 8.1 KB | 0.013s | 200 |
+| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 61 B | 0.010s | 200 |
 
 ### 🔑 Métriques clés
 
 - **Endpoints mesurés** : 33
 - **Transfert total** : 44.5 KB
 - **Transfert moyen / endpoint** : 1.3 KB
-- **Temps moyen** : 0.027s
-- **⚡ Énergie totale / appel** : 0.0087 Wh
-- **🌍 CO₂ / appel** : 0.00046 g (France — 53 gCO₂/kWh)
+- **Temps moyen** : 0.032s
+- **⚡ Énergie totale / appel** : 0.0098 Wh
+- **🌍 CO₂ / appel** : 0.00052 g (France — 53 gCO₂/kWh)
 
 ### 💡 Suggestions d'amélioration
 
@@ -217,67 +217,99 @@ Option 3 — Nginx:
 
 > Analyse statique de l'éco-conception du code source via [Creedengo](https://github.com/green-code-initiative) / SonarQube
 
+> ⚠️ **Seules les règles Creedengo/écodesign sont comptabilisées** dans le score et le récapitulatif ci-dessous. Les règles SonarQube générales sont listées séparément.
+
 - **Langages détectés** : java, python, typescript
 - **Principal** : java (spring-boot)
 - **Plugins Creedengo** : java, javascript, python
 
-🟠 CRITICAL: 45 | 🟡 MAJOR: 50 | ⚪ MINOR: 84 | 🔵 INFO: 1
+### 📊 Récapitulatif — Règles Creedengo écodesign uniquement
 
-- **Issues** : 180
-- **Règles violées** : 28 / 17 analysées
-- **Effort de remédiation** : 31h44min
+| Sévérité | Nombre |
+|:--------:|-------:|
+| 🔴 **Bloquant** | 0 |
+| 🟠 **Critique** | 0 |
+| 🟡 **Majeur** | 0 |
+| ⚪ **Mineur** | 963 |
+| 🔵 **Info** | 0 |
+| **Total** | **963** |
 
-- **Lignes de code** : 4,889
+- **Issues écodesign** : 963
+- **Règles écodesign violées** : 6 / 57 analysées
+- **Effort de remédiation** : 81h00min
+
+- **Lignes de code** : 4,991
 
 ### 🏷️ Catégories éco-design
 
 | Catégorie | Issues | Règles |
 |-----------|-------:|-------:|
-| 🌱 Éco-conception générale | 180 | 28 |
+| 🌱 Éco-conception générale | 948 | 3 |
+| 🖥️ Utilisation CPU | 15 | 3 |
 
 ### 📋 Règles Creedengo violées
 
 | Sévérité | Règle | Issues | Catégorie |
 |:--------:|-------|-------:|-----------|
-| 🟠 CRITICAL | **S2696** — S2696 | 23 | general |
-| 🟠 CRITICAL | **S1192** — S1192 | 12 | general |
-| 🟠 CRITICAL | **S3776** — S3776 | 6 | general |
-| 🟠 CRITICAL | **S6809** — S6809 | 3 | general |
-| 🟠 CRITICAL | **S2119** — S2119 | 1 | general |
-| 🟡 MAJOR | **S5778** — S5778 | 16 | general |
-| 🟡 MAJOR | **S6204** — S6204 | 8 | general |
-| 🟡 MAJOR | **S112** — S112 | 6 | general |
-| 🟡 MAJOR | **S125** — S125 | 6 | general |
-| 🟡 MAJOR | **S6126** — S6126 | 4 | general |
-| 🟡 MAJOR | **S1172** — S1172 | 3 | general |
-| 🟡 MAJOR | **S106** — S106 | 2 | general |
-| 🟡 MAJOR | **S3011** — S3011 | 2 | general |
-| 🟡 MAJOR | **S107** — S107 | 1 | general |
-| 🟡 MAJOR | **S1141** — S1141 | 1 | general |
-| 🟡 MAJOR | **S2142** — S2142 | 1 | general |
-| ⚪ MINOR | **S1104** — S1104 | 23 | general |
-| ⚪ MINOR | **S3008** — S3008 | 23 | general |
-| ⚪ MINOR | **S1444** — S1444 | 23 | general |
-| ⚪ MINOR | **S1481** — S1481 | 5 | general |
-| | *… et 8 autres* | | |
+| ⚪ MINOR | **GCI82** — Variable can be made constant | 931 | general |
+| ⚪ MINOR | **GCI67** — Use ++i instead of i++ | 12 | general |
+| ⚪ MINOR | **GCI3** — Avoid getting the size of the collection in the loop | 7 | cpu |
+| ⚪ MINOR | **GCI69** — Do not call a function when declaring a for-type loop | 7 | cpu |
+| ⚪ MINOR | **GCI32** — Initialize builder/buffer with the appropriate size | 5 | general |
+| ⚪ MINOR | **GCI1** — Avoid Spring repository call in loop or stream operations | 1 | cpu |
 
-### 📁 Fichiers les plus impactés
+### 📁 Fichiers les plus impactés (écodesign)
 
 | Fichier | Issues |
 |---------|-------:|
-| `config/TestDataInitializer.java` | 96 |
-| `service/AccountApplicationServiceTest.java` | 18 |
-| `service/AccountApplicationService.java` | 7 |
-| `service/DocumentService.java` | 7 |
-| `config/OpenApiConfig.java` | 7 |
-| `service/ContractPdfService.java` | 7 |
-| `service/OcrService.java` | 7 |
-| `controller/GreenScoreTestController.java` | 5 |
-| `config/TestDataInitializer.java` | 5 |
-| `config/TestProfileStubsConfig.java` | 3 |
+| `service/OcrService.java` | 134 |
+| `service/AccountApplicationService.java` | 69 |
+| `service/DocumentService.java` | 54 |
+| `service/ContractPdfService.java` | 52 |
+| `controller/DocumentController.java` | 49 |
+| `config/TestDataInitializer.java` | 42 |
+| `config/TestProfileStubsConfig.java` | 27 |
+| `config/OpenApiConfig.java` | 25 |
+| `config/FieldFilterAdvice.java` | 24 |
+| `service/PaymentService.java` | 24 |
 | *… et 10 autres* | |
 
-📅 *2026-04-08T19:59:37Z*
+---
+
+### 🔧 Issues SonarQube générales (hors écodesign) — 188 issues
+
+> Ces issues proviennent des règles SonarQube standard (qualité de code, bugs, sécurité). Elles ne sont **pas** comptabilisées dans le score Creedengo.
+
+| Sévérité | Nombre |
+|:--------:|-------:|
+| 🟠 Critique | 45 |
+| 🟡 Majeur | 54 |
+| ⚪ Mineur | 88 |
+| 🔵 Info | 1 |
+| **Total** | **188** |
+
+| Sévérité | Règle | Issues |
+|:--------:|-------|-------:|
+| 🟠 CRITICAL | **S2696** — S2696 | 23 |
+| 🟠 CRITICAL | **S1192** — S1192 | 12 |
+| 🟠 CRITICAL | **S3776** — S3776 | 6 |
+| 🟠 CRITICAL | **S6809** — S6809 | 3 |
+| 🟠 CRITICAL | **S2119** — S2119 | 1 |
+| 🟡 MAJOR | **S5778** — S5778 | 16 |
+| 🟡 MAJOR | **S6204** — S6204 | 11 |
+| 🟡 MAJOR | **S125** — S125 | 6 |
+| 🟡 MAJOR | **S112** — S112 | 6 |
+| 🟡 MAJOR | **S6126** — S6126 | 4 |
+| 🟡 MAJOR | **S1172** — S1172 | 3 |
+| 🟡 MAJOR | **S3011** — S3011 | 2 |
+| 🟡 MAJOR | **S106** — S106 | 2 |
+| 🟡 MAJOR | **S1068** — S1068 | 1 |
+| 🟡 MAJOR | **S107** — S107 | 1 |
+| | *… et 15 autres* | |
+
+- **Effort de remédiation SonarQube** : 32h12min
+
+📅 *2026-04-08T21:58:43Z*
 
 ---
 

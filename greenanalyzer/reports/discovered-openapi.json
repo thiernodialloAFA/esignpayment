@@ -16,8 +16,6 @@
         "algorithms": [
           "gzip"
         ],
-        "min-response-size": "256 bytes",
-        "enabled": true,
         "mime-types": [
           "application/json",
           "application/xml",
@@ -25,20 +23,22 @@
           "text/plain",
           "application/hal+json",
           "application/cbor"
-        ]
+        ],
+        "enabled": true,
+        "min-response-size": "256 bytes"
       },
       "x-server-range-support": {
+        "enabled": true,
+        "unit": "bytes",
         "endpoints": [
           "/api/documents/{id}/download"
-        ],
-        "unit": "bytes",
-        "enabled": true
+        ]
       },
       "x-server-etag-support": {
         "scope": "all GET /api/* endpoints",
-        "mechanism": "If-None-Match \u2192 304 Not Modified",
+        "filter": "ShallowEtagHeaderFilter",
         "enabled": true,
-        "filter": "ShallowEtagHeaderFilter"
+        "mechanism": "If-None-Match \u2192 304 Not Modified"
       }
     }
   ],

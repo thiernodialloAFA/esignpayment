@@ -213,8 +213,25 @@ print(info.get('sonar_repo', ''), info.get('sonar_lang', ''))
 " 2>/dev/null)
   SONAR_REPO=$(echo "$SONAR_INFO" | awk '{print $1}')
   SONAR_LANG=$(echo "$SONAR_INFO" | awk '{print $2}')
-  ALL_SONAR_REPOS="${ALL_SONAR_REPOS:+$ALL_SONAR_REPOS,}${SONAR_REPO}"
-  ALL_SONAR_LANGS="${ALL_SONAR_LANGS:+$ALL_SONAR_LANGS,}${SONAR_LANG}"
+
+  # Fallback: derive sonar_repo/sonar_lang from plugin_key if Python call failed
+  if [ -z "$SONAR_REPO" ]; then
+    SONAR_REPO="creedengo-${plugin_key}"
+    [ "$DEBUG_MODE" = true ] && echo -e "  ${YELLOW}⚠ Python lookup failed for ${plugin_key} — using fallback repo: ${SONAR_REPO}${NC}"
+  fi
+  if [ -z "$SONAR_LANG" ]; then
+    case "$plugin_key" in
+      java)       SONAR_LANG="java" ;;
+      python)     SONAR_LANG="py" ;;
+      javascript) SONAR_LANG="js" ;;
+      csharp)     SONAR_LANG="cs" ;;
+      *)          SONAR_LANG="$plugin_key" ;;
+    esac
+  fi
+
+  # Only append non-empty values
+  [ -n "$SONAR_REPO" ] && ALL_SONAR_REPOS="${ALL_SONAR_REPOS:+$ALL_SONAR_REPOS,}${SONAR_REPO}"
+  [ -n "$SONAR_LANG" ] && ALL_SONAR_LANGS="${ALL_SONAR_LANGS:+$ALL_SONAR_LANGS,}${SONAR_LANG}"
 
   # ── Skip csharp: no SonarQube JAR plugin published (NuGet only) ──
   if [ "$plugin_key" = "csharp" ]; then
@@ -320,6 +337,30 @@ for a in assets:
     rm -f "$TARGET_JAR"
   fi
 done
+
+# ── Validate ALL_SONAR_REPOS / ALL_SONAR_LANGS are not empty ──
+# Strip stray commas (e.g. ",creedengo-java," → "creedengo-java")
+ALL_SONAR_REPOS=$(echo "$ALL_SONAR_REPOS" | sed 's/^,//;s/,$//' | sed 's/,,*/,/g')
+ALL_SONAR_LANGS=$(echo "$ALL_SONAR_LANGS" | sed 's/^,//;s/,$//' | sed 's/,,*/,/g')
+
+if [ -z "$ALL_SONAR_REPOS" ]; then
+  echo -e "${YELLOW}⚠ ALL_SONAR_REPOS is empty after plugin resolution — rebuilding from PLUGIN_KEYS${NC}"
+  for pk in "${PLUGINS[@]}"; do
+    fb_repo="creedengo-${pk}"
+    case "$pk" in
+      java)       fb_lang="java" ;;
+      python)     fb_lang="py" ;;
+      javascript) fb_lang="js" ;;
+      csharp)     fb_lang="cs" ;;
+      *)          fb_lang="$pk" ;;
+    esac
+    ALL_SONAR_REPOS="${ALL_SONAR_REPOS:+$ALL_SONAR_REPOS,}${fb_repo}"
+    ALL_SONAR_LANGS="${ALL_SONAR_LANGS:+$ALL_SONAR_LANGS,}${fb_lang}"
+  done
+  echo -e "  ${GREEN}✓ ALL_SONAR_REPOS=${ALL_SONAR_REPOS}${NC}"
+  echo -e "  ${GREEN}✓ ALL_SONAR_LANGS=${ALL_SONAR_LANGS}${NC}"
+fi
+
 echo ""
 
 ###############################################################################
@@ -647,92 +688,31 @@ echo -e "  SonarQube:    ${CYAN}${SONAR_URL}${NC}"
 echo ""
 
 ###############################################################################
-# Step 7: Create quality profiles with Creedengo rules & assign to project
+# Step 7: Create quality profiles & gate with Creedengo rules & assign to project
+#   Delegates to setup-sonar-quality.sh which:
+#     1. Creates "creedprofiles-<lang>" quality profile extending "Sonar way"
+#     2. Activates ALL Creedengo eco-design rules in the profile
+#     3. Creates "CreedGate" quality gate (copy of the default)
+#     4. Links profile + gate to the project as default configuration
 ###############################################################################
-echo -e "${YELLOW}━━━ 📋 Activating Creedengo rules ━━━${NC}"
-sleep 3
+echo -e "${YELLOW}━━━ 📋 Setting up Creedengo quality profiles & gate ━━━${NC}"
 
-IFS=',' read -ra REPOS_ARRAY <<< "$ALL_SONAR_REPOS"
-IFS=',' read -ra LANGS_ARRAY <<< "$ALL_SONAR_LANGS"
+# Export variables needed by the setup script
+export SONAR_URL SONAR_AUTH_CURL PROJECT_KEY ALL_SONAR_REPOS ALL_SONAR_LANGS DEBUG_MODE APPNAME
 
-for idx in "${!REPOS_ARRAY[@]}"; do
-  repo="${REPOS_ARRAY[$idx]}"; lang="${LANGS_ARRAY[$idx]}"
-  [ -z "$repo" ] && continue
+SETUP_SCRIPT="$SCRIPT_DIR/setup-sonar-quality.sh"
+if [ -f "$SETUP_SCRIPT" ]; then
+  source "$SETUP_SCRIPT"
+else
+  echo -e "${RED}❌ setup-sonar-quality.sh not found at ${SETUP_SCRIPT}${NC}"
+  echo -e "${YELLOW}  Falling back to inline rule activation...${NC}"
 
-  # Count available Creedengo rules for this language
-  RULE_COUNT=$(curl -s ${SONAR_AUTH_CURL} \
-    "${SONAR_URL}/api/rules/search?repositories=${repo}&ps=1&languages=${lang}" 2>/dev/null \
-    | python3 -c "import sys,json; print(json.load(sys.stdin).get('total',0))" 2>/dev/null || echo "0")
-  echo -e "  ${repo}: ${CYAN}${RULE_COUNT}${NC} rules available"
-
-  if [ "$RULE_COUNT" -gt 0 ]; then
-    # Try to create a dedicated Creedengo quality profile
-    PROFILE_NAME="Creedengo-${lang}"
-    QP_CREATE=$(curl -s ${SONAR_AUTH_CURL} -X POST \
-      "${SONAR_URL}/api/qualityprofiles/create" \
-      -d "language=${lang}&name=${PROFILE_NAME}" 2>/dev/null || echo "{}")
-    NEW_PROFILE_KEY=$(echo "$QP_CREATE" | python3 -c "
-import sys,json
-d=json.load(sys.stdin)
-p = d.get('profile',{})
-print(p.get('key',''))
-" 2>/dev/null || echo "")
-
-    if [ -n "$NEW_PROFILE_KEY" ]; then
-      echo -e "  ${GREEN}✓ Quality profile '${PROFILE_NAME}' created${NC}"
-      TARGET_PROFILE="$NEW_PROFILE_KEY"
-
-      # Inherit from the built-in Sonar way profile (gets all default rules too)
-      BUILTIN_KEY=$(curl -s ${SONAR_AUTH_CURL} \
-        "${SONAR_URL}/api/qualityprofiles/search?language=${lang}" 2>/dev/null \
-        | python3 -c "
-import sys,json
-for p in json.load(sys.stdin).get('profiles',[]):
-    if p.get('isBuiltIn',False): print(p['key']); break
-" 2>/dev/null || echo "")
-      if [ -n "$BUILTIN_KEY" ] && [ "$BUILTIN_KEY" != "$NEW_PROFILE_KEY" ]; then
-        curl -s -o /dev/null ${SONAR_AUTH_CURL} -X POST \
-          "${SONAR_URL}/api/qualityprofiles/change_parent" \
-          -d "qualityProfile=${PROFILE_NAME}&language=${lang}&parentQualityProfile=Sonar%20way" 2>/dev/null || true
-        [ "$DEBUG_MODE" = true ] && echo -e "    ${CYAN}Inherited from Sonar way${NC}"
-      fi
-    else
-      # Profile may already exist — find it
-      TARGET_PROFILE=$(curl -s ${SONAR_AUTH_CURL} \
-        "${SONAR_URL}/api/qualityprofiles/search?language=${lang}" 2>/dev/null \
-        | python3 -c "
-import sys,json
-profiles = json.load(sys.stdin).get('profiles',[])
-for p in profiles:
-    if '${PROFILE_NAME}' in p.get('name',''): print(p['key']); break
-else:
-    for p in profiles:
-        if p.get('isDefault',False): print(p['key']); break
-" 2>/dev/null || echo "")
-      echo -e "  ${YELLOW}⚠ Using existing profile for ${lang}${NC}"
-    fi
-
-    # Activate ALL Creedengo rules in the target profile
-    if [ -n "$TARGET_PROFILE" ]; then
-      ACTIVATE_RESP=$(curl -s -o /dev/null -w "%{http_code}" ${SONAR_AUTH_CURL} -X POST \
-        "${SONAR_URL}/api/qualityprofiles/activate_rules" \
-        -d "targetKey=${TARGET_PROFILE}&repositories=${repo}" 2>/dev/null || echo "000")
-      echo -e "  ${GREEN}✓ ${RULE_COUNT} Creedengo rules activated in profile (HTTP ${ACTIVATE_RESP})${NC}"
-
-      # Set this profile as default for the language
-      curl -s -o /dev/null ${SONAR_AUTH_CURL} -X POST \
-        "${SONAR_URL}/api/qualityprofiles/set_default" \
-        -d "qualityProfile=${PROFILE_NAME}&language=${lang}" 2>/dev/null || true
-
-      # Associate the profile with our project specifically
-      curl -s -o /dev/null ${SONAR_AUTH_CURL} -X POST \
-        "${SONAR_URL}/api/qualityprofiles/add_project" \
-        -d "key=${TARGET_PROFILE}&project=${PROJECT_KEY}" 2>/dev/null || true
-      echo -e "  ${GREEN}✓ Profile '${PROFILE_NAME}' assigned to project${NC}"
-    fi
-  else
-    echo -e "  ${YELLOW}⚠ No rules found for ${repo} — plugin may not be loaded${NC}"
-    # Fallback: activate Creedengo rules in default profile
+  # Minimal fallback: activate rules in default profiles
+  IFS=',' read -ra REPOS_ARRAY <<< "$ALL_SONAR_REPOS"
+  IFS=',' read -ra LANGS_ARRAY <<< "$ALL_SONAR_LANGS"
+  for idx in "${!REPOS_ARRAY[@]}"; do
+    repo="${REPOS_ARRAY[$idx]}"; lang="${LANGS_ARRAY[$idx]}"
+    [ -z "$repo" ] && continue
     FALLBACK_KEY=$(curl -s ${SONAR_AUTH_CURL} \
       "${SONAR_URL}/api/qualityprofiles/search?language=${lang}&defaults=true" 2>/dev/null \
       | python3 -c "import sys,json; ps=json.load(sys.stdin).get('profiles',[]); print(ps[0]['key'] if ps else '')" 2>/dev/null || echo "")
@@ -740,9 +720,10 @@ else:
       curl -s -o /dev/null ${SONAR_AUTH_CURL} -X POST \
         "${SONAR_URL}/api/qualityprofiles/activate_rules" \
         -d "targetKey=${FALLBACK_KEY}&repositories=${repo}" 2>/dev/null || true
+      echo -e "  ${GREEN}✓ Creedengo rules activated in default profile for ${lang}${NC}"
     fi
-  fi
-done
+  done
+fi
 
 # Summary of installed plugins
 echo ""
@@ -981,14 +962,46 @@ if [ -f "$CREEDENGO_REPORT" ]; then
   TOTAL=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('creedengo_score',{}).get('total',0))" 2>/dev/null || echo "?")
   GRADE=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('creedengo_score',{}).get('grade','?'))" 2>/dev/null || echo "?")
   ISSUES=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('creedengo_score',{}).get('issues_count',0))" 2>/dev/null || echo "?")
-  RULES_VIOLATED=$(python3 -c "import json;print(len(json.load(open('$CREEDENGO_REPORT')).get('rules_summary',[])))" 2>/dev/null || echo "?")
+  RULES_VIOLATED=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('rules_violated',0))" 2>/dev/null || echo "?")
+  ALL_RULES=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('all_creedengo_rules',0))" 2>/dev/null || echo "?")
+
+  # Severity breakdown — Creedengo/ecodesign rules ONLY
+  SEV_BREAKDOWN=$(python3 -c "
+import json
+r = json.load(open('$CREEDENGO_REPORT'))
+bd = r.get('creedengo_score',{}).get('severity_breakdown',{})
+parts = []
+for sev, label in [('BLOCKER','Bloquant'),('CRITICAL','Critique'),('MAJOR','Majeur'),('MINOR','Mineur'),('INFO','Info')]:
+    c = bd.get(sev, 0)
+    parts.append(f'{label}: {c}')
+print(' | '.join(parts))
+" 2>/dev/null || echo "")
+
+  # SonarQube general issues count
+  SQ_ISSUES=$(python3 -c "import json;print(json.load(open('$CREEDENGO_REPORT')).get('sonar_issues',{}).get('issues_count',0))" 2>/dev/null || echo "0")
+  SQ_BREAKDOWN=$(python3 -c "
+import json
+r = json.load(open('$CREEDENGO_REPORT'))
+bd = r.get('sonar_issues',{}).get('severity_breakdown',{})
+parts = []
+for sev, label in [('CRITICAL','Critique'),('MAJOR','Majeur'),('MINOR','Mineur'),('INFO','Info')]:
+    c = bd.get(sev, 0)
+    if c > 0: parts.append(f'{label}: {c}')
+print(' | '.join(parts) if parts else 'Aucune')
+" 2>/dev/null || echo "")
 
   echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
   echo -e "${CYAN}║  📦 APP: ${GREEN}${APPNAME}${NC}"
   echo -e "${CYAN}║  🔍 Stack: ${GREEN}${ALL_LANGUAGES}${CYAN} — ${GREEN}${PRIMARY_FRAMEWORK:-no framework}${NC}"
-  echo -e "${CYAN}║  🌱 CREEDENGO SCORE: ${GREEN}${TOTAL}/100${CYAN}  Grade: ${GREEN}${GRADE}${NC}"
-  echo -e "${CYAN}║  🐛 Issues: ${GREEN}${ISSUES}${CYAN}   Rules violated: ${GREEN}${RULES_VIOLATED}${NC}"
   echo -e "${CYAN}║  🔌 Plugins: ${GREEN}${PLUGIN_KEYS}${NC}"
+  echo -e "${CYAN}╠══════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${CYAN}║  🌱 CREEDENGO SCORE (écodesign uniquement)${NC}"
+  echo -e "${CYAN}║     Score: ${GREEN}${TOTAL}/100${CYAN}  Grade: ${GREEN}${GRADE}${NC}"
+  echo -e "${CYAN}║     Issues écodesign: ${GREEN}${ISSUES}${CYAN}  Règles violées: ${GREEN}${RULES_VIOLATED}/${ALL_RULES}${NC}"
+  echo -e "${CYAN}║     ${GREEN}${SEV_BREAKDOWN}${NC}"
+  echo -e "${CYAN}╠══════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${CYAN}║  🔧 SONARQUBE GÉNÉRAL (hors écodesign): ${YELLOW}${SQ_ISSUES} issues${NC}"
+  echo -e "${CYAN}║     ${YELLOW}${SQ_BREAKDOWN}${NC}"
   echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
   echo ""
   echo -e "${GREEN}📄 Report: ${CREEDENGO_REPORT}${NC}"
@@ -997,15 +1010,28 @@ if [ -f "$CREEDENGO_REPORT" ]; then
 import json
 r = json.load(open('$CREEDENGO_REPORT'))
 s = r.get('creedengo_score',{}); d = r.get('detection',{})
+sq = r.get('sonar_issues',{})
 print(f'  Stack:   {d.get(\"languages\",[])}')
 print(f'  Primary: {d.get(\"primary_language\",\"?\")} ({d.get(\"primary_framework\",\"\")})')
 print(f'  Plugins: {d.get(\"plugins_used\",[])}')
+print()
+print(f'  === Creedengo/Écodesign ===')
 print(f'  Score:   {s.get(\"total\",0)}/100  Grade: {s.get(\"grade\",\"?\")}')
 bd = s.get('severity_breakdown',{})
 for sev in ['BLOCKER','CRITICAL','MAJOR','MINOR','INFO']:
     c = bd.get(sev,0)
     print(f'    {\"🔴\" if sev in (\"BLOCKER\",\"CRITICAL\") else \"🟡\" if sev==\"MAJOR\" else \"⚪\"} {sev:10s}: {c}')
 for rule in r.get('rules_summary',[])[:15]:
+    print(f'    [{rule[\"severity\"]:8s}] {rule[\"key\"]:40s} x{rule[\"count\"]}  {rule[\"name\"][:50]}')
+print()
+print(f'  === SonarQube Général (hors écodesign) ===')
+print(f'  Issues: {sq.get(\"issues_count\",0)}')
+sbd = sq.get('severity_breakdown',{})
+for sev in ['BLOCKER','CRITICAL','MAJOR','MINOR','INFO']:
+    c = sbd.get(sev,0)
+    if c > 0:
+        print(f'    {\"🔴\" if sev in (\"BLOCKER\",\"CRITICAL\") else \"🟡\" if sev==\"MAJOR\" else \"⚪\"} {sev:10s}: {c}')
+for rule in sq.get('rules_summary',[])[:10]:
     print(f'    [{rule[\"severity\"]:8s}] {rule[\"key\"]:40s} x{rule[\"count\"]}  {rule[\"name\"][:50]}')
 " 2>/dev/null || true
 else

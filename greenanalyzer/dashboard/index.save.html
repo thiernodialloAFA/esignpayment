@@ -1108,46 +1108,46 @@
                 </div>
 
                 <!-- Creedengo Rules Breakdown -->
-                <div class="card" id="creedengo-rules-card" style="display:none;grid-column:1/-1;">
+                <div class="card" id="creedengo-rules-card" style="grid-column:1/-1;">
                     <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">
                         📋 Règles éco-conception violées <span id="creedengo-rules-count" class="suggestion-count-badge" style="margin-left:6px;">0</span> <span class="chevron">▼</span>
                     </button>
                     <div class="accordion-body collapsed" id="creedengo-rules-accordion">
                         <div id="creedengo-rules-filters" class="suggestions-filters" style="margin-bottom:12px;"></div>
-                        <div id="creedengo-rules-list"></div>
+                        <div id="creedengo-rules-list"><p style="color:var(--gray-500);text-align:center;padding:24px 0;">✅ Aucune règle éco-conception violée</p></div>
                     </div>
                 </div>
 
                 <!-- Environmental Impact Estimation -->
-                <div class="card" id="creedengo-env-impact-card" style="display:none;grid-column:1/-1;">
+                <div class="card" id="creedengo-env-impact-card" style="grid-column:1/-1;">
                     <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">
                         🌍 Impact environnemental estimé — Potentiel d'économie <span class="chevron">▼</span>
                     </button>
                     <div class="accordion-body collapsed" id="creedengo-env-impact-accordion">
-                        <div id="creedengo-env-impact-content"></div>
+                        <div id="creedengo-env-impact-content"><p style="color:var(--gray-500);text-align:center;padding:24px 0;">Aucune donnée d'impact disponible</p></div>
                     </div>
                 </div>
 
                 <!-- Row: Metrics + Effort (2 columns, 50/50) -->
-                <div class="card" id="creedengo-metrics-card" style="display:none;">
+                <div class="card" id="creedengo-metrics-card">
                     <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📊 Métriques <span class="chevron">▼</span></button>
                     <div class="accordion-body collapsed" id="creedengo-metrics-accordion">
-                        <div class="metric-grid" id="creedengo-metrics-grid"></div>
+                        <div class="metric-grid" id="creedengo-metrics-grid"><p style="color:var(--gray-500);text-align:center;padding:24px 0;">Aucune métrique disponible</p></div>
                     </div>
                 </div>
 
-                <div class="card" id="creedengo-effort-card" style="display:none;">
+                <div class="card" id="creedengo-effort-card">
                     <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">⏱️ Effort de remédiation <span class="chevron">▼</span></button>
                     <div class="accordion-body collapsed" id="creedengo-effort-accordion">
-                        <div id="creedengo-effort-content"></div>
+                        <div id="creedengo-effort-content"><p style="color:var(--gray-500);text-align:center;padding:24px 0;">Aucun effort estimé</p></div>
                     </div>
                 </div>
 
                 <!-- Fichiers les plus impactés (full width, last) -->
-                <div class="card" id="creedengo-files-card" style="display:none;grid-column:1/-1;">
+                <div class="card" id="creedengo-files-card" style="grid-column:1/-1;">
                     <button class="accordion-toggle" aria-expanded="false" onclick="toggleAccordion(this)">📁 Fichiers les plus impactés <span class="chevron">▼</span></button>
                     <div class="accordion-body collapsed" id="creedengo-files-accordion">
-                        <div id="creedengo-files-list"></div>
+                        <div id="creedengo-files-list"><p style="color:var(--gray-500);text-align:center;padding:24px 0;">Aucun fichier impacté</p></div>
                     </div>
                 </div>
 
@@ -1222,9 +1222,10 @@ function renderCreedengoReport(report) {
     circle.style.boxShadow = `0 0 30px ${color}40`;
     gradeEl.style.background = color;
 
-    // Severity badges
+    // Severity badges — CREEDENGO/ECODESIGN RULES ONLY
     const bd = score.severity_breakdown || {};
-    const badgesHtml = [
+    let badgesHtml = '';
+    const severityBadges = [
         { key: 'BLOCKER', cls: 'blocker', icon: '🔴', label: 'Bloquant' },
         { key: 'CRITICAL', cls: 'critical', icon: '🟠', label: 'Critique' },
         { key: 'MAJOR', cls: 'major', icon: '🟡', label: 'Majeur' },
@@ -1232,27 +1233,53 @@ function renderCreedengoReport(report) {
         { key: 'INFO', cls: 'info', icon: '🔵', label: 'Info' },
     ].map(s => {
         const count = bd[s.key] || 0;
-        return count > 0 ? `<span class="severity-badge ${s.cls}">${s.icon} ${count} ${s.label}</span>` : '';
-    }).filter(Boolean).join('');
-    document.getElementById('creedengo-severity-badges').innerHTML = badgesHtml ||
-        '<span style="color:var(--green-400);font-weight:700;">✅ Aucun problème détecté</span>';
+        return `<span class="severity-badge ${s.cls}">${s.icon} ${count} ${s.label}</span>`;
+    }).join('');
+    const totalCreedengoIssues = Object.values(bd).reduce((a, b) => a + b, 0);
+    if (totalCreedengoIssues === 0) {
+        badgesHtml += '<span style="color:var(--green-400);font-weight:700;">✅ Aucune violation de règle Creedengo/écodesign 🎉</span>';
+    } else {
+        badgesHtml += severityBadges;
+    }
+    document.getElementById('creedengo-severity-badges').innerHTML = badgesHtml;
+
+    // SonarQube general issues (separate section)
+    const sonarIssues = report.sonar_issues || {};
+    const sqCount = sonarIssues.issues_count || 0;
+    if (sqCount > 0) {
+        const sqBd = sonarIssues.severity_breakdown || {};
+        let sqHtml = '<div style="margin-top:16px;padding:12px 16px;background:rgba(107,114,128,0.12);border-radius:8px;border:1px solid var(--gray-700);">';
+        sqHtml += '<div style="font-size:0.78rem;font-weight:600;color:var(--gray-400);margin-bottom:6px;">🔧 Issues SonarQube générales (hors écodesign) — ' + sqCount + ' issues</div>';
+        sqHtml += '<div style="font-size:0.7rem;color:var(--gray-500);margin-bottom:8px;">Non comptabilisées dans le score Creedengo</div>';
+        sqHtml += [
+            { key: 'BLOCKER', cls: 'blocker', icon: '🔴', label: 'Bloquant' },
+            { key: 'CRITICAL', cls: 'critical', icon: '🟠', label: 'Critique' },
+            { key: 'MAJOR', cls: 'major', icon: '🟡', label: 'Majeur' },
+            { key: 'MINOR', cls: 'minor', icon: '⚪', label: 'Mineur' },
+            { key: 'INFO', cls: 'info', icon: '🔵', label: 'Info' },
+        ].map(s => {
+            const c = sqBd[s.key] || 0;
+            return c > 0 ? `<span class="severity-badge ${s.cls}" style="font-size:0.68rem;padding:2px 6px;">${s.icon} ${c} ${s.label}</span>` : '';
+        }).filter(Boolean).join('');
+        sqHtml += '</div>';
+        document.getElementById('creedengo-severity-badges').innerHTML += sqHtml;
+    }
 
     // Timestamp
     document.getElementById('creedengo-timestamp').textContent =
         `📅 ${report.timestamp || ''} — ${report.language || 'java'} — ${score.issues_count || 0} issues`;
 
     // ── Metrics card ──
-    const metricsCard = document.getElementById('creedengo-metrics-card');
-    metricsCard.style.display = 'block';
     const measures = report.measures || {};
     const metricsGrid = document.getElementById('creedengo-metrics-grid');
     metricsGrid.innerHTML = `
-        <div class="metric-item"><div class="metric-value">${score.issues_count || 0}</div><div class="metric-label">Issues Creedengo</div></div>
-        <div class="metric-item"><div class="metric-value">${report.rules_violated || 0}</div><div class="metric-label">Règles violées</div></div>
-        <div class="metric-item"><div class="metric-value">${report.all_creedengo_rules || '—'}</div><div class="metric-label">Règles analysées</div></div>
+        <div class="metric-item"><div class="metric-value">${score.issues_count || 0}</div><div class="metric-label">Issues écodesign</div></div>
+        <div class="metric-item"><div class="metric-value">${report.rules_violated || 0}</div><div class="metric-label">Règles écodesign violées</div></div>
+        <div class="metric-item"><div class="metric-value">${report.all_creedengo_rules || '—'}</div><div class="metric-label">Règles Creedengo analysées</div></div>
         <div class="metric-item"><div class="metric-value">${(measures.ncloc || 0).toLocaleString('fr-FR')}</div><div class="metric-label">Lignes de code</div></div>
-        <div class="metric-item"><div class="metric-value">${score.total_effort || '—'}</div><div class="metric-label">Effort total</div></div>
+        <div class="metric-item"><div class="metric-value">${score.total_effort || '—'}</div><div class="metric-label">Effort écodesign</div></div>
         <div class="metric-item"><div class="metric-value" style="color:${pct >= 70 ? 'var(--green-400)' : 'var(--yellow-400)'}">${total}/100</div><div class="metric-label">Score éco-design</div></div>
+        <div class="metric-item"><div class="metric-value" style="color:var(--gray-400)">${(report.sonar_issues || {}).issues_count || 0}</div><div class="metric-label">Issues SonarQube (hors écodesign)</div></div>
     `;
 
     // ── Rules list (rendered before metrics in DOM, but populated here) ──
@@ -1261,7 +1288,6 @@ function renderCreedengoReport(report) {
     // ── Top files ──
     const topFiles = report.top_files || [];
     if (topFiles.length > 0) {
-        document.getElementById('creedengo-files-card').style.display = 'block';
         document.getElementById('creedengo-files-list').innerHTML = topFiles.map(f => {
             const shortName = f.file.split('/').slice(-2).join('/');
             return `<div class="creedengo-file-row">
@@ -1269,11 +1295,13 @@ function renderCreedengoReport(report) {
                 <span class="file-count">${f.count} issue${f.count > 1 ? 's' : ''}</span>
             </div>`;
         }).join('');
+    } else {
+        document.getElementById('creedengo-files-list').innerHTML =
+            '<p style="color:var(--green-400);text-align:center;padding:24px 0;font-weight:600;">✅ Aucun fichier impacté</p>';
     }
 
     // ── Effort card ──
     if (score.total_effort_minutes > 0) {
-        document.getElementById('creedengo-effort-card').style.display = 'block';
         const mins = score.total_effort_minutes;
         const hours = (mins / 60).toFixed(1);
         const days = (mins / 480).toFixed(1);
@@ -1287,6 +1315,9 @@ function renderCreedengoReport(report) {
             <p style="margin-top:12px;font-size:0.78rem;color:var(--gray-500);">
                 💡 L'effort est estimé par SonarQube selon la complexité de chaque correction éco-design.
             </p>`;
+    } else {
+        document.getElementById('creedengo-effort-content').innerHTML =
+            '<p style="color:var(--green-400);text-align:center;padding:24px 0;font-weight:600;">✅ Aucun effort de remédiation nécessaire</p>';
     }
 
     // ── Environmental Impact Estimation ──
@@ -1299,10 +1330,15 @@ function renderCreedengoReport(report) {
 
 function renderCreedengoRules(report) {
     const rules = report.rules_summary || [];
-    if (rules.length === 0) return;
 
-    document.getElementById('creedengo-rules-card').style.display = 'block';
     document.getElementById('creedengo-rules-count').textContent = rules.length;
+
+    if (rules.length === 0) {
+        document.getElementById('creedengo-rules-filters').innerHTML = '';
+        document.getElementById('creedengo-rules-list').innerHTML =
+            '<p style="color:var(--green-400);text-align:center;padding:24px 0;font-weight:600;">✅ Aucune règle éco-conception violée</p>';
+        return;
+    }
 
     // Filters
     const severities = ['all', 'BLOCKER', 'CRITICAL', 'MAJOR', 'MINOR', 'INFO'];
@@ -1395,9 +1431,11 @@ function renderCreedengoEnvImpact(report) {
     const measures = report.measures || {};
     const issueCount = score.issues_count || 0;
 
-    if (issueCount === 0) return;
-
-    document.getElementById('creedengo-env-impact-card').style.display = 'block';
+    if (issueCount === 0) {
+        document.getElementById('creedengo-env-impact-content').innerHTML =
+            '<p style="color:var(--green-400);text-align:center;padding:24px 0;font-weight:600;">✅ Aucun impact environnemental à estimer — zéro issue écodesign</p>';
+        return;
+    }
 
     // ── Read sidebar energy parameters (shared with Green API tab) ──
     const serverPowerW = parseFloat(document.getElementById('param-server')?.value || 25);
