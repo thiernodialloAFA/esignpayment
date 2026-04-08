@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 ###############################################################################
 #  Start baseline + optimized (local dev)
-#  Usage: bash scripts/start_light.sh [--analyze] [--debug] [--appname <name>]
+#  Usage: bash greenanalyzer/scripts/start_light.sh [--analyze] [--debug] [--appname <name>]
 ###############################################################################
 set -uo pipefail   # pas de -e : on gère les erreurs manuellement
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+GREEN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$GREEN_DIR/.." && pwd)"
 
 # Parse options
 DEBUG_FLAG=""
@@ -27,7 +28,7 @@ APPNAME="${APPNAME:-$(basename "$ROOT")}"
 export APPNAME
 
 # Détection automatique : docker ou podman ?
-source "$ROOT/scripts/_container-runtime.sh"
+source "$GREEN_DIR/scripts/_container-runtime.sh"
 
 # Suppress Podman "Executing external compose provider" warning (ignoré si docker)
 export PODMAN_COMPOSE_WARNING_LOGS=false
@@ -126,7 +127,7 @@ export BEARER_TOKEN
 echo ""
 
 echo "Running Green Score analyzer..."
-bash "$ROOT/scripts/green-score-analyzer_withdiscovery.sh" $DEBUG_FLAG || true
+bash "$GREEN_DIR/scripts/green-score-analyzer_withdiscovery.sh" $DEBUG_FLAG || true
 
 # ── Creedengo eco-design analysis (optional, requires Docker) ──
 RUN_CREEDENGO=false
@@ -139,7 +140,7 @@ done
 if [ "$RUN_CREEDENGO" = true ]; then
   echo ""
   echo "Running Creedengo eco-design code analyzer..."
-  bash "$ROOT/scripts/creedengo-analyzer.sh" $DEBUG_FLAG --skip-build || true
+  bash "$GREEN_DIR/scripts/creedengo-analyzer.sh" $DEBUG_FLAG --skip-build || true
 else
   echo ""
   echo "💡 Tip: run with --creedengo to also run Creedengo eco-design code analysis"
