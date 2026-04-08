@@ -1,5 +1,6 @@
 package com.esign.payment.service;
 
+import com.esign.payment.config.ServiceException;
 import com.esign.payment.dto.request.CreateDocumentRequest;
 import com.esign.payment.dto.request.SignDocumentRequest;
 import com.esign.payment.dto.response.DocumentResponse;
@@ -10,6 +11,7 @@ import com.esign.payment.model.enums.SignerStatus;
 import com.esign.payment.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -257,7 +259,7 @@ public class DocumentService {
             }
             return Files.readAllBytes(path);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read file: " + e.getMessage(), e);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "Failed to read file: " + e.getMessage(), e);
         }
     }
 
@@ -372,7 +374,7 @@ public class DocumentService {
 
             return filePath.toString();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save file: " + e.getMessage(), e);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY, "Failed to save file: " + e.getMessage(), e);
         }
     }
 

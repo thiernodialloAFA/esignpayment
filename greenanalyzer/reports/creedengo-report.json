@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-08T17:33:14Z",
+  "timestamp": "2026-04-08T19:59:37Z",
   "appname": "esignpay",
   "project": "esign-payment-backend",
   "language": "java",
@@ -12,24 +12,24 @@
     "total": 0,
     "max": 100,
     "grade": "E",
-    "issues_count": 164,
+    "issues_count": 180,
     "severity_breakdown": {
       "BLOCKER": 0,
       "CRITICAL": 45,
-      "MAJOR": 38,
-      "MINOR": 80,
+      "MAJOR": 50,
+      "MINOR": 84,
       "INFO": 1
     },
-    "total_effort": "31h11min",
-    "total_effort_minutes": 1871
+    "total_effort": "31h44min",
+    "total_effort_minutes": 1904
   },
   "measures": {
-    "ncloc": 4822,
+    "ncloc": 4889,
     "bugs": 2,
     "vulnerabilities": 0,
-    "code_smells": 162,
-    "complexity": 571,
-    "cognitive_complexity": 390
+    "code_smells": 178,
+    "complexity": 580,
+    "cognitive_complexity": 391
   },
   "rules_summary": [
     {
@@ -72,8 +72,8 @@
       "count": 6,
       "files": [
         "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-        "src/main/java/com/esign/payment/service/ContractPdfService.java",
         "src/main/java/com/esign/payment/service/KeycloakUserService.java",
+        "src/main/java/com/esign/payment/service/ContractPdfService.java",
         "src/main/java/com/esign/payment/service/OcrService.java"
       ]
     },
@@ -86,9 +86,9 @@
       "category": "general",
       "count": 3,
       "files": [
-        "src/main/java/com/esign/payment/config/TestKeycloakUserService.java",
         "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-        "src/main/java/com/esign/payment/service/KeycloakUserService.java"
+        "src/main/java/com/esign/payment/service/KeycloakUserService.java",
+        "src/main/java/com/esign/payment/config/TestKeycloakUserService.java"
       ]
     },
     {
@@ -104,21 +104,15 @@
       ]
     },
     {
-      "key": "java:S112",
-      "name": "S112",
+      "key": "java:S5778",
+      "name": "S5778",
       "severity": "MAJOR",
       "type": "CODE_SMELL",
       "description": "",
       "category": "general",
-      "count": 10,
+      "count": 16,
       "files": [
-        "src/main/java/com/esign/payment/config/TestProfileStubsConfig.java",
-        "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
-        "src/main/java/com/esign/payment/config/SecurityConfig.java",
-        "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-        "src/main/java/com/esign/payment/service/ContractPdfService.java",
-        "src/main/java/com/esign/payment/service/DocumentService.java",
-        "src/main/java/com/esign/payment/service/PaymentService.java"
+        "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java"
       ]
     },
     {
@@ -130,10 +124,26 @@
       "category": "general",
       "count": 8,
       "files": [
-        "src/main/java/com/esign/payment/service/PaymentService.java",
-        "src/main/java/com/esign/payment/config/SecurityConfig.java",
         "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-        "src/main/java/com/esign/payment/service/DocumentService.java"
+        "src/main/java/com/esign/payment/service/DocumentService.java",
+        "src/main/java/com/esign/payment/service/PaymentService.java",
+        "src/main/java/com/esign/payment/config/SecurityConfig.java"
+      ]
+    },
+    {
+      "key": "java:S112",
+      "name": "S112",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "description": "",
+      "category": "general",
+      "count": 6,
+      "files": [
+        "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+        "src/main/java/com/esign/payment/config/TestProfileStubsConfig.java",
+        "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
+        "src/main/java/com/esign/payment/config/SecurityConfig.java",
+        "src/main/java/com/esign/payment/service/ContractPdfService.java"
       ]
     },
     {
@@ -177,18 +187,6 @@
       ]
     },
     {
-      "key": "java:S3011",
-      "name": "S3011",
-      "severity": "MAJOR",
-      "type": "CODE_SMELL",
-      "description": "",
-      "category": "general",
-      "count": 2,
-      "files": [
-        "src/main/java/com/esign/payment/config/TestProfileStubsConfig.java"
-      ]
-    },
-    {
       "key": "java:S106",
       "name": "S106",
       "severity": "MAJOR",
@@ -198,6 +196,18 @@
       "count": 2,
       "files": [
         "src/main/java/com/esign/payment/service/DocumentService.java"
+      ]
+    },
+    {
+      "key": "java:S3011",
+      "name": "S3011",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "description": "",
+      "category": "general",
+      "count": 2,
+      "files": [
+        "src/main/java/com/esign/payment/config/TestProfileStubsConfig.java"
       ]
     },
     {
@@ -237,8 +247,8 @@
       ]
     },
     {
-      "key": "java:S3008",
-      "name": "S3008",
+      "key": "java:S1104",
+      "name": "S1104",
       "severity": "MINOR",
       "type": "CODE_SMELL",
       "description": "",
@@ -249,8 +259,8 @@
       ]
     },
     {
-      "key": "java:S1104",
-      "name": "S1104",
+      "key": "java:S3008",
+      "name": "S3008",
       "severity": "MINOR",
       "type": "CODE_SMELL",
       "description": "",
@@ -285,6 +295,18 @@
       ]
     },
     {
+      "key": "java:S1874",
+      "name": "S1874",
+      "severity": "MINOR",
+      "type": "CODE_SMELL",
+      "description": "",
+      "category": "general",
+      "count": 2,
+      "files": [
+        "src/main/java/com/esign/payment/service/DocumentService.java"
+      ]
+    },
+    {
       "key": "java:S1130",
       "name": "S1130",
       "severity": "MINOR",
@@ -307,6 +329,30 @@
       "count": 2,
       "files": [
         "src/main/java/com/esign/payment/service/ContractPdfService.java"
+      ]
+    },
+    {
+      "key": "java:S1128",
+      "name": "S1128",
+      "severity": "MINOR",
+      "type": "CODE_SMELL",
+      "description": "",
+      "category": "general",
+      "count": 1,
+      "files": [
+        "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java"
+      ]
+    },
+    {
+      "key": "java:S6068",
+      "name": "S6068",
+      "severity": "MINOR",
+      "type": "CODE_SMELL",
+      "description": "",
+      "category": "general",
+      "count": 1,
+      "files": [
+        "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java"
       ]
     },
     {
@@ -350,8 +396,8 @@
     {
       "key": "general",
       "label": "🌱 Éco-conception générale",
-      "issues_count": 164,
-      "rules_count": 24
+      "issues_count": 180,
+      "rules_count": 28
     }
   ],
   "top_files": [
@@ -360,19 +406,23 @@
       "count": 96
     },
     {
-      "file": "src/main/java/com/esign/payment/config/OpenApiConfig.java",
-      "count": 7
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "count": 18
     },
     {
       "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
       "count": 7
     },
     {
-      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
       "count": 7
     },
     {
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "file": "src/main/java/com/esign/payment/config/OpenApiConfig.java",
+      "count": 7
+    },
+    {
+      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
       "count": 7
     },
     {
@@ -388,10 +438,6 @@
       "count": 5
     },
     {
-      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
-      "count": 4
-    },
-    {
       "file": "src/main/java/com/esign/payment/config/TestProfileStubsConfig.java",
       "count": 3
     },
@@ -400,15 +446,19 @@
       "count": 3
     },
     {
+      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
+      "count": 2
+    },
+    {
+      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
+      "count": 2
+    },
+    {
       "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
       "count": 2
     },
     {
       "file": "src/main/java/com/esign/payment/service/EmailService.java",
-      "count": 2
-    },
-    {
-      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
       "count": 2
     },
     {
@@ -430,13 +480,333 @@
     {
       "file": "src/main/java/com/esign/payment/config/StripeConfig.java",
       "count": 1
-    },
-    {
-      "file": "src/main/java/com/esign/payment/service/OtpService.java",
-      "count": 1
     }
   ],
   "issues": [
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 52,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6809",
+      "severity": "CRITICAL",
+      "message": "Call transactional methods via an injected dependency instead of directly via 'this'.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 327,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S3776",
+      "severity": "CRITICAL",
+      "message": "Refactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 418,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S107",
+      "severity": "MAJOR",
+      "message": "Method has 13 parameters, which is greater than 7 authorized.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 418,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S2119",
+      "severity": "CRITICAL",
+      "message": "Save and re-use this \"Random\".",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 448,
+      "effort": "5min",
+      "type": "BUG"
+    },
+    {
+      "rule": "java:S112",
+      "severity": "MAJOR",
+      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 460,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
+      "line": 491,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 85,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 160,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S106",
+      "severity": "MAJOR",
+      "message": "Replace this use of System.err by a logger.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 198,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1874",
+      "severity": "MINOR",
+      "message": "Remove this use of \"UNPROCESSABLE_ENTITY\"; it is deprecated.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 262,
+      "effort": "15min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S106",
+      "severity": "MAJOR",
+      "message": "Replace this use of System.err by a logger.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 340,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1874",
+      "severity": "MINOR",
+      "message": "Remove this use of \"UNPROCESSABLE_ENTITY\"; it is deprecated.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 377,
+      "effort": "15min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
+      "line": 392,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6809",
+      "severity": "CRITICAL",
+      "message": "Call transactional methods via an injected dependency instead of directly via 'this'.",
+      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
+      "line": 35,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S3776",
+      "severity": "CRITICAL",
+      "message": "Refactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
+      "line": 48,
+      "effort": "9min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
+      "line": 122,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6204",
+      "severity": "MAJOR",
+      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
+      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
+      "line": 138,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1128",
+      "severity": "MINOR",
+      "message": "Remove this unused import 'com.esign.payment.dto.response.OcrVerificationDetail'.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 9,
+      "effort": "1min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 244,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 258,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 348,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 361,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 439,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 459,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 476,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 492,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 599,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 618,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 688,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 737,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S6068",
+      "severity": "MINOR",
+      "message": "Remove this and every subsequent useless \"eq(...)\" invocation; pass the values directly.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 765,
+      "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 829,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 843,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 857,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S5778",
+      "severity": "MAJOR",
+      "message": "Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.",
+      "file": "src/test/java/com/esign/payment/service/AccountApplicationServiceTest.java",
+      "line": 871,
+      "effort": "5min",
+      "type": "CODE_SMELL"
+    },
     {
       "rule": "java:S6809",
       "severity": "CRITICAL",
@@ -528,12 +898,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
-      "line": 136,
-      "effort": "5min",
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make TEST_USER_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 49,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -546,30 +916,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make TEST_USER_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 49,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static TEST_USER_ID\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 49,
       "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 52,
-      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -591,6 +943,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make APP_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 52,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S1444",
       "severity": "MINOR",
       "message": "Make this \"public static APP_DRAFT_ID\" field final",
@@ -609,21 +970,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_SUBMITTABLE_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 53,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"APP_SUBMITTABLE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 53,
       "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make APP_SUBMITTABLE_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 53,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -654,6 +1015,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static APP_CONTRACT_PENDING_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 55,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make APP_CONTRACT_PENDING_ID a static final constant or non-public and provide accessors if needed.",
@@ -672,12 +1042,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
+      "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make this \"public static APP_CONTRACT_PENDING_ID\" field final",
+      "message": "Make APP_FOR_DELETE_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 55,
-      "effort": "20min",
+      "line": 56,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -690,30 +1060,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_FOR_DELETE_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 56,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"APP_FOR_DELETE_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 56,
       "effort": "2min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make APP_FOR_KYC_UPLOAD_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 57,
-      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -732,6 +1084,15 @@
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 57,
       "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make APP_FOR_KYC_UPLOAD_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 57,
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -762,6 +1123,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make KYC_DELETABLE_APP_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 61,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"KYC_DELETABLE_APP_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
@@ -777,15 +1147,6 @@
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 61,
       "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make KYC_DELETABLE_APP_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 61,
-      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -825,15 +1186,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
-      "severity": "MINOR",
-      "message": "Make DOC_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 65,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"DOC_DRAFT_ID\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
@@ -843,20 +1195,11 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static DOC_PENDING_ID\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 66,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make DOC_PENDING_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make DOC_DRAFT_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 66,
+      "line": 65,
       "effort": "10min",
       "type": "CODE_SMELL"
     },
@@ -872,19 +1215,28 @@
     {
       "rule": "java:S1104",
       "severity": "MINOR",
-      "message": "Make DOC_FOR_LIVE_SIGN_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make DOC_PENDING_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 67,
+      "line": 66,
       "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
       "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make this \"public static DOC_FOR_LIVE_SIGN_ID\" field final",
+      "message": "Make this \"public static DOC_PENDING_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 66,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make DOC_FOR_LIVE_SIGN_ID a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 67,
-      "effort": "20min",
+      "effort": "10min",
       "type": "CODE_SMELL"
     },
     {
@@ -894,6 +1246,15 @@
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 67,
       "effort": "2min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static DOC_FOR_LIVE_SIGN_ID\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 67,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1005,15 +1366,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static TOKEN_VERIFY_OTP\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 76,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make TOKEN_VERIFY_OTP a static final constant or non-public and provide accessors if needed.",
@@ -1032,21 +1384,21 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static TOKEN_VERIFY_OTP\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 76,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make TOKEN_SIGN a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 77,
       "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static TOKEN_SIGN\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 77,
-      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1061,9 +1413,9 @@
     {
       "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make this \"public static PAYMENT_READ_ID\" field final",
+      "message": "Make this \"public static TOKEN_SIGN\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 80,
+      "line": 77,
       "effort": "20min",
       "type": "CODE_SMELL"
     },
@@ -1077,6 +1429,15 @@
       "type": "CODE_SMELL"
     },
     {
+      "rule": "java:S1104",
+      "severity": "MINOR",
+      "message": "Make PAYMENT_READ_ID a static final constant or non-public and provide accessors if needed.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 80,
+      "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
       "rule": "java:S125",
       "severity": "MAJOR",
       "message": "This block of commented-out lines of code should be removed.",
@@ -1086,12 +1447,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1104",
+      "rule": "java:S1444",
       "severity": "MINOR",
-      "message": "Make PAYMENT_READ_ID a static final constant or non-public and provide accessors if needed.",
+      "message": "Make this \"public static PAYMENT_READ_ID\" field final",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 80,
-      "effort": "10min",
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1149,15 +1510,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1444",
-      "severity": "MINOR",
-      "message": "Make this \"public static ACCOUNT_TYPE_CODE\" field final",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 85,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3008",
       "severity": "MINOR",
       "message": "Rename this field \"ACCOUNT_TYPE_CODE\" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.",
@@ -1167,21 +1519,30 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1192",
-      "severity": "CRITICAL",
-      "message": "Define a constant instead of duplicating this literal \"CHECKING\" 3 times.",
-      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
-      "line": 85,
-      "effort": "8min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1104",
       "severity": "MINOR",
       "message": "Make ACCOUNT_TYPE_CODE a static final constant or non-public and provide accessors if needed.",
       "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
       "line": 85,
       "effort": "10min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1444",
+      "severity": "MINOR",
+      "message": "Make this \"public static ACCOUNT_TYPE_CODE\" field final",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 85,
+      "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1192",
+      "severity": "CRITICAL",
+      "message": "Define a constant instead of duplicating this literal \"CHECKING\" 3 times.",
+      "file": "src/main/java/com/esign/payment/config/TestDataInitializer.java",
+      "line": 85,
+      "effort": "8min",
       "type": "CODE_SMELL"
     },
     {
@@ -1473,21 +1834,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
-      "line": 34,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1130",
       "severity": "MINOR",
       "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
       "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
       "line": 34,
       "effort": "5min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S112",
+      "severity": "MAJOR",
+      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
+      "file": "src/main/java/com/esign/payment/config/TestProfileSecurityConfig.java",
+      "line": 34,
+      "effort": "20min",
       "type": "CODE_SMELL"
     },
     {
@@ -1536,21 +1897,21 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S1130",
-      "severity": "MINOR",
-      "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
-      "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
-      "line": 37,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S112",
       "severity": "MAJOR",
       "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
       "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
       "line": 37,
       "effort": "20min",
+      "type": "CODE_SMELL"
+    },
+    {
+      "rule": "java:S1130",
+      "severity": "MINOR",
+      "message": "Remove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.",
+      "file": "src/main/java/com/esign/payment/config/SecurityConfig.java",
+      "line": 37,
+      "effort": "5min",
       "type": "CODE_SMELL"
     },
     {
@@ -1572,66 +1933,12 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 50,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6809",
-      "severity": "CRITICAL",
-      "message": "Call transactional methods via an injected dependency instead of directly via 'this'.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 325,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S3776",
       "severity": "CRITICAL",
-      "message": "Refactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 416,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S107",
-      "severity": "MAJOR",
-      "message": "Method has 13 parameters, which is greater than 7 authorized.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 416,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S2119",
-      "severity": "CRITICAL",
-      "message": "Save and re-use this \"Random\".",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 446,
-      "effort": "5min",
-      "type": "BUG"
-    },
-    {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 458,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/AccountApplicationService.java",
-      "line": 489,
-      "effort": "5min",
+      "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
+      "line": 51,
+      "effort": "8min",
       "type": "CODE_SMELL"
     },
     {
@@ -1641,15 +1948,6 @@
       "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
       "line": 51,
       "effort": "0min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S3776",
-      "severity": "CRITICAL",
-      "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
-      "file": "src/main/java/com/esign/payment/service/ContractPdfService.java",
-      "line": 51,
-      "effort": "8min",
       "type": "CODE_SMELL"
     },
     {
@@ -1698,69 +1996,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 83,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 158,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S106",
-      "severity": "MAJOR",
-      "message": "Replace this use of System.err by a logger.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 196,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 260,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S106",
-      "severity": "MAJOR",
-      "message": "Replace this use of System.err by a logger.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 338,
-      "effort": "10min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 375,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/DocumentService.java",
-      "line": 390,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S6126",
       "severity": "MAJOR",
       "message": "Replace this String concatenation with Text block.",
@@ -1776,24 +2011,6 @@
       "file": "src/main/java/com/esign/payment/service/EmailService.java",
       "line": 51,
       "effort": "2min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6809",
-      "severity": "CRITICAL",
-      "message": "Call transactional methods via an injected dependency instead of directly via 'this'.",
-      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
-      "line": 33,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S3776",
-      "severity": "CRITICAL",
-      "message": "Refactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.",
-      "file": "src/main/java/com/esign/payment/service/KeycloakUserService.java",
-      "line": 45,
-      "effort": "9min",
       "type": "CODE_SMELL"
     },
     {
@@ -1869,33 +2086,6 @@
       "type": "CODE_SMELL"
     },
     {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
-      "line": 68,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S112",
-      "severity": "MAJOR",
-      "message": "Replace generic exceptions with specific library exceptions or a custom exception.",
-      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
-      "line": 96,
-      "effort": "20min",
-      "type": "CODE_SMELL"
-    },
-    {
-      "rule": "java:S6204",
-      "severity": "MAJOR",
-      "message": "Replace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.",
-      "file": "src/main/java/com/esign/payment/service/PaymentService.java",
-      "line": 120,
-      "effort": "5min",
-      "type": "CODE_SMELL"
-    },
-    {
       "rule": "java:S1172",
       "severity": "MAJOR",
       "message": "Remove this unused method parameter \"signerName\".",
@@ -1915,7 +2105,7 @@
     }
   ],
   "all_creedengo_rules": 17,
-  "rules_violated": 24,
+  "rules_violated": 28,
   "detection": {
     "languages": [
       "java",
@@ -1948,15 +2138,7 @@
       },
       {
         "name": "scripts",
-        "path": "scripts",
-        "language": "python",
-        "framework": "",
-        "framework_version": "",
-        "language_version": ""
-      },
-      {
-        "name": "unused",
-        "path": "scripts/unused",
+        "path": "greenanalyzer/scripts",
         "language": "python",
         "framework": "",
         "framework_version": "",

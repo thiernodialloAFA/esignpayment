@@ -1,9 +1,9 @@
 {
   "appname": "esignpay",
-  "timestamp": "2026-04-08T17:27:31Z",
+  "timestamp": "2026-04-08T19:57:27Z",
   "service_base_url": "http://localhost:8080",
   "green_score": {
-    "total": 65,
+    "total": 69,
     "max": 100,
     "grade": "B",
     "breakdown": {
@@ -15,7 +15,7 @@
       "range_206": 10,
       "AR02_format_cbor": 0,
       "LO01_observability": 4,
-      "US07_rate_limit": 1
+      "US07_rate_limit": 5
     },
     "details": {
       "DE11_pagination": {
@@ -966,7 +966,7 @@
             "method": "GET",
             "path": "/health",
             "matched": false,
-            "reason": "HTTP 401"
+            "reason": "HTTP 500"
           },
           {
             "method": "GET",
@@ -1010,20 +1010,20 @@
           {
             "method": "GET",
             "path": "/api/account-applications/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "PUT",
             "path": "/api/account-applications/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "DELETE",
             "path": "/api/account-applications/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
@@ -1034,20 +1034,20 @@
           {
             "method": "POST",
             "path": "/api/sign/{token}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/sign/{token}/verify-otp",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/sign/{token}/send-otp",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
@@ -1058,20 +1058,20 @@
           {
             "method": "POST",
             "path": "/api/payments",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/payments/{id}/cancel",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/payments/confirm",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
@@ -1082,26 +1082,26 @@
           {
             "method": "POST",
             "path": "/api/documents",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/documents/{id}/send",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/documents/{id}/resend",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/documents/{id}/live-sign/{signerId}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
@@ -1112,44 +1112,44 @@
           {
             "method": "POST",
             "path": "/api/account-applications",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/account-applications/{id}/submit",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/account-applications/{id}/regenerate-contract",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/account-applications/{id}/kyc",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "POST",
             "path": "/api/account-applications/{id}/generate-contract",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
             "path": "/api/sign/verify/{token}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
             "path": "/api/payments/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
@@ -1166,14 +1166,14 @@
           {
             "method": "GET",
             "path": "/api/documents/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "DELETE",
             "path": "/api/documents/{id}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           },
           {
             "method": "GET",
@@ -1208,13 +1208,13 @@
           {
             "method": "DELETE",
             "path": "/api/account-applications/{id}/kyc/{kycId}",
-            "matched": false,
-            "reason": "No rate-limit headers in response"
+            "matched": true,
+            "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
           }
         ],
         "validated": true,
-        "score": 1,
-        "matched_count": 9,
+        "score": 5,
+        "matched_count": 32,
         "candidate_count": 34,
         "suggestions": [
           {
@@ -1473,317 +1473,308 @@
   },
   "totals": {
     "endpoints_discovered": 34,
-    "endpoints_measured": 34,
-    "total_bytes": 30276,
-    "total_time_s": 1.0192050000000001,
-    "energy_total_wh": 0.008769615836143494
+    "endpoints_measured": 33,
+    "total_bytes": 44549,
+    "total_time_s": 0.9013899999999999,
+    "energy_total_wh": 0.008749022140370476
   },
   "endpoints": [
     {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.028884,
-      "speed_download": 2423,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00020058333333333332,
-      "energy_total_wh": 0.00020449488814671833
+      "http_code": 200,
+      "size_download": 917,
+      "time_total": 0.025551,
+      "speed_download": 35888,
+      "energy_network_wh": 5.124136805534362e-05,
+      "energy_server_wh": 0.0001774375,
+      "energy_total_wh": 0.00022867886805534362
     },
     {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.015803,
-      "speed_download": 4429,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00010974305555555555,
-      "energy_total_wh": 0.00011365461036894056
+      "http_code": 200,
+      "size_download": 941,
+      "time_total": 0.050335,
+      "speed_download": 18694,
+      "energy_network_wh": 5.258247256278992e-05,
+      "energy_server_wh": 0.0003495486111111111,
+      "energy_total_wh": 0.000402131083673901
     },
     {
-      "http_code": 500,
+      "http_code": 200,
+      "size_download": 60,
+      "time_total": 0.026107,
+      "speed_download": 2298,
+      "energy_network_wh": 3.3527612686157222e-06,
+      "energy_server_wh": 0.0001812986111111111,
+      "energy_total_wh": 0.00018465137237972683
+    },
+    {
+      "http_code": 200,
+      "size_download": 1346,
+      "time_total": 0.044188,
+      "speed_download": 30461,
+      "energy_network_wh": 7.521361112594603e-05,
+      "energy_server_wh": 0.0003068611111111111,
+      "energy_total_wh": 0.00038207472223705715
+    },
+    {
+      "http_code": 200,
+      "size_download": 117,
+      "time_total": 0.013669,
+      "speed_download": 8559,
+      "energy_network_wh": 6.537884473800659e-06,
+      "energy_server_wh": 9.492361111111111e-05,
+      "energy_total_wh": 0.00010146149558491177
+    },
+    {
+      "http_code": 200,
+      "size_download": 135,
+      "time_total": 0.011095,
+      "speed_download": 12167,
+      "energy_network_wh": 7.543712854385376e-06,
+      "energy_server_wh": 7.704861111111111e-05,
+      "energy_total_wh": 8.459232396549648e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 1323,
+      "time_total": 0.012271,
+      "speed_download": 107811,
+      "energy_network_wh": 7.392838597297668e-05,
+      "energy_server_wh": 8.521527777777778e-05,
+      "energy_total_wh": 0.00015914366375075446
+    },
+    {
+      "http_code": 201,
+      "size_download": 498,
+      "time_total": 0.070742,
+      "speed_download": 7039,
+      "energy_network_wh": 2.7827918529510498e-05,
+      "energy_server_wh": 0.0004912638888888888,
+      "energy_total_wh": 0.0005190918074183993
+    },
+    {
+      "http_code": 200,
+      "size_download": 372,
+      "time_total": 0.012732,
+      "speed_download": 29216,
+      "energy_network_wh": 2.078711986541748e-05,
+      "energy_server_wh": 8.841666666666667e-05,
+      "energy_total_wh": 0.00010920378653208415
+    },
+    {
+      "http_code": 200,
+      "size_download": 384,
+      "time_total": 0.020657,
+      "speed_download": 18589,
+      "energy_network_wh": 2.1457672119140625e-05,
+      "energy_server_wh": 0.00014345138888888887,
+      "energy_total_wh": 0.0001649090610080295
+    },
+    {
+      "http_code": 200,
+      "size_download": 5558,
+      "time_total": 0.011377,
+      "speed_download": 488534,
+      "energy_network_wh": 0.0003105774521827697,
+      "energy_server_wh": 7.900694444444444e-05,
+      "energy_total_wh": 0.00038958439662721415
+    },
+    {
+      "http_code": 201,
+      "size_download": 767,
+      "time_total": 0.018535,
+      "speed_download": 41380,
+      "energy_network_wh": 4.2859464883804315e-05,
+      "energy_server_wh": 0.00012871527777777778,
+      "energy_total_wh": 0.0001715747426615821
+    },
+    {
+      "http_code": 200,
+      "size_download": 752,
+      "time_total": 0.011439,
+      "speed_download": 65737,
+      "energy_network_wh": 4.202127456665039e-05,
+      "energy_server_wh": 7.943749999999999e-05,
+      "energy_total_wh": 0.00012145877456665038
+    },
+    {
+      "http_code": 200,
+      "size_download": 770,
+      "time_total": 0.007677,
+      "speed_download": 100296,
+      "energy_network_wh": 4.30271029472351e-05,
+      "energy_server_wh": 5.3312499999999995e-05,
+      "energy_total_wh": 9.63396029472351e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 774,
+      "time_total": 0.323689,
+      "speed_download": 2391,
+      "energy_network_wh": 4.325062036514282e-05,
+      "energy_server_wh": 0.002247840277777778,
+      "energy_total_wh": 0.0022910908981429207
+    },
+    {
+      "http_code": 200,
+      "size_download": 6277,
+      "time_total": 0.019102,
+      "speed_download": 328610,
+      "energy_network_wh": 0.0003507547080516815,
+      "energy_server_wh": 0.0001326527777777778,
+      "energy_total_wh": 0.0004834074858294593
+    },
+    {
+      "http_code": 201,
+      "size_download": 940,
+      "time_total": 0.01525,
+      "speed_download": 61637,
+      "energy_network_wh": 5.252659320831299e-05,
+      "energy_server_wh": 0.00010590277777777777,
+      "energy_total_wh": 0.00015842937098609078
+    },
+    {
+      "http_code": 200,
+      "size_download": 1964,
+      "time_total": 0.014317,
+      "speed_download": 137179,
+      "energy_network_wh": 0.00010974705219268797,
+      "energy_server_wh": 9.942361111111111e-05,
+      "energy_total_wh": 0.0002091706633037991
+    },
+    {
+      "http_code": 200,
+      "size_download": 1326,
+      "time_total": 0.041301,
+      "speed_download": 32106,
+      "energy_network_wh": 7.409602403640747e-05,
+      "energy_server_wh": 0.00028681249999999996,
+      "energy_total_wh": 0.00036090852403640743
+    },
+    {
+      "http_code": 201,
+      "size_download": 366,
+      "time_total": 0.015166,
+      "speed_download": 24132,
+      "energy_network_wh": 2.0451843738555908e-05,
+      "energy_server_wh": 0.00010531944444444445,
+      "energy_total_wh": 0.00012577128818300036
+    },
+    {
+      "http_code": 200,
+      "size_download": 1149,
+      "time_total": 0.035096,
+      "speed_download": 32738,
+      "energy_network_wh": 6.420537829399109e-05,
+      "energy_server_wh": 0.0002437222222222222,
+      "energy_total_wh": 0.0003079276005162133
+    },
+    {
+      "http_code": 200,
+      "size_download": 229,
+      "time_total": 0.006899,
+      "speed_download": 33192,
+      "energy_network_wh": 1.2796372175216675e-05,
+      "energy_server_wh": 4.790972222222222e-05,
+      "energy_total_wh": 6.070609439743889e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 359,
+      "time_total": 0.006114,
+      "speed_download": 58719,
+      "energy_network_wh": 2.0060688257217407e-05,
+      "energy_server_wh": 4.2458333333333326e-05,
+      "energy_total_wh": 6.251902159055073e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 79,
+      "time_total": 0.006732,
+      "speed_download": 11734,
+      "energy_network_wh": 4.414469003677368e-06,
+      "energy_server_wh": 4.675e-05,
+      "energy_total_wh": 5.1164469003677366e-05
+    },
+    {
+      "http_code": 200,
+      "size_download": 1335,
+      "time_total": 0.009818,
+      "speed_download": 135968,
+      "energy_network_wh": 7.459893822669983e-05,
+      "energy_server_wh": 6.818055555555555e-05,
+      "energy_total_wh": 0.00014277949378225537
+    },
+    {
+      "http_code": 200,
+      "size_download": 721,
+      "time_total": 0.006631,
+      "speed_download": 108729,
+      "energy_network_wh": 4.02890145778656e-05,
+      "energy_server_wh": 4.604861111111111e-05,
+      "energy_total_wh": 8.63376256889767e-05
+    },
+    {
+      "http_code": 200,
       "size_download": 70,
-      "time_total": 0.011359,
+      "time_total": 0.011358,
       "speed_download": 6162,
       "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 7.888194444444444e-05,
-      "energy_total_wh": 8.279349925782945e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.014715,
-      "speed_download": 4757,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.0001021875,
-      "energy_total_wh": 0.000106099054813385
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.021576,
-      "speed_download": 3244,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00014983333333333333,
-      "energy_total_wh": 0.00015374488814671834
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.019184,
-      "speed_download": 3648,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.0001332222222222222,
-      "energy_total_wh": 0.00013713377703560722
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.013892,
-      "speed_download": 5038,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 9.647222222222221e-05,
-      "energy_total_wh": 0.00010038377703560722
-    },
-    {
-      "http_code": 200,
-      "size_download": 655,
-      "time_total": 0.310552,
-      "speed_download": 2109,
-      "energy_network_wh": 3.6600977182388306e-05,
-      "energy_server_wh": 0.002156611111111111,
-      "energy_total_wh": 0.002193212088293499
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.016938,
-      "speed_download": 4132,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.000117625,
-      "energy_total_wh": 0.00012153655481338501
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.028133,
-      "speed_download": 2488,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00019536805555555553,
-      "energy_total_wh": 0.00019927961036894054
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.019246,
-      "speed_download": 3637,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00013365277777777776,
-      "energy_total_wh": 0.00013756433259116277
-    },
-    {
-      "http_code": 200,
-      "size_download": 3185,
-      "time_total": 0.053479,
-      "speed_download": 59556,
-      "energy_network_wh": 0.00017797574400901794,
-      "energy_server_wh": 0.0003713819444444444,
-      "energy_total_wh": 0.0005493576884534623
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.014046,
-      "speed_download": 4983,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 9.754166666666666e-05,
-      "energy_total_wh": 0.00010145322148005167
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.011455,
-      "speed_download": 6110,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 7.95486111111111e-05,
-      "energy_total_wh": 8.346016592449611e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.015232,
-      "speed_download": 4595,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00010577777777777777,
-      "energy_total_wh": 0.00010968933259116278
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.014687,
-      "speed_download": 4766,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00010199305555555556,
-      "energy_total_wh": 0.00010590461036894057
-    },
-    {
-      "http_code": 200,
-      "size_download": 10427,
-      "time_total": 0.05751,
-      "speed_download": 181306,
-      "energy_network_wh": 0.0005826540291309357,
-      "energy_server_wh": 0.000399375,
-      "energy_total_wh": 0.0009820290291309357
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.015807,
-      "speed_download": 4428,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00010977083333333334,
-      "energy_total_wh": 0.00011368238814671835
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.013248,
-      "speed_download": 5284,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 9.199999999999999e-05,
-      "energy_total_wh": 9.5911554813385e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.01353,
-      "speed_download": 5173,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 9.395833333333333e-05,
-      "energy_total_wh": 9.786988814671834e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.016279,
-      "speed_download": 4299,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00011304861111111109,
-      "energy_total_wh": 0.0001169601659244961
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.013454,
-      "speed_download": 5202,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 9.343055555555556e-05,
-      "energy_total_wh": 9.734211036894057e-05
+      "energy_server_wh": 7.887499999999999e-05,
+      "energy_total_wh": 8.2786554813385e-05
     },
     {
       "http_code": 404,
-      "size_download": 76,
-      "time_total": 0.017606,
-      "speed_download": 4316,
-      "energy_network_wh": 4.246830940246582e-06,
-      "energy_server_wh": 0.00012226388888888888,
-      "energy_total_wh": 0.00012651071982913546
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.021026,
-      "speed_download": 3329,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00014601388888888889,
-      "energy_total_wh": 0.0001499254437022739
+      "size_download": 106,
+      "time_total": 0.006767,
+      "speed_download": 15665,
+      "energy_network_wh": 5.9232115745544425e-06,
+      "energy_server_wh": 4.699305555555555e-05,
+      "energy_total_wh": 5.291626713011e-05
     },
     {
       "http_code": 200,
-      "size_download": 167,
-      "time_total": 0.038866,
-      "speed_download": 4296,
-      "energy_network_wh": 9.331852197647095e-06,
-      "energy_server_wh": 0.00026990277777777776,
-      "energy_total_wh": 0.00027923462997542486
+      "size_download": 5999,
+      "time_total": 0.009461,
+      "speed_download": 634061,
+      "energy_network_wh": 0.00033522024750709534,
+      "energy_server_wh": 6.570138888888889e-05,
+      "energy_total_wh": 0.00040092163639598424
     },
     {
       "http_code": 200,
-      "size_download": 339,
-      "time_total": 0.046566,
-      "speed_download": 7279,
-      "energy_network_wh": 1.8943101167678833e-05,
-      "energy_server_wh": 0.000323375,
-      "energy_total_wh": 0.0003423181011676788
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.016219,
-      "speed_download": 4315,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 0.00011263194444444444,
-      "energy_total_wh": 0.00011654349925782945
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.011993,
-      "speed_download": 5836,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 8.328472222222222e-05,
-      "energy_total_wh": 8.719627703560723e-05
-    },
-    {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.012039,
-      "speed_download": 5814,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 8.360416666666665e-05,
-      "energy_total_wh": 8.751572148005166e-05
-    },
-    {
-      "http_code": 200,
-      "size_download": 2869,
-      "time_total": 0.027449,
-      "speed_download": 104519,
-      "energy_network_wh": 0.00016031786799430847,
-      "energy_server_wh": 0.00019061805555555555,
-      "energy_total_wh": 0.000350935923549864
-    },
-    {
-      "http_code": 200,
-      "size_download": 208,
-      "time_total": 0.020435,
-      "speed_download": 10178,
-      "energy_network_wh": 1.1622905731201172e-05,
-      "energy_server_wh": 0.0001419097222222222,
-      "energy_total_wh": 0.00015353262795342337
+      "size_download": 209,
+      "time_total": 0.005734,
+      "speed_download": 36449,
+      "energy_network_wh": 1.16787850856781e-05,
+      "energy_server_wh": 3.981944444444444e-05,
+      "energy_total_wh": 5.149822953012254e-05
     },
     {
       "http_code": 200,
       "size_download": 559,
-      "time_total": 0.020001,
-      "speed_download": 27948,
+      "time_total": 0.006742,
+      "speed_download": 82913,
       "energy_network_wh": 3.123655915260315e-05,
-      "energy_server_wh": 0.00013889583333333335,
-      "energy_total_wh": 0.0001701323924859365
+      "energy_server_wh": 4.681944444444444e-05,
+      "energy_total_wh": 7.805600359704759e-05
     },
     {
       "http_code": 200,
-      "size_download": 10111,
-      "time_total": 0.036349,
-      "speed_download": 278165,
-      "energy_network_wh": 0.0005649961531162262,
-      "energy_server_wh": 0.0002524236111111111,
-      "energy_total_wh": 0.0008174197642273372
+      "size_download": 8086,
+      "time_total": 0.016257,
+      "speed_download": 497373,
+      "energy_network_wh": 0.0004518404603004455,
+      "energy_server_wh": 0.00011289583333333334,
+      "energy_total_wh": 0.0005647362936337789
     },
     {
-      "http_code": 500,
-      "size_download": 70,
-      "time_total": 0.011647,
-      "speed_download": 6009,
-      "energy_network_wh": 3.91155481338501e-06,
-      "energy_server_wh": 8.088194444444443e-05,
-      "energy_total_wh": 8.479349925782944e-05
+      "http_code": 200,
+      "size_download": 61,
+      "time_total": 0.008581,
+      "speed_download": 7108,
+      "energy_network_wh": 3.408640623092651e-06,
+      "energy_server_wh": 5.959027777777777e-05,
+      "energy_total_wh": 6.299891840087042e-05
     }
   ]
 }
