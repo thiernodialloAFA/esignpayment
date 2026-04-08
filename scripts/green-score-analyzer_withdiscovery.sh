@@ -8,6 +8,12 @@
 #  This script is a thin wrapper around green-api-auto-discover.py which
 #  handles all discovery, measurement, scoring, and reporting.
 #
+#  Port layout (avoid collisions with esign backend):
+#    - esign backend:  8080  (target for measurement)
+#    - Keycloak:       9090  (token acquisition)
+#    - SonarQube:      9100  (Creedengo analysis, separate script)
+#    - OTEL Collector: 4317/4318
+#
 #  Usage:
 #    bash green-score-analyzer_withdiscovery.sh
 #    bash green-score-analyzer_withdiscovery.sh --debug
@@ -34,6 +40,13 @@ BEARER_TOKEN=${BEARER_TOKEN:-""}
 REPEAT=${REPEAT:-3}
 SKIP_SPECTRAL=${SKIP_SPECTRAL:-true}
 APPNAME=${APPNAME:-$(basename "$(cd "$(dirname "$0")/.." && pwd)")}
+
+# ── Keycloak settings for auto-token acquisition ──
+KEYCLOAK_URL=${KEYCLOAK_URL:-"http://localhost:9090"}
+KEYCLOAK_REALM=${KEYCLOAK_REALM:-"esignpayment"}
+KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-"esignpay-frontend"}
+KEYCLOAK_USER=${KEYCLOAK_USER:-"admin@test.com"}
+KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD:-"password"}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -84,6 +97,49 @@ for i in $(seq 1 $MAX_WAIT); do
   sleep 1
 done
 echo ""
+
+###############################################################################
+# Auto-acquire Keycloak JWT token (if not already set)
+###############################################################################
+if [ -z "$BEARER_TOKEN" ]; then
+  echo -e "${YELLOW}━━━ 🔐 Acquiring JWT token from Keycloak (${KEYCLOAK_URL}) ━━━${NC}"
+  TOKEN_ENDPOINT="${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token"
+
+  # Wait for Keycloak to be ready (max 30s)
+  KC_READY=false
+  for kc_i in $(seq 1 30); do
+    if curl -sf "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}" -o /dev/null 2>/dev/null; then
+      KC_READY=true
+      break
+    fi
+    sleep 1
+  done
+
+  if [ "$KC_READY" = true ]; then
+    TOKEN_RESPONSE=$(curl -s --connect-timeout 10 --max-time 15 -X POST "$TOKEN_ENDPOINT" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -d "grant_type=password" \
+      -d "client_id=${KEYCLOAK_CLIENT_ID}" \
+      -d "username=${KEYCLOAK_USER}" \
+      -d "password=${KEYCLOAK_PASSWORD}" 2>/dev/null || echo "")
+
+    BEARER_TOKEN=$(echo "$TOKEN_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
+
+    if [ -n "$BEARER_TOKEN" ]; then
+      echo -e "  ${GREEN}✓ JWT token acquired (user: ${KEYCLOAK_USER})${NC}"
+    else
+      ERROR_DESC=$(echo "$TOKEN_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('error_description','unknown'))" 2>/dev/null || echo "no response")
+      echo -e "  ${YELLOW}⚠ Could not acquire token: ${ERROR_DESC}${NC}"
+      echo -e "  ${YELLOW}  → Endpoints requiring auth will return 401${NC}"
+      echo -e "  ${YELLOW}  💡 Set BEARER_TOKEN env var or check Keycloak at ${KEYCLOAK_URL}${NC}"
+    fi
+  else
+    echo -e "  ${YELLOW}⚠ Keycloak not reachable at ${KEYCLOAK_URL}${NC}"
+    echo -e "  ${YELLOW}  → Endpoints requiring auth will return 401${NC}"
+    echo -e "  ${YELLOW}  💡 Set BEARER_TOKEN env var manually${NC}"
+  fi
+  echo ""
+fi
 
 ###############################################################################
 # Run the fully dynamic Python analyzer

@@ -16,6 +16,8 @@
         "algorithms": [
           "gzip"
         ],
+        "min-response-size": "256 bytes",
+        "enabled": true,
         "mime-types": [
           "application/json",
           "application/xml",
@@ -23,22 +25,20 @@
           "text/plain",
           "application/hal+json",
           "application/cbor"
-        ],
-        "enabled": true,
-        "min-response-size": "256 bytes"
+        ]
       },
       "x-server-range-support": {
-        "enabled": true,
         "unit": "bytes",
+        "enabled": true,
         "endpoints": [
           "/api/documents/{id}/download"
         ]
       },
       "x-server-etag-support": {
         "scope": "all GET /api/* endpoints",
-        "filter": "ShallowEtagHeaderFilter",
+        "mechanism": "If-None-Match \u2192 304 Not Modified",
         "enabled": true,
-        "mechanism": "If-None-Match \u2192 304 Not Modified"
+        "filter": "ShallowEtagHeaderFilter"
       }
     }
   ],
@@ -3111,26 +3111,13 @@
       "PagePaymentResponse": {
         "type": "object",
         "properties": {
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
           "totalElements": {
             "type": "integer",
             "format": "int64"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "numberOfElements": {
+          "totalPages": {
             "type": "integer",
             "format": "int32"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -3149,6 +3136,19 @@
           "sort": {
             "$ref": "#/components/schemas/SortObject"
           },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
           "empty": {
             "type": "boolean"
           }
@@ -3157,39 +3157,39 @@
       "PageableObject": {
         "type": "object",
         "properties": {
-          "paged": {
-            "type": "boolean"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "unpaged": {
-            "type": "boolean"
-          },
           "offset": {
             "type": "integer",
             "format": "int64"
           },
           "sort": {
             "$ref": "#/components/schemas/SortObject"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
       "SortObject": {
         "type": "object",
         "properties": {
-          "sorted": {
+          "empty": {
             "type": "boolean"
           },
           "unsorted": {
             "type": "boolean"
           },
-          "empty": {
+          "sorted": {
             "type": "boolean"
           }
         }
@@ -3245,26 +3245,13 @@
       "PageDocumentResponse": {
         "type": "object",
         "properties": {
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
           "totalElements": {
             "type": "integer",
             "format": "int64"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "numberOfElements": {
+          "totalPages": {
             "type": "integer",
             "format": "int32"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -3282,6 +3269,19 @@
           },
           "sort": {
             "$ref": "#/components/schemas/SortObject"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
           },
           "empty": {
             "type": "boolean"
@@ -3353,26 +3353,13 @@
       "PageAccountApplicationResponse": {
         "type": "object",
         "properties": {
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
           "totalElements": {
             "type": "integer",
             "format": "int64"
           },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "numberOfElements": {
+          "totalPages": {
             "type": "integer",
             "format": "int32"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
           },
           "size": {
             "type": "integer",
@@ -3390,6 +3377,19 @@
           },
           "sort": {
             "$ref": "#/components/schemas/SortObject"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
           },
           "empty": {
             "type": "boolean"

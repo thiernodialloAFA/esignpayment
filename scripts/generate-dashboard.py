@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime
 
 PLACEHOLDER = "__REPORT_JSON__"
+CREEDENGO_PLACEHOLDER = "__CREEDENGO_JSON__"
 
 # ── Labels & max scores for the breakdown table ──
 LABELS = {
@@ -46,7 +47,113 @@ def _fmt_bytes(n: int) -> str:
     return f"{n} B"
 
 
-def generate_markdown(report: dict, *, appname: str = "") -> str:
+def generate_creedengo_markdown(creedengo: dict) -> str:
+    """Return a Markdown section for the Creedengo eco-design analysis."""
+    lines: list[str] = []
+    a = lines.append
+
+    score = creedengo.get("creedengo_score", {})
+    total = score.get("total", 0)
+    grade = score.get("grade", "?")
+    issues = score.get("issues_count", 0)
+    bd = score.get("severity_breakdown", {})
+    emoji = "🟢" if total >= 85 else "🟡" if total >= 70 else "🔴"
+
+    a("")
+    a("---")
+    a("")
+    a(f"## 🌱 Creedengo Éco-Design : **{total}/100** — Grade **{grade}** {emoji}")
+    a("")
+    a(f"> Analyse statique de l'éco-conception du code source via "
+      f"[Creedengo](https://github.com/green-code-initiative) / SonarQube")
+    a("")
+
+    # Detection metadata
+    detection = creedengo.get("detection", {})
+    if detection:
+        langs = ", ".join(detection.get("languages", []))
+        primary = detection.get("primary_language", "?")
+        fw = detection.get("primary_framework", "")
+        plugins = ", ".join(detection.get("plugins_used", []))
+        a(f"- **Langages détectés** : {langs}")
+        a(f"- **Principal** : {primary}" + (f" ({fw})" if fw else ""))
+        a(f"- **Plugins Creedengo** : {plugins}")
+        a("")
+
+    # Severity breakdown
+    sev_icons = {"BLOCKER": "🔴", "CRITICAL": "🟠", "MAJOR": "🟡", "MINOR": "⚪", "INFO": "🔵"}
+    sev_parts = []
+    for sev, icon in sev_icons.items():
+        count = bd.get(sev, 0)
+        if count > 0:
+            sev_parts.append(f"{icon} {sev}: {count}")
+    if sev_parts:
+        a(" | ".join(sev_parts))
+        a("")
+
+    a(f"- **Issues** : {issues}")
+    a(f"- **Règles violées** : {creedengo.get('rules_violated', 0)} / "
+      f"{creedengo.get('all_creedengo_rules', 0)} analysées")
+    if score.get("total_effort"):
+        a(f"- **Effort de remédiation** : {score['total_effort']}")
+    a("")
+
+    # Measures
+    measures = creedengo.get("measures", {})
+    ncloc = measures.get("ncloc", 0)
+    if ncloc:
+        a(f"- **Lignes de code** : {ncloc:,}")
+        a("")
+
+    # Categories
+    categories = creedengo.get("categories", [])
+    if categories:
+        a("### 🏷️ Catégories éco-design")
+        a("")
+        a("| Catégorie | Issues | Règles |")
+        a("|-----------|-------:|-------:|")
+        for cat in categories:
+            a(f"| {cat.get('label', cat.get('key', '?'))} | {cat['issues_count']} | {cat['rules_count']} |")
+        a("")
+
+    # Rules summary (top 20)
+    rules = creedengo.get("rules_summary", [])
+    if rules:
+        a("### 📋 Règles Creedengo violées")
+        a("")
+        a("| Sévérité | Règle | Issues | Catégorie |")
+        a("|:--------:|-------|-------:|-----------|")
+        for rule in rules[:20]:
+            sev = rule.get("severity", "INFO")
+            icon = sev_icons.get(sev, "⚪")
+            short_key = rule["key"].split(":")[-1] if ":" in rule["key"] else rule["key"]
+            a(f"| {icon} {sev} | **{short_key}** — {rule['name']} | {rule['count']} | {rule.get('category', '')} |")
+        if len(rules) > 20:
+            a(f"| | *… et {len(rules) - 20} autres* | | |")
+        a("")
+
+    # Top files
+    top_files = creedengo.get("top_files", [])
+    if top_files:
+        a("### 📁 Fichiers les plus impactés")
+        a("")
+        a("| Fichier | Issues |")
+        a("|---------|-------:|")
+        for f in top_files[:10]:
+            short = "/".join(f["file"].split("/")[-2:])
+            a(f"| `{short}` | {f['count']} |")
+        if len(top_files) > 10:
+            a(f"| *… et {len(top_files) - 10} autres* | |")
+        a("")
+
+    a(f"📅 *{creedengo.get('timestamp', '')}*")
+    a("")
+
+    return "\n".join(lines)
+
+
+def generate_markdown(report: dict, *, appname: str = "",
+                      creedengo: dict | None = None) -> str:
     """Return a Markdown string representing the Green Score report."""
     gs = report.get("green_score", {})
     total = gs.get("total", 0)
@@ -340,11 +447,16 @@ def generate_markdown(report: dict, *, appname: str = "") -> str:
               f"toutes les règles analysées sont conformes.")
         a("")
 
+    # ── Creedengo eco-design section ──
+    if creedengo and creedengo.get("creedengo_score"):
+        a(generate_creedengo_markdown(creedengo))
+
     # ── Footer ──
     a("---")
     a("")
     a("🌿 *API Green Score — [Framework](https://github.com/API-Green-Score/APIGreenScore) | "
-      "[Training](https://github.com/API-Green-Score/training-student) | Devoxx France 2026*")
+      "[Training](https://github.com/API-Green-Score/training-student) | "
+      "🌱 [Creedengo](https://github.com/green-code-initiative) | Devoxx France 2026*")
     a("")
     a("> 📊 Pour le dashboard interactif complet, ouvrez [`dashboard/index.html`](index.html)")
     a("")
@@ -357,11 +469,13 @@ def main() -> int:
     parser.add_argument("--report", required=True, help="Path to report JSON")
     parser.add_argument("--template", required=True, help="Path to HTML template")
     parser.add_argument("--output", required=True, help="Path to output HTML")
+    parser.add_argument("--creedengo-report", default="", help="Path to Creedengo report JSON (optional)")
     args = parser.parse_args()
 
     report_path = Path(args.report)
     template_path = Path(args.template)
     output_path = Path(args.output)
+    creedengo_path = Path(args.creedengo_report) if args.creedengo_report else None
 
     if not report_path.is_file():
         print(f"Report not found: {report_path}", file=sys.stderr)
@@ -393,13 +507,32 @@ def main() -> int:
     embedded = json.dumps(raw_data, ensure_ascii=True)
     output = template.replace(PLACEHOLDER, embedded)
 
+    # ── Embed Creedengo report if available ──
+    if creedengo_path and creedengo_path.is_file():
+        creedengo_text = creedengo_path.read_text(encoding="utf-8").strip()
+        if creedengo_text:
+            creedengo_data = json.loads(creedengo_text)
+            creedengo_embedded = json.dumps(creedengo_data, ensure_ascii=True)
+            output = output.replace(CREEDENGO_PLACEHOLDER, creedengo_embedded)
+            print(f"Creedengo report embedded from {creedengo_path}")
+        else:
+            output = output.replace(CREEDENGO_PLACEHOLDER, "null")
+    else:
+        output = output.replace(CREEDENGO_PLACEHOLDER, "null")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(output, encoding="utf-8")
     print(f"Dashboard written to {output_path}")
 
     # ── Generate Markdown (same directory as HTML, named index.md) ──
     md_path = output_path.parent / "index.md"
-    md_content = generate_markdown(report, appname=appname)
+    creedengo_data_md = None
+    if creedengo_path and creedengo_path.is_file():
+        try:
+            creedengo_data_md = json.loads(creedengo_path.read_text(encoding="utf-8").strip())
+        except Exception:
+            pass
+    md_content = generate_markdown(report, appname=appname, creedengo=creedengo_data_md)
     md_path.write_text(md_content, encoding="utf-8")
     print(f"Markdown dashboard written to {md_path}")
 

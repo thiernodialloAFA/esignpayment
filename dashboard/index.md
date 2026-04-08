@@ -1,14 +1,14 @@
 # 🌿 Green API Score Dashboard
 
-> 📦 **Application : esignpaym-api**
+> 📦 **Application : esignpay**
 >
 > **Devoxx France 2026 — Green Architecture : moins de gras, plus d'impact !**
 
-📅 *Dernière analyse : 2026-04-04T22:19:08Z*
+📅 *Dernière analyse : 2026-04-08T15:53:16Z*
 
 ---
 
-## 🟡 Green Score : **69/100** — Grade **B** 🥈
+## 🟡 Green Score : **65/100** — Grade **B** 🥈
 
 ### 📋 Détail par règle
 
@@ -21,59 +21,60 @@
 | ⚠️ | DE06 Delta | 2 | 10 | 3/14 | Delta endpoint(s) found: 3 |
 | ✅ | 206 Range | 10 | 10 | 14/14 | Range/206 supported (OpenAPI servers.x-server-range-support.enabled=true) |
 | ⚠️ | LO01 Observabilité | 4 | 5 | 4/5 | Actuator/health detected |
-| ✅ | US07 Rate Limit | 5 | 5 | 32/34 | Rate-limit headers detected |
+| ⚠️ | US07 Rate Limit | 1 | 5 | 9/34 | Rate-limit headers detected |
 | ❌ | AR02 CBOR | 0 | 10 | 1/34 | Binary format on 1 endpoint(s) |
 
 ### 📊 Mesures par endpoint (API découverte)
 
 | Méthode | Endpoint | Taille | Temps | HTTP |
 |:-------:|----------|-------:|------:|-----:|
-| GET | `/api/account-applications/{id}` | 917 B | 0.012s | 200 |
-| PUT | `/api/account-applications/{id}` | 938 B | 0.027s | 200 |
-| DELETE | `/api/account-applications/{id}` | 60 B | 0.014s | 200 |
-| POST | `/api/sign/{token}` | 1.3 KB | 0.030s | 200 |
-| POST | `/api/sign/{token}/verify-otp` | 117 B | 0.007s | 200 |
-| POST | `/api/sign/{token}/send-otp` | 135 B | 0.007s | 200 |
-| GET | `/api/payments` | 1.3 KB | 0.007s | 200 |
-| POST | `/api/payments` | 492 B | 0.050s | 201 |
-| POST | `/api/payments/{id}/cancel` | 373 B | 0.007s | 200 |
-| POST | `/api/payments/confirm` | 384 B | 0.009s | 200 |
-| GET | `/api/documents` | 5.6 KB | 0.008s | 200 |
-| POST | `/api/documents` | 758 B | 0.013s | 201 |
-| POST | `/api/documents/{id}/send` | 752 B | 0.008s | 200 |
-| POST | `/api/documents/{id}/resend` | 772 B | 0.007s | 200 |
-| POST | `/api/documents/{id}/live-sign/{signerId}` | 768 B | 0.312s | 200 |
-| GET | `/api/account-applications` | 6.3 KB | 0.010s | 200 |
-| POST | `/api/account-applications` | 931 B | 0.011s | 201 |
-| POST | `/api/account-applications/{id}/submit` | 1.9 KB | 0.009s | 200 |
-| POST | `/api/account-applications/{id}/regenerate-contract` | 1.3 KB | 0.017s | 200 |
-| POST | `/api/account-applications/{id}/kyc` | 363 B | 0.009s | 201 |
-| POST | `/api/account-applications/{id}/generate-contract` | 1.1 KB | 0.011s | 200 |
-| GET | `/api/sign/verify/{token}` | 229 B | 0.003s | 200 |
-| GET | `/api/payments/{id}` | 359 B | 0.003s | 200 |
-| GET | `/api/payments/config` | 79 B | 0.002s | 200 |
-| GET | `/api/payments/changes` | 1.3 KB | 0.005s | 200 |
-| GET | `/api/documents/{id}` | 723 B | 0.003s | 200 |
-| DELETE | `/api/documents/{id}` | 70 B | 0.004s | 200 |
-| GET | `/api/documents/{id}/download` | 106 B | 0.004s | 404 |
-| GET | `/api/documents/changes` | 6.0 KB | 0.006s | 200 |
-| GET | `/api/auth/me` | 209 B | 0.003s | 200 |
-| GET | `/api/account-types` | 559 B | 0.009s | 200 |
-| GET | `/api/account-applications/changes` | 8.1 KB | 0.009s | 200 |
-| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 61 B | 0.006s | 200 |
+| GET | `/api/account-applications/{id}` | 70 B | 0.024s | 500 |
+| PUT | `/api/account-applications/{id}` | 70 B | 0.011s | 500 |
+| DELETE | `/api/account-applications/{id}` | 70 B | 0.014s | 500 |
+| POST | `/api/webhooks/stripe` | 70 B | 0.016s | 500 |
+| POST | `/api/sign/{token}` | 70 B | 0.016s | 500 |
+| POST | `/api/sign/{token}/verify-otp` | 70 B | 0.025s | 500 |
+| POST | `/api/sign/{token}/send-otp` | 70 B | 0.025s | 500 |
+| GET | `/api/payments` | 655 B | 0.299s | 200 |
+| POST | `/api/payments` | 70 B | 0.016s | 500 |
+| POST | `/api/payments/{id}/cancel` | 70 B | 0.011s | 500 |
+| POST | `/api/payments/confirm` | 70 B | 0.013s | 500 |
+| GET | `/api/documents` | 3.2 KB | 0.048s | 200 |
+| POST | `/api/documents` | 70 B | 0.011s | 500 |
+| POST | `/api/documents/{id}/send` | 70 B | 0.012s | 500 |
+| POST | `/api/documents/{id}/resend` | 70 B | 0.014s | 500 |
+| POST | `/api/documents/{id}/live-sign/{signerId}` | 70 B | 0.013s | 500 |
+| GET | `/api/account-applications` | 10.4 KB | 0.065s | 200 |
+| POST | `/api/account-applications` | 70 B | 0.011s | 500 |
+| POST | `/api/account-applications/{id}/submit` | 70 B | 0.016s | 500 |
+| POST | `/api/account-applications/{id}/regenerate-contract` | 70 B | 0.020s | 500 |
+| POST | `/api/account-applications/{id}/kyc` | 70 B | 0.013s | 500 |
+| POST | `/api/account-applications/{id}/generate-contract` | 70 B | 0.008s | 500 |
+| GET | `/api/sign/verify/{token}` | 76 B | 0.014s | 404 |
+| GET | `/api/payments/{id}` | 70 B | 0.013s | 500 |
+| GET | `/api/payments/config` | 167 B | 0.012s | 200 |
+| GET | `/api/payments/changes` | 339 B | 0.025s | 200 |
+| GET | `/api/documents/{id}` | 70 B | 0.013s | 500 |
+| DELETE | `/api/documents/{id}` | 70 B | 0.021s | 500 |
+| GET | `/api/documents/{id}/download` | 70 B | 0.010s | 500 |
+| GET | `/api/documents/changes` | 2.9 KB | 0.028s | 200 |
+| GET | `/api/auth/me` | 208 B | 0.023s | 200 |
+| GET | `/api/account-types` | 559 B | 0.027s | 200 |
+| GET | `/api/account-applications/changes` | 10.1 KB | 0.062s | 200 |
+| DELETE | `/api/account-applications/{id}/kyc/{kycId}` | 70 B | 0.019s | 500 |
 
 ### 🔑 Métriques clés
 
-- **Endpoints mesurés** : 33
-- **Transfert total** : 44.5 KB
-- **Transfert moyen / endpoint** : 1.3 KB
-- **Temps moyen** : 0.019s
-- **⚡ Énergie totale / appel** : 0.0069 Wh
-- **🌍 CO₂ / appel** : 0.00037 g (France — 53 gCO₂/kWh)
+- **Endpoints mesurés** : 34
+- **Transfert total** : 30.3 KB
+- **Transfert moyen / endpoint** : 890 B
+- **Temps moyen** : 0.028s
+- **⚡ Énergie totale / appel** : 0.0084 Wh
+- **🌍 CO₂ / appel** : 0.00045 g (France — 53 gCO₂/kWh)
 
 ### 💡 Suggestions d'amélioration
 
-> **Score actuel : 69/100** — Score potentiel avec toutes les suggestions : **98/100** (+29 pts possibles)
+> **Score actuel : 65/100** — Score potentiel avec toutes les suggestions : **98/100** (+33 pts possibles)
 
 🔴 Haute priorité : 5 | 🟡 Moyenne : 4 | ⚪ Basse : 2 | **Total : 11 suggestions**
 
@@ -157,34 +158,9 @@ Alternative: Add @RequestParam 'since' to existing /api/payments.
 ```
 </details>
 
-#### 👁️ LO01 — Observabilité (⚠️ Partiel (4/5) — +1 pts possibles)
+#### 🚦 US07 — Rate Limiting (⚠️ Partiel (9/34) — +4 pts possibles)
 
-> Actuator / health / metrics doit etre expose. (4/5 endpoints validés)
-
-| Priorité | Cible | Action | Impact |
-|:--------:|-------|--------|--------|
-| 🔴 Haute | `/actuator/health, /actuator/metrics` | Expose Spring Boot Actuator endpoints | +5 pts — essential for production monitoring |
-
-<details><summary>🔧 Comment implémenter</summary>
-
-```
-Spring Boot application.yml:
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health,info,metrics
-    endpoint:
-      health:
-        show-details: when-authorized
-
-Add dependency: spring-boot-starter-actuator (likely already present).
-```
-</details>
-
-#### 🚦 US07 — Rate Limiting (⚠️ Partiel (32/34))
-
-> Un mecanisme de rate limiting doit etre present. (32/34 endpoints validés)
+> Un mecanisme de rate limiting doit etre present. (9/34 endpoints validés)
 
 | Priorité | Cible | Action | Impact |
 |:--------:|-------|--------|--------|
@@ -210,8 +186,102 @@ Option 3 — Nginx:
 ```
 </details>
 
+#### 👁️ LO01 — Observabilité (⚠️ Partiel (4/5) — +1 pts possibles)
+
+> Actuator / health / metrics doit etre expose. (4/5 endpoints validés)
+
+| Priorité | Cible | Action | Impact |
+|:--------:|-------|--------|--------|
+| 🔴 Haute | `/actuator/health, /actuator/metrics` | Expose Spring Boot Actuator endpoints | +5 pts — essential for production monitoring |
+
+<details><summary>🔧 Comment implémenter</summary>
+
+```
+Spring Boot application.yml:
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics
+    endpoint:
+      health:
+        show-details: when-authorized
+
+Add dependency: spring-boot-starter-actuator (likely already present).
+```
+</details>
+
+
 ---
 
-🌿 *API Green Score — [Framework](https://github.com/API-Green-Score/APIGreenScore) | [Training](https://github.com/API-Green-Score/training-student) | Devoxx France 2026*
+## 🌱 Creedengo Éco-Design : **0/100** — Grade **E** 🔴
+
+> Analyse statique de l'éco-conception du code source via [Creedengo](https://github.com/green-code-initiative) / SonarQube
+
+- **Langages détectés** : java, python, typescript
+- **Principal** : java (spring-boot)
+- **Plugins Creedengo** : java, javascript, python
+
+🟠 CRITICAL: 45 | 🟡 MAJOR: 38 | ⚪ MINOR: 80 | 🔵 INFO: 1
+
+- **Issues** : 164
+- **Règles violées** : 24 / 17 analysées
+- **Effort de remédiation** : 31h11min
+
+- **Lignes de code** : 4,822
+
+### 🏷️ Catégories éco-design
+
+| Catégorie | Issues | Règles |
+|-----------|-------:|-------:|
+| 🌱 Éco-conception générale | 164 | 24 |
+
+### 📋 Règles Creedengo violées
+
+| Sévérité | Règle | Issues | Catégorie |
+|:--------:|-------|-------:|-----------|
+| 🟠 CRITICAL | **S2696** — S2696 | 23 | general |
+| 🟠 CRITICAL | **S1192** — S1192 | 12 | general |
+| 🟠 CRITICAL | **S3776** — S3776 | 6 | general |
+| 🟠 CRITICAL | **S6809** — S6809 | 3 | general |
+| 🟠 CRITICAL | **S2119** — S2119 | 1 | general |
+| 🟡 MAJOR | **S112** — S112 | 10 | general |
+| 🟡 MAJOR | **S6204** — S6204 | 8 | general |
+| 🟡 MAJOR | **S125** — S125 | 6 | general |
+| 🟡 MAJOR | **S6126** — S6126 | 4 | general |
+| 🟡 MAJOR | **S1172** — S1172 | 3 | general |
+| 🟡 MAJOR | **S3011** — S3011 | 2 | general |
+| 🟡 MAJOR | **S106** — S106 | 2 | general |
+| 🟡 MAJOR | **S107** — S107 | 1 | general |
+| 🟡 MAJOR | **S1141** — S1141 | 1 | general |
+| 🟡 MAJOR | **S2142** — S2142 | 1 | general |
+| ⚪ MINOR | **S3008** — S3008 | 23 | general |
+| ⚪ MINOR | **S1444** — S1444 | 23 | general |
+| ⚪ MINOR | **S1104** — S1104 | 23 | general |
+| ⚪ MINOR | **S1481** — S1481 | 5 | general |
+| ⚪ MINOR | **S1130** — S1130 | 2 | general |
+| | *… et 4 autres* | | |
+
+### 📁 Fichiers les plus impactés
+
+| Fichier | Issues |
+|---------|-------:|
+| `config/TestDataInitializer.java` | 96 |
+| `config/OpenApiConfig.java` | 7 |
+| `service/AccountApplicationService.java` | 7 |
+| `service/ContractPdfService.java` | 7 |
+| `service/DocumentService.java` | 7 |
+| `service/OcrService.java` | 7 |
+| `controller/GreenScoreTestController.java` | 5 |
+| `config/TestDataInitializer.java` | 5 |
+| `service/PaymentService.java` | 4 |
+| `config/TestProfileStubsConfig.java` | 3 |
+| *… et 10 autres* | |
+
+📅 *2026-04-08T15:55:43Z*
+
+---
+
+🌿 *API Green Score — [Framework](https://github.com/API-Green-Score/APIGreenScore) | [Training](https://github.com/API-Green-Score/training-student) | 🌱 [Creedengo](https://github.com/green-code-initiative) | Devoxx France 2026*
 
 > 📊 Pour le dashboard interactif complet, ouvrez [`dashboard/index.html`](index.html)

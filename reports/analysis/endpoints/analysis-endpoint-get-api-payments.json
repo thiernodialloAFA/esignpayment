@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-04-04T22:19:08Z",
+  "timestamp": "2026-04-08T15:53:16Z",
   "service_base_url": "http://localhost:8080",
   "endpoint": {
     "method": "get",
     "path": "/api/payments",
     "url": "http://localhost:8080/api/payments",
     "http_code": 200,
-    "size_download": 1324,
-    "time_total": 0.007222,
-    "speed_download": 183335,
-    "energy_network_wh": 7.398426532745361e-05,
-    "energy_server_wh": 5.0152777777777774e-05,
-    "energy_total_wh": 0.00012413704310523137
+    "size_download": 655,
+    "time_total": 0.29899,
+    "speed_download": 2190,
+    "energy_network_wh": 3.6600977182388306e-05,
+    "energy_server_wh": 0.002076319444444444,
+    "energy_total_wh": 0.0021129204216268323
   }
 }

@@ -85,8 +85,65 @@ if ! $BASE_READY; then
 fi
 echo ""
 
+# --- Attente de Keycloak (port 9090, max 30s) pour acquérir le JWT ---
+KEYCLOAK_URL=${KEYCLOAK_URL:-"http://localhost:9090"}
+KEYCLOAK_REALM=${KEYCLOAK_REALM:-"esignpayment"}
+KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-"esignpay-frontend"}
+KEYCLOAK_USER=${KEYCLOAK_USER:-"admin@test.com"}
+KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD:-"password"}
+
+echo "⏳ Attente de Keycloak (${KEYCLOAK_URL})..."
+KC_READY=false
+for kc_i in $(seq 1 30); do
+  if curl -sf "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}" -o /dev/null 2>/dev/null; then
+    KC_READY=true
+    echo "  ✅ Keycloak prêt"
+    break
+  fi
+  sleep 1
+done
+
+BEARER_TOKEN=""
+if [ "$KC_READY" = true ]; then
+  echo "🔐 Acquisition du token JWT..."
+  TOKEN_ENDPOINT="${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token"
+  TOKEN_RESPONSE=$(curl -s --connect-timeout 10 --max-time 15 -X POST "$TOKEN_ENDPOINT" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "grant_type=password" \
+    -d "client_id=${KEYCLOAK_CLIENT_ID}" \
+    -d "username=${KEYCLOAK_USER}" \
+    -d "password=${KEYCLOAK_PASSWORD}" 2>/dev/null || echo "")
+  BEARER_TOKEN=$(echo "$TOKEN_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
+  if [ -n "$BEARER_TOKEN" ]; then
+    echo "  ✅ JWT token acquis (user: ${KEYCLOAK_USER})"
+  else
+    echo "  ⚠️  Impossible d'acquérir le token — les endpoints protégés retourneront 401"
+  fi
+else
+  echo "  ⚠️  Keycloak non disponible — les endpoints protégés retourneront 401"
+fi
+export BEARER_TOKEN
+echo ""
+
 echo "Running Green Score analyzer..."
 bash "$ROOT/scripts/green-score-analyzer_withdiscovery.sh" $DEBUG_FLAG || true
+
+# ── Creedengo eco-design analysis (optional, requires Docker) ──
+RUN_CREEDENGO=false
+for arg in "$@"; do
+  case "$arg" in
+    --creedengo) RUN_CREEDENGO=true ;;
+  esac
+done
+
+if [ "$RUN_CREEDENGO" = true ]; then
+  echo ""
+  echo "Running Creedengo eco-design code analyzer..."
+  bash "$ROOT/scripts/creedengo-analyzer.sh" $DEBUG_FLAG --skip-build || true
+else
+  echo ""
+  echo "💡 Tip: run with --creedengo to also run Creedengo eco-design code analysis"
+fi
 
 echo "Press Ctrl+C to stop."
 trap - EXIT    # désactive le cleanup auto, on attend manuellement

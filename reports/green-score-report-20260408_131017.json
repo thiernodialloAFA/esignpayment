@@ -1,21 +1,21 @@
 {
-  "appname": "esignpaym-api",
+  "appname": "esignpay",
   "report": {
-    "timestamp": "2026-04-04T21:07:20Z",
+    "timestamp": "2026-04-08T13:10:17Z",
     "green_score": {
-      "total": 100,
+      "total": 65,
       "max": 100,
-      "grade": "A+",
+      "grade": "B",
       "breakdown": {
-        "DE11_pagination": 15,
-        "DE08_fields": 15,
+        "DE11_pagination": 5,
+        "DE08_fields": 13,
         "DE01_compression": 15,
         "DE02_DE03_cache": 15,
-        "DE06_delta": 10,
+        "DE06_delta": 2,
         "range_206": 10,
-        "AR02_format_cbor": 10,
-        "LO01_observability": 5,
-        "US07_rate_limit": 5
+        "AR02_format_cbor": 0,
+        "LO01_observability": 4,
+        "US07_rate_limit": 1
       },
       "details": {
         "DE11_pagination": {
@@ -111,10 +111,39 @@
             }
           ],
           "validated": true,
-          "score": 15,
+          "score": 5,
           "matched_count": 3,
           "candidate_count": 9,
-          "suggestions": []
+          "suggestions": [
+            {
+              "target": "GET /api/payments/changes",
+              "action": "Add pagination parameters (page & size)",
+              "priority": "high",
+              "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+              "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+            },
+            {
+              "target": "GET /api/documents/changes",
+              "action": "Add pagination parameters (page & size)",
+              "priority": "high",
+              "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+              "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+            },
+            {
+              "target": "GET /api/account-types",
+              "action": "Add pagination parameters (page & size)",
+              "priority": "high",
+              "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+              "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+            },
+            {
+              "target": "GET /api/account-applications/changes",
+              "action": "Add pagination parameters (page & size)",
+              "priority": "high",
+              "impact": "+1.7 pts/endpoint (total gap: 10 pts) \u2014 reduces payload size for large collections",
+              "how": "Spring Boot: Change return type from List<T> to Page<T> and add @RequestParam defaultValue parameters:\n  @GetMapping\n  public ApiResponse<Page<T>> list(\n      @RequestParam(defaultValue = \"0\") int page,\n      @RequestParam(defaultValue = \"20\") int size) {\n    return ApiResponse.success(repository.findAll(PageRequest.of(page, size)));\n  }\nOpenAPI: params 'page' and 'size' will appear automatically via springdoc."
+            }
+          ]
         },
         "DE08_fields": {
           "id": "DE08",
@@ -208,7 +237,7 @@
             }
           ],
           "validated": true,
-          "score": 15,
+          "score": 13,
           "matched_count": 12,
           "candidate_count": 14,
           "suggestions": []
@@ -565,10 +594,32 @@
             }
           ],
           "validated": true,
-          "score": 10,
+          "score": 2,
           "matched_count": 3,
           "candidate_count": 14,
-          "suggestions": []
+          "suggestions": [
+            {
+              "target": "GET /api/payments/changes  (new endpoint)",
+              "action": "Add a delta/changes endpoint with a 'since' parameter",
+              "priority": "medium",
+              "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+              "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/payments."
+            },
+            {
+              "target": "GET /api/documents/changes  (new endpoint)",
+              "action": "Add a delta/changes endpoint with a 'since' parameter",
+              "priority": "medium",
+              "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+              "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/documents."
+            },
+            {
+              "target": "GET /api/account-applications/changes  (new endpoint)",
+              "action": "Add a delta/changes endpoint with a 'since' parameter",
+              "priority": "medium",
+              "impact": "+0.7 pts/endpoint (total gap: 8 pts) \u2014 clients fetch only what changed since last sync",
+              "how": "Spring Boot: Add a new endpoint that filters by updatedAt:\n  @GetMapping(\"/changes\")\n  public ApiResponse<List<T>> getChanges(\n      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime since) {\n    return ApiResponse.success(\n        repository.findByUpdatedAtAfter(since));\n  }\n\nPrerequisite: Add an 'updatedAt' column with @UpdateTimestamp\nto your entity, and a repository method findByUpdatedAtAfter().\nAlternative: Add @RequestParam 'since' to existing /api/account-applications."
+            }
+          ]
         },
         "range_206": {
           "id": "206",
@@ -879,10 +930,25 @@
             }
           ],
           "validated": true,
-          "score": 10,
+          "score": 0,
           "matched_count": 1,
           "candidate_count": 34,
-          "suggestions": []
+          "suggestions": [
+            {
+              "target": "GET /api/payments  (add CBOR variant)",
+              "action": "Add a binary format alternative (CBOR or Protobuf)",
+              "priority": "low",
+              "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+              "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+            },
+            {
+              "target": "GET /api/documents  (add CBOR variant)",
+              "action": "Add a binary format alternative (CBOR or Protobuf)",
+              "priority": "low",
+              "impact": "+10 pts \u2014 binary formats are 30-50% smaller than JSON",
+              "how": "Spring Boot + CBOR:\n  1. Add dependency: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor\n  2. Register the converter:\n     @Bean\n     public HttpMessageConverter<Object> cborConverter(ObjectMapper mapper) {\n       ObjectMapper cborMapper = new ObjectMapper(new CBORFactory());\n       return new MappingJackson2CborHttpMessageConverter(cborMapper);\n     }\n  3. Clients send: Accept: application/cbor\n\nAlternative (Protobuf):\n  Add spring-boot-starter-protobuf and define .proto schemas.\n  Register ProtobufHttpMessageConverter."
+            }
+          ]
         },
         "LO01_observability": {
           "id": "LO01",
@@ -900,7 +966,7 @@
               "method": "GET",
               "path": "/health",
               "matched": false,
-              "reason": "HTTP 500"
+              "reason": "HTTP 401"
             },
             {
               "method": "GET",
@@ -922,10 +988,18 @@
             }
           ],
           "validated": true,
-          "score": 5,
+          "score": 4,
           "matched_count": 4,
           "candidate_count": 5,
-          "suggestions": []
+          "suggestions": [
+            {
+              "target": "/actuator/health, /actuator/metrics",
+              "action": "Expose Spring Boot Actuator endpoints",
+              "priority": "high",
+              "impact": "+5 pts \u2014 essential for production monitoring",
+              "how": "Spring Boot application.yml:\n  management:\n    endpoints:\n      web:\n        exposure:\n          include: health,info,metrics\n    endpoint:\n      health:\n        show-details: when-authorized\n\nAdd dependency: spring-boot-starter-actuator (likely already present)."
+            }
+          ]
         },
         "US07_rate_limit": {
           "id": "US07",
@@ -960,20 +1034,20 @@
             {
               "method": "POST",
               "path": "/api/sign/{token}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/sign/{token}/verify-otp",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "POST",
               "path": "/api/sign/{token}/send-otp",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1068,8 +1142,8 @@
             {
               "method": "GET",
               "path": "/api/sign/verify/{token}",
-              "matched": true,
-              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
+              "matched": false,
+              "reason": "No rate-limit headers in response"
             },
             {
               "method": "GET",
@@ -1086,8 +1160,8 @@
             {
               "method": "GET",
               "path": "/api/payments/changes",
-              "matched": false,
-              "reason": "No rate-limit headers in response"
+              "matched": true,
+              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
             },
             {
               "method": "GET",
@@ -1110,14 +1184,14 @@
             {
               "method": "GET",
               "path": "/api/documents/changes",
-              "matched": false,
-              "reason": "No rate-limit headers in response"
+              "matched": true,
+              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
             },
             {
               "method": "GET",
               "path": "/api/auth/me",
-              "matched": false,
-              "reason": "No rate-limit headers in response"
+              "matched": true,
+              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
             },
             {
               "method": "GET",
@@ -1128,8 +1202,8 @@
             {
               "method": "GET",
               "path": "/api/account-applications/changes",
-              "matched": false,
-              "reason": "No rate-limit headers in response"
+              "matched": true,
+              "reason": "Rate-limit headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
             },
             {
               "method": "DELETE",
@@ -1139,10 +1213,18 @@
             }
           ],
           "validated": true,
-          "score": 5,
+          "score": 1,
           "matched_count": 9,
           "candidate_count": 34,
-          "suggestions": []
+          "suggestions": [
+            {
+              "target": "ALL endpoints (server-level)",
+              "action": "Add rate-limit response headers",
+              "priority": "medium",
+              "impact": "+5 pts \u2014 protects the API from abuse and signals limits to clients",
+              "how": "Option 1 \u2014 Spring Boot filter:\n  Add a HandlerInterceptor or OncePerRequestFilter that adds:\n    X-RateLimit-Limit: 100\n    X-RateLimit-Remaining: 97\n    X-RateLimit-Reset: 1620000000\n\nOption 2 \u2014 Use Bucket4j + Spring Boot Starter:\n  <dependency>com.bucket4j:bucket4j-spring-boot-starter</dependency>\n  Configure rate limits in application.yml per endpoint.\n\nOption 3 \u2014 Nginx:\n  limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;\n  location /api/ { limit_req zone=api burst=20; }\n  add_header X-RateLimit-Limit 100;"
+            }
+          ]
         }
       },
       "endpoint_rules": {
@@ -1412,221 +1494,227 @@
       },
       "optimized": {
         "delta_changes": {
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.003615,
-          "speed_download": 19361
+          "http_code": 200,
+          "size_download": 339,
+          "time_total": 0.056104,
+          "speed_download": 6042
         },
         "full_payload": {
           "http_code": 200,
-          "size_download": 1344,
-          "time_total": 0.033006,
-          "speed_download": 40719
+          "size_download": 10427,
+          "time_total": 0.075329,
+          "speed_download": 138420
         }
       }
     },
     "auto_discovery": {
       "base_url": "http://localhost:8080",
-      "endpoints_discovered": 33,
-      "endpoints_measured": 33,
+      "endpoints_discovered": 34,
+      "endpoints_measured": 34,
       "all_measurements": {
         "get:/api/account-applications/{id}": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.00955,
-          "speed_download": 10366
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.024492,
+          "speed_download": 2858
         },
         "put:/api/account-applications/{id}": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.024236,
-          "speed_download": 4084
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.01226,
+          "speed_download": 5709
         },
         "delete:/api/account-applications/{id}": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.004956,
-          "speed_download": 19975
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.009027,
+          "speed_download": 7754
+        },
+        "post:/api/webhooks/stripe": {
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012383,
+          "speed_download": 5652
         },
         "post:/api/sign/{token}": {
-          "http_code": 200,
-          "size_download": 1344,
-          "time_total": 0.033006,
-          "speed_download": 40719
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.014683,
+          "speed_download": 4767
         },
         "post:/api/sign/{token}/verify-otp": {
-          "http_code": 200,
-          "size_download": 117,
-          "time_total": 0.007876,
-          "speed_download": 14854
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.011108,
+          "speed_download": 6302
         },
         "post:/api/sign/{token}/send-otp": {
-          "http_code": 200,
-          "size_download": 135,
-          "time_total": 0.007249,
-          "speed_download": 18624
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.011277,
+          "speed_download": 6207
         },
         "get:/api/payments": {
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.009217,
-          "speed_download": 38622
+          "size_download": 655,
+          "time_total": 0.351183,
+          "speed_download": 1865
         },
         "post:/api/payments": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.058916,
-          "speed_download": 1188
+          "time_total": 0.027641,
+          "speed_download": 2532
         },
         "post:/api/payments/{id}/cancel": {
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.006068,
-          "speed_download": 15656
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.024803,
+          "speed_download": 2822
         },
         "post:/api/payments/confirm": {
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.012399,
-          "speed_download": 7661
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.016933,
+          "speed_download": 4133
         },
         "get:/api/documents": {
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.006267,
-          "speed_download": 56804
+          "size_download": 3185,
+          "time_total": 0.060133,
+          "speed_download": 52966
         },
         "post:/api/documents": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.01206,
-          "speed_download": 5804
+          "time_total": 0.020556,
+          "speed_download": 3405
         },
         "post:/api/documents/{id}/send": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005517,
-          "speed_download": 17400
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.026293,
+          "speed_download": 2662
         },
         "post:/api/documents/{id}/resend": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005148,
-          "speed_download": 18648
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.04039,
+          "speed_download": 1733
         },
         "post:/api/documents/{id}/live-sign/{signerId}": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005027,
-          "speed_download": 19096
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.019204,
+          "speed_download": 3645
         },
         "get:/api/account-applications": {
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.004796,
-          "speed_download": 74228
+          "size_download": 10427,
+          "time_total": 0.075329,
+          "speed_download": 138420
         },
         "post:/api/account-applications": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011344,
-          "speed_download": 6170
+          "time_total": 0.010727,
+          "speed_download": 6525
         },
         "post:/api/account-applications/{id}/submit": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.008641,
-          "speed_download": 11457
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.020699,
+          "speed_download": 3381
         },
         "post:/api/account-applications/{id}/regenerate-contract": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.005565,
-          "speed_download": 17790
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012865,
+          "speed_download": 5441
         },
         "post:/api/account-applications/{id}/kyc": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.006193,
-          "speed_download": 15984
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.010897,
+          "speed_download": 6423
         },
         "post:/api/account-applications/{id}/generate-contract": {
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.320612,
-          "speed_download": 218
+          "time_total": 0.010308,
+          "speed_download": 6791
         },
         "get:/api/sign/verify/{token}": {
-          "http_code": 200,
-          "size_download": 229,
-          "time_total": 0.003626,
-          "speed_download": 63154
+          "http_code": 404,
+          "size_download": 76,
+          "time_total": 0.02175,
+          "speed_download": 3494
         },
         "get:/api/payments/{id}": {
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.006696,
-          "speed_download": 14186
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.017452,
+          "speed_download": 4011
         },
         "get:/api/payments/config": {
           "http_code": 200,
-          "size_download": 79,
-          "time_total": 0.002791,
-          "speed_download": 28303
+          "size_download": 167,
+          "time_total": 0.016013,
+          "speed_download": 10428
         },
         "get:/api/payments/changes": {
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.003615,
-          "speed_download": 19361
+          "http_code": 200,
+          "size_download": 339,
+          "time_total": 0.056104,
+          "speed_download": 6042
         },
         "get:/api/documents/{id}": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.004524,
-          "speed_download": 21220
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.017792,
+          "speed_download": 3934
         },
         "delete:/api/documents/{id}": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.0079,
-          "speed_download": 12152
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.015467,
+          "speed_download": 4525
         },
         "get:/api/documents/{id}/download": {
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.006095,
-          "speed_download": 15751
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.018018,
+          "speed_download": 3885
         },
         "get:/api/documents/changes": {
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.003487,
-          "speed_download": 20071
+          "http_code": 200,
+          "size_download": 2869,
+          "time_total": 0.028359,
+          "speed_download": 101168
         },
         "get:/api/auth/me": {
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.006594,
-          "speed_download": 10615
+          "http_code": 200,
+          "size_download": 208,
+          "time_total": 0.025789,
+          "speed_download": 8065
         },
         "get:/api/account-types": {
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.007691,
-          "speed_download": 72681
+          "time_total": 0.023882,
+          "speed_download": 23406
         },
         "get:/api/account-applications/changes": {
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.005116,
-          "speed_download": 13681
+          "http_code": 200,
+          "size_download": 10111,
+          "time_total": 0.041978,
+          "speed_download": 240864
         },
         "delete:/api/account-applications/{id}/kyc/{kycId}": {
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.006938,
-          "speed_download": 14269
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.086387,
+          "speed_download": 810
         }
       },
       "discovered_endpoints": [
@@ -1638,10 +1726,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.00955,
-          "speed_download": 10366
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.024492,
+          "speed_download": 2858
         },
         {
           "method": "PUT",
@@ -1651,10 +1739,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.024236,
-          "speed_download": 4084
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.01226,
+          "speed_download": 5709
         },
         {
           "method": "DELETE",
@@ -1664,10 +1752,23 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.004956,
-          "speed_download": 19975
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.009027,
+          "speed_download": 7754
+        },
+        {
+          "method": "POST",
+          "path": "/api/webhooks/stripe",
+          "operationId": "handleStripeWebhook",
+          "summary": "Stripe webhook endpoint (public)",
+          "tags": [
+            "Webhooks"
+          ],
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012383,
+          "speed_download": 5652
         },
         {
           "method": "POST",
@@ -1677,10 +1778,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 1344,
-          "time_total": 0.033006,
-          "speed_download": 40719
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.014683,
+          "speed_download": 4767
         },
         {
           "method": "POST",
@@ -1690,10 +1791,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 117,
-          "time_total": 0.007876,
-          "speed_download": 14854
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.011108,
+          "speed_download": 6302
         },
         {
           "method": "POST",
@@ -1703,10 +1804,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 135,
-          "time_total": 0.007249,
-          "speed_download": 18624
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.011277,
+          "speed_download": 6207
         },
         {
           "method": "GET",
@@ -1717,9 +1818,9 @@
             "Payments"
           ],
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.009217,
-          "speed_download": 38622
+          "size_download": 655,
+          "time_total": 0.351183,
+          "speed_download": 1865
         },
         {
           "method": "POST",
@@ -1731,8 +1832,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.058916,
-          "speed_download": 1188
+          "time_total": 0.027641,
+          "speed_download": 2532
         },
         {
           "method": "POST",
@@ -1742,10 +1843,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.006068,
-          "speed_download": 15656
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.024803,
+          "speed_download": 2822
         },
         {
           "method": "POST",
@@ -1755,10 +1856,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.012399,
-          "speed_download": 7661
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.016933,
+          "speed_download": 4133
         },
         {
           "method": "GET",
@@ -1769,9 +1870,9 @@
             "Documents"
           ],
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.006267,
-          "speed_download": 56804
+          "size_download": 3185,
+          "time_total": 0.060133,
+          "speed_download": 52966
         },
         {
           "method": "POST",
@@ -1783,8 +1884,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.01206,
-          "speed_download": 5804
+          "time_total": 0.020556,
+          "speed_download": 3405
         },
         {
           "method": "POST",
@@ -1794,10 +1895,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005517,
-          "speed_download": 17400
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.026293,
+          "speed_download": 2662
         },
         {
           "method": "POST",
@@ -1807,10 +1908,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005148,
-          "speed_download": 18648
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.04039,
+          "speed_download": 1733
         },
         {
           "method": "POST",
@@ -1820,10 +1921,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.005027,
-          "speed_download": 19096
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.019204,
+          "speed_download": 3645
         },
         {
           "method": "GET",
@@ -1834,9 +1935,9 @@
             "Account Applications"
           ],
           "http_code": 200,
-          "size_download": 356,
-          "time_total": 0.004796,
-          "speed_download": 74228
+          "size_download": 10427,
+          "time_total": 0.075329,
+          "speed_download": 138420
         },
         {
           "method": "POST",
@@ -1848,8 +1949,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.011344,
-          "speed_download": 6170
+          "time_total": 0.010727,
+          "speed_download": 6525
         },
         {
           "method": "POST",
@@ -1859,10 +1960,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.008641,
-          "speed_download": 11457
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.020699,
+          "speed_download": 3381
         },
         {
           "method": "POST",
@@ -1872,10 +1973,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.005565,
-          "speed_download": 17790
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.012865,
+          "speed_download": 5441
         },
         {
           "method": "POST",
@@ -1885,10 +1986,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.006193,
-          "speed_download": 15984
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.010897,
+          "speed_download": 6423
         },
         {
           "method": "POST",
@@ -1900,8 +2001,8 @@
           ],
           "http_code": 500,
           "size_download": 70,
-          "time_total": 0.320612,
-          "speed_download": 218
+          "time_total": 0.010308,
+          "speed_download": 6791
         },
         {
           "method": "GET",
@@ -1911,10 +2012,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 200,
-          "size_download": 229,
-          "time_total": 0.003626,
-          "speed_download": 63154
+          "http_code": 404,
+          "size_download": 76,
+          "time_total": 0.02175,
+          "speed_download": 3494
         },
         {
           "method": "GET",
@@ -1924,10 +2025,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 403,
-          "size_download": 95,
-          "time_total": 0.006696,
-          "speed_download": 14186
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.017452,
+          "speed_download": 4011
         },
         {
           "method": "GET",
@@ -1938,9 +2039,9 @@
             "Payments"
           ],
           "http_code": 200,
-          "size_download": 79,
-          "time_total": 0.002791,
-          "speed_download": 28303
+          "size_download": 167,
+          "time_total": 0.016013,
+          "speed_download": 10428
         },
         {
           "method": "GET",
@@ -1950,10 +2051,10 @@
           "tags": [
             "Payments"
           ],
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.003615,
-          "speed_download": 19361
+          "http_code": 200,
+          "size_download": 339,
+          "time_total": 0.056104,
+          "speed_download": 6042
         },
         {
           "method": "GET",
@@ -1963,10 +2064,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.004524,
-          "speed_download": 21220
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.017792,
+          "speed_download": 3934
         },
         {
           "method": "DELETE",
@@ -1976,10 +2077,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.0079,
-          "speed_download": 12152
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.015467,
+          "speed_download": 4525
         },
         {
           "method": "GET",
@@ -1989,10 +2090,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 403,
-          "size_download": 96,
-          "time_total": 0.006095,
-          "speed_download": 15751
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.018018,
+          "speed_download": 3885
         },
         {
           "method": "GET",
@@ -2002,10 +2103,10 @@
           "tags": [
             "Documents"
           ],
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.003487,
-          "speed_download": 20071
+          "http_code": 200,
+          "size_download": 2869,
+          "time_total": 0.028359,
+          "speed_download": 101168
         },
         {
           "method": "GET",
@@ -2015,10 +2116,10 @@
           "tags": [
             "Authentication"
           ],
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.006594,
-          "speed_download": 10615
+          "http_code": 200,
+          "size_download": 208,
+          "time_total": 0.025789,
+          "speed_download": 8065
         },
         {
           "method": "GET",
@@ -2030,8 +2131,8 @@
           ],
           "http_code": 200,
           "size_download": 559,
-          "time_total": 0.007691,
-          "speed_download": 72681
+          "time_total": 0.023882,
+          "speed_download": 23406
         },
         {
           "method": "GET",
@@ -2041,10 +2142,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 500,
-          "size_download": 70,
-          "time_total": 0.005116,
-          "speed_download": 13681
+          "http_code": 200,
+          "size_download": 10111,
+          "time_total": 0.041978,
+          "speed_download": 240864
         },
         {
           "method": "DELETE",
@@ -2054,10 +2155,10 @@
           "tags": [
             "Account Applications"
           ],
-          "http_code": 403,
-          "size_download": 99,
-          "time_total": 0.006938,
-          "speed_download": 14269
+          "http_code": 500,
+          "size_download": 70,
+          "time_total": 0.086387,
+          "speed_download": 810
         }
       ]
     }

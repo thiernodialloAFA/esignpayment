@@ -72,6 +72,53 @@ Authentication is handled by **Keycloak** (OAuth2/OIDC).
 docker compose up --build
 ```
 
+## Scripts de démarrage & analyse Green Score
+
+Deux modes de lancement sont disponibles dans `scripts/` :
+
+### Mode Full (`start.sh`)
+
+Le mode **full** effectue un cycle complet : **arrêt de tous les conteneurs** → **rebuild** → **démarrage** → **analyse Green Score** (+ Creedengo en option). Idéal pour un démarrage propre ou une démo depuis zéro.
+
+```bash
+# Lancement full (rebuild complet + analyse Green Score)
+bash scripts/start.sh
+
+# Full + mode debug (logs détaillés)
+bash scripts/start.sh --debug
+
+# Full + analyse éco-conception Creedengo (SonarQube + plugins Green Code)
+bash scripts/start.sh --creedengo
+
+# Full + debug + Creedengo
+bash scripts/start.sh --debug --creedengo
+
+# Full avec un nom d'application personnalisé (pour les rapports)
+bash scripts/start.sh --appname mon-app
+```
+
+| Option | Description |
+|--------|-------------|
+| `--debug` | Active les logs détaillés durant l'analyse |
+| `--creedengo` | Lance aussi l'analyse éco-conception Creedengo (nécessite Docker) |
+| `--appname <name>` | Nom de l'application utilisé dans les rapports (défaut : nom du dossier racine) |
+
+> ⚠️ Le mode full ouvre automatiquement un **nouveau terminal** pour `docker compose up --build --force-recreate`. Ne fermez pas ce terminal pendant l'exécution.
+
+### Mode Light (`start_light.sh`)
+
+Le mode **light** suppose que les conteneurs sont **déjà démarrés**. Il attend que les services soient prêts puis lance l'analyse directement, sans rebuild.
+
+```bash
+# Lancement light (pas de rebuild, analyse seulement)
+bash scripts/start_light.sh
+
+# Light + Creedengo
+bash scripts/start_light.sh --creedengo
+```
+
+> 💡 Utilisez `start_light.sh` quand vous avez déjà lancé `docker compose up` séparément.
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080
 - Keycloak: http://localhost:9090 (admin/admin)
